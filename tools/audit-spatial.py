@@ -11,6 +11,11 @@ def main():
     city=json.loads((ROOT/'public/data/city.json').read_text())
     footprints=[polygons_for(b) for b in city['buildings']]
     footprints += [Polygon(l['footprint'][0],l['footprint'][1:]) for l in city['landmarks']]
+    for building,footprint in zip(city['buildings'],footprints):
+        for part in building.get('massingParts',[]):
+            ring=part['rings'];p=Polygon(ring[0],ring[1:])
+            if not p.is_valid or p.difference(footprint.buffer(.01)).area>.01:raise SystemExit('Massing part escapes its source footprint: '+building['id'])
+            if part['baseY']<0 or part['h']<=0 or part['baseY']+part['h']>building['h']+.01:raise SystemExit('Invalid vertical massing: '+building['id'])
     blockers=unary_union(footprints);tree=STRtree(footprints)
     surfaces=unary_union([Polygon(p[0],p[1:]) for name in ('asphalt','pedestrian') for p in city[name]])
     overlap=surfaces.intersection(blockers).area

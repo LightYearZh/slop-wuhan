@@ -2,7 +2,8 @@
 from pathlib import Path
 import json, math, re, hashlib
 import osmium
-from city_profile import load_profile
+from city_profile import load_profile,importer_fingerprint
+from building_attributes import RETAINED_TAGS,height_from_tags
 PROFILE=load_profile()
 from shapely import wkb, make_valid
 from shapely.ops import transform
@@ -37,8 +38,15 @@ class Importer(osmium.SimpleHandler):
     def __init__(self):
         super().__init__()
         self.factory=osmium.geom.WKBFactory()
-        self.roads=[]; self.coast=[]; self.buildings=[]; self.areas=[]; self.districts=[]; self.boundary=None
+        self.pois=[]; self.roads=[]; self.coast=[]; self.buildings=[]; self.areas=[]; self.districts=[]; self.boundary=None
         self.skipped=0
+
+    def node(self,n):
+        if not(PILOT_WGS84.bounds[0]<=n.lon<=PILOT_WGS84.bounds[2] and PILOT_WGS84.bounds[1]<=n.lat<=PILOT_WGS84.bounds[3]):return
+        tags={k:v for k,v in n.tags if k in RETAINED_TAGS}
+        if not any(tags.get(k) for k in ('shop','amenity','office','tourism')):return
+        x,z=project(n.lon,n.lat)
+        self.pois.append({'id':'osm-node-'+str(n.id),'x':round(x,2),'z':round(z,2),'tags':tags})
 
     def way(self,w):
         kind=w.tags.get('highway')
@@ -86,12 +94,10 @@ class Importer(osmium.SimpleHandler):
             elif name in DISTRICTS:self.districts.append({'id':'osm-relation-'+str(a.orig_id()),'name':name,'polygons':polygons(geom)})
         if kind:self.areas.append({'id':('way-' if a.from_way() else 'relation-')+str(a.orig_id()),'kind':kind,'polygons':polygons(geom.simplify(1,preserve_topology=True))})
         if building:
-            raw=t.get('height') or t.get('building:height') or ''
-            number=re.search(r'[\d.]+',raw)
-            try:height=float(number.group()) if number else float(t.get('building:levels','0'))*3.2
-            except ValueError:height=0
-            source='OSM:height' if number else 'OSM:levels' if height else 'visual-estimate'
-            self.buildings.append({'id':('osm-building-way-' if a.from_way() else 'osm-building-relation-')+str(a.orig_id()),'polygons':polygons(geom.simplify(.3,preserve_topology=True)),'h':height,'heightSource':source,'name':name,'use':t.get('building','yes')})
+            tags={k:v for k,v in t if k in RETAINED_TAGS}
+            height,source=height_from_tags(tags)
+            self.buildings.append({'id':('osm-building-way-' if a.from_way() else 'osm-building-relation-')+str(a.orig_id()),'polygons':polygons(geom.simplify(.3,preserve_topology=True)),
+                'h':height,'heightSource':source,'name':name,'use':t.get('building','yes'),'tags':tags})
 
 def main():
     path=ROOT/'data/hubei-latest.osm.pbf'
@@ -100,7 +106,7 @@ def main():
     h=Importer();h.apply_file(str(path),locations=True,idx='flex_mem')
     reader=osmium.io.Reader(str(path));timestamp=reader.header().get('osmosis_replication_timestamp');reader.close()
     meta={'provider':'Geofabrik / OpenStreetMap','url':'https://download.geofabrik.de/asia/china/hubei-latest.osm.pbf','sha256':digest,'timestamp':timestamp,'license':'ODbL 1.0'}
-    data={'source':meta,'profileBounds':PROFILE['boundsWgs84'],'importerSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
+    data={'source':meta,'profileBounds':PROFILE['boundsWgs84'],'importerSha256':importer_fingerprint(),'pois':h.pois,'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
     DERIVED.mkdir(exist_ok=True)
     (DERIVED/'wuhan.json').write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')))
     print(json.dumps({'roads':len(h.roads),'buildings':len(h.buildings),'areas':len(h.areas),'skippedGeometries':h.skipped,'timestamp':timestamp},ensure_ascii=False),flush=True)

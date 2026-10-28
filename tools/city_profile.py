@@ -12,3 +12,8 @@ def load_profile(path=None):
         raise ValueError('Current runtime requires the fixed Wuhan origin and 500m tiles')
     data['_file']=str(file)
     return data
+
+
+def importer_fingerprint():
+    import hashlib
+    return hashlib.sha256(b''.join((ROOT/'tools'/name).read_bytes() for name in ('import-citywide.py','building_attributes.py'))).hexdigest()

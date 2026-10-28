@@ -3,9 +3,11 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {pointInPolygon} from './core.js';
 
 export function footprintRings(building){return building.rings||[building.footprint];}
+export function renderParts(building){return building.massingParts?.length?building.massingParts.map((p,i)=>({...building,...p,id:building.id+':part:'+i,massingParts:null,footprint:p.rings[0],frontages:[]})):[building];}
+export function buildingColliders(building){return renderParts(building).map(footprintCollider);}
 export function footprintCollider(building){
  const rings=footprintRings(building),xs=rings[0].map(p=>p[0]),zs=rings[0].map(p=>p[1]);
- return {id:building.id,rings,minX:Math.min(...xs),maxX:Math.max(...xs),minZ:Math.min(...zs),maxZ:Math.max(...zs),minY:2,maxY:2+building.h};
+ return {id:building.id,rings,minX:Math.min(...xs),maxX:Math.max(...xs),minZ:Math.min(...zs),maxZ:Math.max(...zs),minY:2+(building.baseY||0),maxY:2+(building.baseY||0)+building.h};
 }
 
 // Keep the exact courtyard and concave outline for collision as well as rendering.
@@ -35,13 +37,13 @@ export function createFootprintGeometry(building){
  const shape=new THREE.Shape(rings[0].map(([x,z])=>new THREE.Vector2(x,-z)));
  for(const hole of rings.slice(1))shape.holes.push(new THREE.Path(hole.map(([x,z])=>new THREE.Vector2(x,-z))));
  const geo=new THREE.ExtrudeGeometry(shape,{depth:building.h,bevelEnabled:false,steps:1,curveSegments:1});
- geo.rotateX(-Math.PI/2);geo.translate(0,2,0);
+ geo.rotateX(-Math.PI/2);geo.translate(0,2+(building.baseY||0),0);
  return geo;
 }
 
 export function createFootprintMeshes(buildings,wall,roof){
  const group=new THREE.Group(),caps=[],walls=[];
- for(const b of buildings){
+ for(const b of buildings.flatMap(renderParts)){
   const geo=createFootprintGeometry(b);
   for(const source of geo.groups){
    const part=new THREE.BufferGeometry();

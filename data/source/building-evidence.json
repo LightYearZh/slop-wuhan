@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "osmId": "osm-building-way-128398494",
+      "expectedName": "平安大厦",
+      "displayName": "佳丽广场（平安大厦）",
+      "totalHeightM": 251,
+      "heightMeaning": "architectural-total; not a surveyed roof elevation",
+      "storeys": 59,
+      "podiumStoreys": 8,
+      "use": "mixed-commercial-office",
+      "source": "https://www.jianghan.gov.cn/xwzx/mtbd/201808/t20180801_3416.shtml",
+      "publisher": "武汉市江汉区人民政府（转载长江日报）",
+      "published": "2018-08-01",
+      "massingRecipe": {"type": "podium-tower", "towerScale": 0.38, "crownFraction": 0.06},
+      "massingNote": "Podium height, tower position, setback footprint and crown proportions are visual estimates; total height is documented. The mapped footprint covers a complex, so it must not be extruded to 251m as one slab."
+    },
+    {
+      "osmId": "osm-building-way-1314771285",
+      "expectedName": "璇宫饭店（中心百货）",
+      "storeys": 5,
+      "use": "historic-commercial",
+      "source": "https://www.thepaper.cn/newsDetail_forward_13355836",
+      "publisher": "武汉消防（澎湃政务号）",
+      "published": "2021-06-28",
+      "heightMeaning": "documented historical main-block storeys; metric height remains a floor-height estimate; roof pavilion and later alterations not reconstructed"
+    }
+  ]
+}

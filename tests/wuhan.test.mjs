@@ -33,3 +33,13 @@ test('street upgrade restores footprints, adds source buildings and keeps Jiangh
  assert.ok(data.roads.some(r=>r.widthSource==='OSM:width'||r.widthSource==='OSM:lanes-derived'));
  const landmark=data.landmarks[0];assert.equal(landmark.height,45.85);assert.ok(landmark.arrival);assert.ok(landmark.footprint[0].length>4);
 });
+
+test('building classification keeps source, contextual inference and visual estimates separate',()=>{
+ assert.ok(data.buildings.some(b=>b.category==='historic'));
+ assert.ok(data.buildings.every(b=>b.categorySource&&b.heightEvidence));
+ const tower=data.buildings.find(b=>b.id.startsWith('osm-building-way-128398494-'));
+ assert.equal(tower.h,251);assert.equal(tower.heightSource,'reference:architectural-total');
+ assert.ok(tower.massingSource.startsWith('visual-estimate'));assert.equal(tower.massingParts.length,3);
+ assert.ok(data.buildings.some(b=>b.categorySource.startsWith('context-estimate:')));
+ assert.ok(data.buildings.filter(b=>b.heightSource==='visual-estimate').every(b=>b.h===12));
+});

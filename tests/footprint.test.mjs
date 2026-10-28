@@ -19,3 +19,13 @@ test('a real courtyard remains open for rendering and walking',()=>{
  const push=footprintPush(4.2,6,.5,[outer,hole]);assert.ok(push);assert.ok(push.x>4.5);
  const geometry=createFootprintGeometry({rings:[outer,hole],h:8});assert.ok(geometry.getAttribute('position').count>0);geometry.dispose();
 });
+
+test('tower parts keep the low podium open above its roof instead of colliding as a full-height slab',async()=>{
+ const {buildingColliders,renderParts}=await import('../js/footprint-buildings.js');
+ const outer=[[0,0],[20,0],[20,20],[0,20],[0,0]],inner=[[7,7],[13,7],[13,13],[7,13],[7,7]];
+ const building={id:'tower',h:200,rings:[outer],massingParts:[{baseY:0,h:28,rings:[outer],style:5},{baseY:28,h:172,rings:[inner],style:0}]};
+ const colliders=buildingColliders(building);assert.equal(colliders[0].maxY,30);assert.equal(colliders[1].minY,30);
+ assert.equal(colliders[1].maxY,202);assert.equal(colliders[1].minX,7);
+ const parts=renderParts(building);const geo=createFootprintGeometry(parts[1]);geo.computeBoundingBox();
+ assert.equal(geo.boundingBox.min.y,30);assert.equal(geo.boundingBox.max.y,202);geo.dispose();
+});

@@ -4,7 +4,8 @@ import json, math, hashlib, runpy, collections, shutil, os, re, argparse
 from shapely.geometry import shape
 from shapely.ops import transform
 from shapely.strtree import STRtree
-from city_profile import load_profile
+from city_profile import load_profile,importer_fingerprint
+from building_attributes import BuildingEnricher
 from road_audit import audit_roads
 from spatial_rules import resolve_ground_layout
 from shapely.geometry import Polygon, Point, LineString, box
@@ -47,7 +48,7 @@ def main():
     args=parser.parse_args();profile=load_profile(args.profile);os.environ['WUHAN_PROFILE']=profile['_file']
     if not SOURCE.exists():raise SystemExit('Missing data/hubei-latest.osm.pbf; see README.md')
     digest=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
-    importer_digest=hashlib.sha256((ROOT/'tools/import-citywide.py').read_bytes()).hexdigest()
+    importer_digest=importer_fingerprint()
     if not CACHE.exists() or json.loads(CACHE.read_text()).get('importerSha256')!=importer_digest or json.loads(CACHE.read_text()).get('profileBounds')!=profile['boundsWgs84'] or json.loads(CACHE.read_text())['source']['sha256']!=digest:
         runpy.run_path(str(ROOT/'tools/import-citywide.py'),run_name='__main__')
     raw=json.loads(CACHE.read_text())
@@ -89,6 +90,8 @@ def main():
     theta=math.atan2(q[1][1]-q[0][1],q[1][0]-q[0][0])
     landmark={'id':'jianghanguan','name':'江汉关博物馆','type':'jianghanguan','x':cx,'z':cz,'height':45.85,'w':math.dist(q[0],q[1]),'d':math.dist(q[1],q[2]),'ry':-theta,'footprint':polygons(landmark_poly)[0],
         'source':landmark_source['id'],'modelSource':'OSM footprint + Wuhan government photo reference; simplified exterior','heightSource':'https://3g.wuhan.gov.cn/sy/kwh/202401/t20240122_2347703.shtml','aliases':['江汉关','江汉关大楼','钟楼'],'district':'汉口试验区'}
+    evidence=json.loads((ROOT/'data/source/building-evidence.json').read_text())
+    enricher=BuildingEnricher(raw,roads,evidence)
     road_tree=STRtree(road_lines)
     def add_building(item,poly,i,provider):
         if poly.area<16 or poly.intersection(water).area>poly.area*.1:return
@@ -105,10 +108,11 @@ def main():
         seen.add(key)
         h=item.get('h',0)
         if not (2<=h<=650):h=12
+        attributes=enricher.enrich(item,poly,provider)
         buildings.append({'id':item['id']+f'-{i}','name':item.get('name',''),'x':round(x,2),'z':round(z,2),'w':round(w,2),'d':round(d,2),'h':h,
             'ry':round(-math.atan2(q[1][1]-q[0][1],q[1][0]-q[0][0]),5),'style':0 if h>70 else 1 if h>24 else 3,
             'source':provider,'sourceDatasets':item.get('sourceDatasets',[]),'heightSource':item['heightSource'] if h==item.get('h') else 'visual-estimate',
-            'footprint':polygons(poly)[0][0],'rings':polygons(poly)[0]})
+            'footprint':polygons(poly)[0][0],'rings':polygons(poly)[0],**attributes})
     for item in raw['buildings']:
         for i,poly in enumerate(parts(geometry(item['polygons']).intersection(region))):
             add_building(item,poly,i,'OSM:footprint')
@@ -131,6 +135,7 @@ def main():
                 excluded['overture_duplicate_osm']+=1;continue
             item={'id':'overture-'+feature['id'],'h':props.get('height') or (props.get('num_floors') or 0)*3.2,
                   'heightSource':'Overture:height' if props.get('height') else 'Overture:floors' if props.get('num_floors') else 'visual-estimate',
+                  'name':(props.get('names') or {}).get('primary',''),'tags':{'building':props.get('class') or 'yes'},
                   'sourceDatasets':sorted(set(s.get('dataset') or s.get('resource','unknown') for s in props.get('sources',[])))}
             add_building(item,poly,i,'Overture:footprint')
     roads,asphalt,pedestrian,shoulders,spatial_audit=resolve_ground_layout(roads,buildings,[landmark],region,water)
@@ -142,6 +147,13 @@ def main():
         r,line=min(candidates,key=lambda p:p[1].distance(Point(0,0)))
         p=line.interpolate(line.length/2)
         places.append({'id':'road-'+name,'name':name,'district':'汉口试验区','x':p.x,'z':p.y,'road':r['name'],'source':r['id']})
+    for b in buildings:
+        if not b['heightEvidence'].get('reference'):continue
+        point=Point(b['x'],b['z'])
+        candidates=[(r,line) for r,line in zip(roads,road_lines) if r['mode']=='car']
+        r,line=min(candidates,key=lambda value:value[1].distance(point));q=line.interpolate(line.project(point))
+        places.append({'id':'building-'+b['id'],'name':b['name'],'aliases':['佳丽广场'] if '平安大厦' in b['name'] else ['璇宫饭店'],
+            'district':'汉口试验区','x':b['x'],'z':b['z'],'arrival':{'x':q.x,'z':q.y},'source':b['id'],'heightSource':b['heightSource']})
     spawn=next((p for p in places if p['name']=='沿江大道'),None)
     if spawn is None:raise SystemExit('Missing 沿江大道; inspect geographic bounds before continuing')
     # A safe roadside arrival, outside the museum footprint, rather than the building centre.
@@ -176,6 +188,16 @@ def main():
         'waterAreaM2':round(water.area),'waterPolygons':len(city['water']),'tiles':len(manifest['tiles']),'places':[p['name'] for p in places],
         'buildingSources':dict(collections.Counter(b['source'] for b in buildings)),'supplement':city['supplement'],'landmarks':['江汉关博物馆'],'roadAudit':road_audit,'spatialAudit':spatial_audit,'excluded':dict(excluded),'skippedSourceGeometries':raw['skippedGeometries'],
         'limitations':['Flat ground, no DEM','Actual building footprints extruded; facade styles and missing heights are estimates','Jianghanguan is a photo-referenced simplified exterior, not surveyed detail','Bridge/tunnel/layer roads excluded pending elevation verification','Vehicle visuals inherited from Shanghai, not an authentic Wuhan fleet','No metro data or ride-hailing tasks yet']}
+    attributes_report={'categoryCounts':dict(collections.Counter(b['category'] for b in buildings)),
+        'categorySources':dict(collections.Counter(b['categorySource'] for b in buildings)),
+        'heightSources':dict(collections.Counter(b['heightSource'] for b in buildings)),
+        'retainedPOIs':len(raw.get('pois',[])),'buildingsWithPOIs':sum(bool(b['pois']) for b in buildings),
+        'frontageBuildings':sum(bool(b['frontages']) for b in buildings),
+        'appliedReferences':sorted(set(enricher.applied)),
+        'massingEstimates':[{'id':b['id'],'source':b['massingReference'],'method':b['massingSource']} for b in buildings if b.get('massingParts')],
+        'rules':'Documented height > floor-derived estimate > marked 12m fallback; classification has its own source; facade appearance remains illustrative'}
+    report['attributes']=attributes_report
+    dump(stage/'building-attributes-audit.json',attributes_report)
     dump(stage/'wuhan-audit.json',report)
     OUT.mkdir(parents=True,exist_ok=True)
     for p in stage.iterdir():

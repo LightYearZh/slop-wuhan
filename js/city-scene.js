@@ -1,5 +1,7 @@
+import {createBuildingMaterials} from './building-materials.js';
+import {createFrontageDetails} from './building-frontages.js';
 import {SpatialPlacement} from './spatial-placement.js';
-import {createFootprintMeshes,footprintCollider} from './footprint-buildings.js';
+import {createFootprintMeshes,footprintCollider,buildingColliders,renderParts} from './footprint-buildings.js';
 import {buildWuhanLandmarks} from './wuhan-landmarks.js';
 import {buildWuhanStreetscape} from './wuhan-streetscape.js';
 import {buildStrip as strip} from './road-geometry.js';
@@ -84,14 +86,8 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
  }
  await onProgress(2,'跨江隧道已构建');
  const landmarkSystem=buildWuhanLandmarks(scene,data.landmarks);buildWuhanStreetscape(scene,data,placement);await onProgress(3,'江汉关与江汉路街景已构建');
- const styles=[
-  createCurtainWallMaterial({glassTint:0x24445b,frameTint:0x53616b,boxLocal:false,seed:2}),
-  createPreWarBuildingMaterial({stoneColor:0xb8b6ab,trimColor:0x807d72,windowWidth:2.1,floorHeight:3.1,boxLocal:false,seed:8}),
-  createPreWarBuildingMaterial({stoneColor:0xc1ae89,trimColor:0x86775f,windowWidth:2.5,floorHeight:3.8,boxLocal:false,seed:10}),
-  createPreWarBuildingMaterial({stoneColor:0x9f8170,trimColor:0xd0baa1,windowWidth:1.9,floorHeight:3.3,boxLocal:false,seed:14}),
-  createCurtainWallMaterial({glassTint:0x354d54,frameTint:0x8a8c87,windowWidth:2.3,floorHeight:3.4,boxLocal:false,seed:19})
- ];
- const footprintRoof=new THREE.MeshStandardNodeMaterial({color:0x777b79,roughness:.88});
+ const buildingMaterials=createBuildingMaterials(),styles=buildingMaterials.walls;
+ const footprintRoof=buildingMaterials.roofs[7];
  const overview=new Map(),loaded=new Map();
  const overviewSize=streamed?1000:500,grouped=new Map();for(const b of data.buildings){const key=Math.floor(b.x/overviewSize)+'_'+Math.floor(b.z/overviewSize);if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(b);}
  const distantMat=createCurtainWallMaterial({glassTint:0x51636c,frameTint:0x66747a,windowWidth:2.6,boxLocal:false,seed:22});
@@ -111,11 +107,13 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
    flat(group,tile.land,2.015,streetMaterials.land,'Tile land');if(tile.farmland)flat(group,tile.farmland,2.035,streetMaterials.farm,'Farmland');flat(group,tile.water,.012,waterMat,'Tile water');flat(group,tile.parks,2.06,streetMaterials.park,'Tile parks');flat(group,tile.shoulders,2.08,sidewalk,'Tile pavements');
    streetTiles.set(meta.id,{...buildTileStreets(group,tile,streetMaterials),roads:tile.roads,water:tile.water});streetRevision++;surfaceProvider?.setTileWater(meta,tile.water);
   }
+  const renderBuildings=tile.buildings.flatMap(renderParts);
   for(let i=0;i<styles.length;i++){
-   const bs=tile.buildings.filter(b=>b.style===i).map(b=>({...b,y:2+b.h/2}));if(!bs.length)continue;
-   const mesh=createFootprintMeshes(bs,styles[i],footprintRoof);group.add(mesh);
+   const bs=renderBuildings.filter(b=>b.style===i).map(b=>({...b,y:2+b.h/2}));if(!bs.length)continue;
+   const mesh=createFootprintMeshes(bs,styles[i],buildingMaterials.roofs[i]);group.add(mesh);
   }
-  for(const b of tile.buildings)colliders.push(footprintCollider(b));
+  group.add(createFrontageDetails(tile.buildings,buildingMaterials.details));
+  for(const b of tile.buildings)colliders.push(...buildingColliders(b));
   const metro=metroSystem.mountTile(group,meta.id);colliders.push(...metro.colliders);if(streamed)surfaceProvider?.setTileRoads(meta,[...tile.roads,...metro.floorRoads]);
   scene.add(group);showOverview(meta.id,false);loaded.set(meta.id,group);collisionWorld.addTile(meta.id,colliders);
   return {dispose(){scene.remove(group);disposeTileGeometry(group);metro.dispose();showOverview(meta.id,true);loaded.delete(meta.id);collisionWorld.removeTile(meta.id);streetTiles.get(meta.id)?.dispose?.();streetTiles.delete(meta.id);surfaceProvider?.removeTileWater(meta.id);surfaceProvider?.removeTileRoads(meta.id);streetRevision++;}};
