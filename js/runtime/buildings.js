@@ -69,6 +69,9 @@ class GeoBuilder {
 
 function styleOf(b) {
   const r = b.seed;
+  if(b.facadeProfile==='qingchuan-hotel')return BUILDING_STYLE.hotel;
+  if(b.facadeProfile==='riverfront-office')return BUILDING_STYLE.glass;
+  if(b.facadeProfile==='riverfront-residential'||b.category==='residential'&&b.h>=60)return BUILDING_STYLE.residentialTower;
   if(b.category==='historic') return BUILDING_STYLE.civic;
   switch (b.kind) {
     case K.TEMPLE: return b.area < 4000 ? BUILDING_STYLE.temple : BUILDING_STYLE.civic;
@@ -250,13 +253,12 @@ function buildCityBlocks(scene) {
   };
 }
 
-// Corrugated steel sheds (the illegal top-floor additions, 顶楼加盖) in blue, teal, white or rusty steel, stair houses &
-// stainless / blue plastic water tanks on the walk-up & mid-rise roofs
+// Sparse illustrative rooftop utility rooms. Unverified water tanks are not generated city-wide.
 function buildRooftops(group, sites) {
   const shedMat = createCorrugatedMetalMaterial();
   const sheds = [];
   const tanks = [];
-  const SHED_TINTS = [0x2f6db0, 0x3a8a9a, 0xd8d8d0, 0x5a8a5a, 0x8a9aa6, 0x2a5a8a, 0xb0b8b8, 0x9a5a3a];
+  const SHED_TINTS = [0xb5b3ac, 0x929795, 0xd8d8d0, 0x697674];
   for (const b of sites) {
     const box = orientedBox(b.rings[0]);
     if (!box || box.hx < 2.2 || box.hz < 2.2) continue;
@@ -267,23 +269,11 @@ function buildRooftops(group, sites) {
     const yaw = Math.atan2(box.ux, box.uz); // turns local +z onto the box's u axis
     const walkup = b.h <= 17.5;
     const rings=roofRings(b.rings);
-    const fits=(x,z,hx,hz)=>roofRectangleFits(rings,x,z,box.ux,box.uz,hx,hz);
-    if (r1 < (walkup ? 0.72 : 0.3)) {
+    if (r1 < (walkup ? 0.18 : 0.08)) {
       const site=fitRoofShed(rings,box,r2,r3);
       if(site) sheds.push({...site,y:roofY,h:2.5+r2*.6,yaw,tint:walkup?SHED_TINTS[Math.floor(r2*SHED_TINTS.length)]:0xc8c4bc});
     }
-    // 1-3 water tanks on the free end
-    const nt = 1 + Math.floor(r3 * Math.min(3, box.hx * box.hz / 20));
-    for (let t = 0; t < nt; t++) {
-      const along = (r1 < 0.5 ? 1 : -1) * (box.hx - 1.2) * (0.6 + 0.4 * hash(t, b.cx));
-      const across = (t - (nt - 1) / 2) * 1.6;
-      const tx=box.cx+box.ux*along-box.uz*across,tz=box.cz+box.uz*along+box.ux*across;
-      if(!fits(tx,tz,.85,.85))continue;
-      tanks.push({
-        x: box.cx + box.ux * along - box.uz * across, z: box.cz + box.uz * along + box.ux * across, y: roofY + 0.35,
-        r: 0.55 + r2 * 0.2, h: 1.3 + r3 * 0.4, kind: hash(t + 3, b.cz) < 0.6 ? 0 : hash(t, b.cz) < 0.7 ? 1 : 2
-      });
-    }
+
   }
 
   // Shed: a unit box (bottom at 0) under a shallow gabled prism, both instanced

@@ -24,8 +24,8 @@ test('source heights survive display estimates and documented tower parts remain
  const source=new Map(city.buildings.map(b=>[b.id,b]));
  for(const b of BUILDINGS){
   const original=source.get(b.sourceId);assert.ok(original);
-  if(original.heightSource==='visual-estimate'){
-   assert.equal(b.sourceHeight,null);assert.match(b.displayHeightSource,/visual-estimate:hankou/);
+  if(original.heightSource==='visual-estimate'||original.heightSource.startsWith('visual-reference:')){
+   assert.equal(b.sourceHeight,null);assert.match(b.displayHeightSource,/visual-estimate:hankou|visual-reference:photo-envelope/);
   }else assert.equal(b.sourceHeight,original.h);
   assert.ok(b.h>b.base);assert.ok(b.rings.every(r=>Array.from(r).every(Number.isFinite)));
  }
@@ -146,4 +146,29 @@ test('all mapped paired bridge decks support lateral movement across the entire 
    assert.ok(deckHeightAt(p[0],p[2],h+1.2)>=h-.01);
   }
  }
+});
+
+
+test('Wuhan skyline keeps real tower footprints, low podiums and explicit height evidence',()=>{
+ const hotel=BUILDINGS.filter(b=>b.sourceId==='osm-building-way-132727666-0');
+ assert.ok(hotel.some(b=>b.role==='podium'&&b.h===6.4));
+ const hotelTower=hotel.find(b=>b.partSourceId==='osm-building-way-675137406');
+ assert.ok(hotelTower);assert.equal(hotelTower.h,88.6);
+ assert.equal(hotelTower.facadeProfile,'qingchuan-hotel');
+ assert.equal(hotelTower.partHeightSource,'reference:architectural-total');
+ assert.ok(hotelTower.partHeightReference);
+ assert.ok(hotelTower.area<hotel.find(b=>b.role==='podium').area);
+ for(const id of ['1018926851','1018926852','1018926854','1018926855','1018926856']){
+  const b=BUILDINGS.find(b=>b.sourceId===`osm-building-way-${id}-0`);
+  assert.ok(b);assert.equal(b.h,134.4);assert.equal(b.sourceHeightType,'reference:storeys-derived');
+  assert.equal(b.facadeProfile,'riverfront-residential');
+ }
+ const retail=city.buildings.find(b=>b.id==='osm-building-way-1018926853-0');
+ assert.ok(retail.h<40,'long retail wing must not become a residential tower');
+ for(const id of ['1100564308','1100564309']){
+  const b=BUILDINGS.find(b=>b.sourceId===`osm-building-way-${id}-0`);
+  assert.equal(b.h,54);assert.equal(b.sourceHeight,null);assert.equal(b.facadeProfile,'riverfront-office');
+ }
+ assert.equal(city.buildingPartsAudit.parents_restored,33);
+ assert.equal(city.buildingPartsAudit.rendered_parts,60);
 });

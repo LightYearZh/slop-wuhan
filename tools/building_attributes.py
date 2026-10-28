@@ -4,7 +4,7 @@ from shapely.geometry import Point,Polygon,LineString
 from shapely.affinity import scale
 from shapely.strtree import STRtree
 
-RETAINED_TAGS=('building','building:use','height','building:height','building:levels','roof:height','roof:shape','roof:colour','roof:material',
+RETAINED_TAGS=('building','building:part','min_height','building:min_level','source:height','height:source','building:use','height','building:height','building:levels','roof:height','roof:shape','roof:colour','roof:material',
  'building:material','building:colour','historic','heritage','start_date','shop','amenity','office','tourism','name','name:zh','old_name','natural','man_made','ele')
 
 def height_value(raw):
@@ -79,17 +79,21 @@ class BuildingEnricher:
         if reference and item.get('name')!=reference['expectedName']:raise ValueError('Evidence identity mismatch: '+item['id'])
         if reference:
             if reference.get('use')=='mixed-commercial-office':category,category_source='office','reference:documented-use'
+            if reference.get('use')=='residential':category,category_source='residential','reference:documented-use'
             if reference.get('use')=='historic-commercial':category,category_source='historic','reference:documented-use'
             self.applied.append(reference['osmId'])
             if reference.get('totalHeightM'):
                 height=reference['totalHeightM'];hs='reference:architectural-total';height_details={'confidence':'documented-total;estimated-massing','reference':reference['source'],'meaning':reference['heightMeaning']}
-            elif not height and reference.get('storeys'):
-                height=reference['storeys']*3.6;hs='reference:storeys-derived';height_details={'confidence':'floor-derived','reference':reference['source'],'floorHeightEstimateM':3.6,'meaning':reference['heightMeaning']}
+            elif reference.get('storeys') and (not height or reference.get('overrideHeight')):
+                height=reference['storeys']*reference.get('floorHeightEstimateM',3.6);hs='reference:storeys-derived';height_details={'confidence':'floor-derived','reference':reference['source'],'floorHeightEstimateM':reference.get('floorHeightEstimateM',3.6),'meaning':reference['heightMeaning']}
+            elif reference.get('displayHeightM'):
+                height=reference['displayHeightM'];hs='visual-reference:photo-envelope';height_details={'confidence':'visual-estimate','reference':reference['source'],'rangeM':reference['displayHeightRangeM'],'meaning':reference['heightMeaning']}
         if not (2<=height<=650):height=12;hs='visual-estimate';height_details={'confidence':'visual-estimate','rule':'fixed-12m-placeholder'}
         result={'h':height,'heightSource':hs,'heightEvidence':height_details,'category':category,'categorySource':category_source,
                 'style':style_for(category,seed),'paletteVariant':seed%3,'roofStyle':'parapet' if category in ('historic','retail','civic') else 'flat',
                 'use':tags.get('building:use') or tags.get('building','unknown'),'historic':(category=='historic'),
                 'startDate':tags.get('start_date'),'pois':[{'id':p['id'],'name':p['tags'].get('name',''),'shop':p['tags'].get('shop'),'amenity':p['tags'].get('amenity'),'tourism':p['tags'].get('tourism')} for p in pois]}
+        if reference and reference.get('facadeProfile'):result['facadeProfile']=reference['facadeProfile']
         result['frontages']=self.frontages(poly,category,pois)
         if reference and reference.get('massingRecipe'):
             from shapely import make_valid

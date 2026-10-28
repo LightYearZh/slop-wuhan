@@ -2916,7 +2916,7 @@ function createCarFlareMaterial() {
  * shed: factories, warehouses, garages: corrugated steel siding, high windows
  * temple: red walls under a curved tile roof (the roof itself is modelled in buildings.js)
  */
-const BUILDING_STYLE = { walkup: 0, midrise: 1, glass: 2, civic: 3, shed: 4, temple: 5 };
+const BUILDING_STYLE = { walkup: 0, midrise: 1, glass: 2, civic: 3, shed: 4, temple: 5, residentialTower:6, hotel:7 };
 
 // Tile & paint palettes (ceramic 二丁挂 tiles: beige, sand, salmon, brown, grey; painted concrete; steel siding)
 const TILE_PALETTE = [0xd6c8ae, 0xc8b49a, 0xe2dacb, 0xb7a796, 0xc48e78, 0xa47a62, 0x929ba1, 0xd8c39c, 0xe9e5dc, 0x9a6b56, 0xb9b3a6, 0xcfb9a8];
@@ -2955,7 +2955,10 @@ function createWuhanBuildingMaterial() {
   const seed = fract(vB);
   const isStyle = (s) => step(abs(style.sub(s)), 0.25);
   const walkup = isStyle(BUILDING_STYLE.walkup);
-  const midrise = isStyle(BUILDING_STYLE.midrise);
+  const modernTower = isStyle(BUILDING_STYLE.residentialTower);
+  const hotel = isStyle(BUILDING_STYLE.hotel);
+  const modern = max(modernTower,hotel);
+  const midrise = isStyle(BUILDING_STYLE.midrise).add(modern);
   const glass = isStyle(BUILDING_STYLE.glass);
   const civic = isStyle(BUILDING_STYLE.civic);
   const shed = isStyle(BUILDING_STYLE.shed);
@@ -3022,20 +3025,21 @@ function createWuhanBuildingMaterial() {
 
   // Iron window cages (铁窗) on most walk-up windows, some mid-rise ones; window AC units
   const cageRand = hash2D(cellId.add(vec2(r4.mul(23.0), 1.7)));
-  const hasCage = step(cageRand, mix(float(0.15), float(0.78), walkup)).mul(residential).mul(float(1.0).sub(balcony.mul(0.6)));
+  const hasCage = step(cageRand, mix(float(0.15), float(0.78), walkup)).mul(residential).mul(float(1.0).sub(balcony.mul(0.6))).mul(float(1.0).sub(modern));
   const acRand = hash2D(cellId.add(vec2(r3.mul(31.0), 9.1)));
   const hasAC = step(acRand, mix(float(0.12), float(0.45), walkup)).mul(residential.add(civic.mul(0.6))).mul(float(1.0).sub(isGround)).mul(float(1.0).sub(solid)).mul(wall);
   const acSide = step(0.5, fract(acRand.mul(7.0)));
   const acX0 = mix(float(0.04), float(0.72), acSide);
-  const inAC = filteredPulse(cellUV.x, acX0, acX0.add(0.24), fw.x).mul(filteredPulse(cellUV.y, 0.05, 0.27, fw.y)).mul(hasAC).mul(float(1.0).sub(balcony)).toVar();
+  const inAC = filteredPulse(cellUV.x, acX0, acX0.add(0.24), fw.x).mul(filteredPulse(cellUV.y, 0.05, 0.27, fw.y)).mul(hasAC).mul(float(1.0).sub(balcony)).mul(float(1.0).sub(modern)).toVar();
 
   const aptRoom = evaluateWuhanInterior(u, v, winUV, cellId, bayW, floorH, seed.mul(97.0), mix(float(0.3), float(0.6), r2), mix(float(0.55), float(0.4), glass), fw, tangent);
 
-  const cWall = mix(
+  const cWallBase = mix(
     mix(pickFromPalette(TILE_PALETTE, r1), pickFromPalette(PAINT_PALETTE, r1), civic),
     mix(pickFromPalette(STEEL_PALETTE, r1), color(0xb03a2a), temple),
     max(shed, temple)
   ).toVar();
+  const cWall=mix(mix(cWallBase,mix(color(0xd9cdbb),color(0xebe7df),r2),modernTower),color(0xe3dfd4),hotel).toVar();
   const cGlass = pickFromPalette(GLASS_PALETTE, r3);
 
   mat.aoNode = canyonSkyAONode();
@@ -3107,7 +3111,9 @@ function createWuhanBuildingMaterial() {
     const residentialWall = mix(mix(wallCol, withCage, winMask), acCol, inAC);
     const withShops = mix(residentialWall, shopCol.mul(arcadeShade), shopFront);
     const withGroundWin = mix(withShops, glassCol, groundWin);
-    const walls = mix(withGroundWin, glassWall, glass);
+    const hotelBand=filteredPulse(fract(v.div(3.6)),.28,.84,fwidth(v.div(3.6))).mul(wall);
+    const hotelWall=mix(wallCol,mix(color(0x344d59),skyRefl,.16),hotelBand);
+    const walls = mix(mix(withGroundWin, glassWall, glass),hotelWall,hotel);
     return mix(walls, mix(roofCol, templeRoof, temple), isRoof);
   })();
 

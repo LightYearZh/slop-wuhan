@@ -1,0 +1,56 @@
+{
+  "version": "0.7.0",
+  "baseline": "da68c4f",
+  "sourceCitySha256": "0136554522631b807829451cb44ec90a01fed9534cea7e31645251ddc34583ff",
+  "buildingParts": {
+    "no_containing_parent": 9,
+    "missing_or_invalid_height": 29,
+    "parents_restored": 33,
+    "rendered_parts": 60
+  },
+  "unchangedGeography": {
+    "roads": true,
+    "water": true,
+    "land": true,
+    "hills": true,
+    "tunnels": true,
+    "rampCuts": true,
+    "bridgeModels": true,
+    "landmarks": true,
+    "spawn": true
+  },
+  "buildingCounts": {
+    "before": 23465,
+    "after": 23463
+  },
+  "browser": {
+    "baselinePort": 4187,
+    "developmentPort": 4799,
+    "views": [
+      "hankou",
+      "qingchuan",
+      "wanda"
+    ],
+    "lighting": "midday",
+    "fov": 50,
+    "errors": [],
+    "validatedProductionVersion": "0.7.0",
+    "presetIds": [
+      "hankou-skyline",
+      "qingchuan-skyline",
+      "jiyuqiao-skyline"
+    ]
+  },
+  "limits": [
+    "Photographic office height estimates are not measurements",
+    "Residential heights derive from a published 42-43 storey group range and an estimated 3.2m storey height",
+    "Facade profiles remain illustrative",
+    "Only one official aerial photograph was visually inspected; retrieved video was not played successfully"
+  ],
+  "tests": {
+    "javascriptPassed": 80,
+    "pythonPassed": 27,
+    "spatialAudit": "passed",
+    "build": "passed"
+  }
+}

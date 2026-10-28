@@ -9,6 +9,7 @@ from building_attributes import BuildingEnricher
 from road_audit import audit_roads
 from core_geometry import HeightMatcher,hill_grid,sample_hill,landmark_from_building,named_crossings
 from tunnel_routes import build_tunnels
+from building_parts import apply_parts
 from spatial_rules import resolve_ground_layout
 from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union
@@ -162,6 +163,7 @@ def main():
                   'name':(props.get('names') or {}).get('primary',''),'tags':{'building':props.get('class') or 'yes'},
                   'sourceDatasets':sorted(set(s.get('dataset') or s.get('resource','unknown') for s in props.get('sources',[])))}
             add_building(item,poly,i,'Overture:footprint')
+    parts_audit=apply_parts(buildings,raw.get('buildingParts',[]),evidence)
     roads,asphalt,pedestrian,shoulders,spatial_audit=resolve_ground_layout(roads,buildings,landmarks,region,water)
     crossings,bridge_models=named_crossings(raw['roads'],region,road_width,hills) if hills else ([],[])
     # Ground roads drape on the same hill sampler as buildings and the player; bridge decks stay independent.
@@ -220,7 +222,7 @@ def main():
         'source':raw['source'],'water':polygons(water),'waterAreaM2':round(water.area),'parks':polygons(parks.difference(forest)),'forest':polygons(forest),
         'land':polygons(region.difference(water)),'asphalt':polygons(asphalt),'shoulders':polygons(shoulders),
         'roads':roads,'pedestrian':polygons(pedestrian),'tunnels':tunnels,'rampCuts':polygons(ramp_cuts),'landmarks':landmarks,'buildings':buildings,'places':places,'controlPoints':[],'spawn':spawn,
-        'pois':raw.get('pois',[]),'streetNodes':raw.get('streetNodes',[])}
+        'buildingPartsAudit':parts_audit,'pois':raw.get('pois',[]),'streetNodes':raw.get('streetNodes',[])}
     if hills:
         hills.pop('_values',None);city['hills']=hills;city['bridgeModels']=bridge_models
     city['region'].update({'widthM':round(bounds[2]-bounds[0],1),'heightM':round(bounds[3]-bounds[1],1),'areaKm2':round(region.area/1e6,3),'scale':'1:1'})
@@ -249,10 +251,11 @@ def main():
         'retainedPOIs':len(raw.get('pois',[])),'buildingsWithPOIs':sum(bool(b['pois']) for b in buildings),
         'frontageBuildings':sum(bool(b['frontages']) for b in buildings),
         'appliedReferences':sorted(set(enricher.applied)),
-        'massingEstimates':[{'id':b['id'],'source':b['massingReference'],'method':b['massingSource']} for b in buildings if b.get('massingParts')],
+        'massingEstimates':[{'id':b['id'],'source':b.get('massingReference','OpenStreetMap:building:part'),'method':b['massingSource']} for b in buildings if b.get('massingParts')],
         'rules':'Documented height > floor-derived estimate > marked 12m fallback; classification has its own source; facade appearance remains illustrative'}
     report['attributes']=attributes_report
     dump(stage/'building-attributes-audit.json',attributes_report)
+    report['buildingParts']=parts_audit
     report['tunnels']=[{k:t[k] for k in ['id','direction','sourceIds','length','width','widthSource','depthEstimateM','heightSource','portalConnections']} for t in tunnels]
     dump(stage/'wuhan-audit.json',report)
     OUT.mkdir(parents=True,exist_ok=True)

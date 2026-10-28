@@ -89,9 +89,9 @@ def convert(city):
             base=part.get('baseY',0);top=base+part['h']
             part_kind=1 if part.get('role') in ('tower','crown') else kind
             buildings.extend(encode_building(part['rings'],top,base,part_kind))
-            meta.append({'sourceId':b['id'],'category':b['category'],'sourceHeight':None if b['heightSource']=='visual-estimate' else b['h'],
+            meta.append({'sourceId':b['id'],'category':b['category'],'sourceHeight':None if b['heightSource']=='visual-estimate' or b['heightSource'].startswith('visual-reference:') else b['h'],
                          'sourceHeightType':b['heightSource'],'displayHeight':top,'displayHeightSource':source,'baseY':base,
-                         'role':part.get('role'),'name':b['name']})
+                         'role':part.get('role'),'partSourceId':part.get('sourceId'),'partHeightSource':part.get('heightSource'),'partHeightReference':part.get('heightReference'),'facadeProfile':part.get('facadeProfile') or b.get('facadeProfile'),'name':b['name']})
     print('Matching storefront signs...',flush=True)
     sign_data,sign_rejected=build_signs(city,display_height)
     signs=sign_data['signs']

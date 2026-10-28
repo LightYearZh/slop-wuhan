@@ -38,7 +38,7 @@ class Importer(osmium.SimpleHandler):
     def __init__(self):
         super().__init__()
         self.factory=osmium.geom.WKBFactory()
-        self.pois=[]; self.street_nodes=[]; self.roads=[]; self.coast=[]; self.buildings=[]; self.areas=[]; self.districts=[]; self.boundary=None
+        self.pois=[]; self.street_nodes=[]; self.roads=[]; self.coast=[]; self.buildings=[]; self.building_parts=[]; self.areas=[]; self.districts=[]; self.boundary=None
         self.skipped=0
 
     def node(self,n):
@@ -81,11 +81,12 @@ class Importer(osmium.SimpleHandler):
         t=a.tags; name=t.get('name:zh') or t.get('name','')
         admin=False
         building=t.get('building') not in (None,'no')
+        building_part=t.get('building:part') not in (None,'no')
         kind=('water' if t.get('natural')=='water' or t.get('waterway')=='riverbank' or t.get('landuse')=='reservoir' else
               'park' if t.get('leisure') in ('park','garden') else
               'green' if t.get('landuse') in ('forest','grass','meadow','recreation_ground') or t.get('natural') in ('wood','scrub') else
               t.get('landuse') if t.get('landuse') in ('residential','commercial','retail','industrial','farmland','farmyard','orchard') else None)
-        if not (admin or building or kind):return
+        if not (admin or building or building_part or kind):return
         try:
             raw=wkb.loads(self.factory.create_multipolygon(a),hex=True)
             if not raw.intersects(PILOT_WGS84):return
@@ -97,10 +98,10 @@ class Importer(osmium.SimpleHandler):
             if a.orig_id()==913067:self.boundary=polygons(geom)
             elif name in DISTRICTS:self.districts.append({'id':'osm-relation-'+str(a.orig_id()),'name':name,'polygons':polygons(geom)})
         if kind:self.areas.append({'id':('way-' if a.from_way() else 'relation-')+str(a.orig_id()),'name':name,'kind':kind,'natural':t.get('natural'),'polygons':polygons(geom.simplify(1,preserve_topology=True))})
-        if building:
+        if building or building_part:
             tags={k:v for k,v in t if k in RETAINED_TAGS}
             height,source=height_from_tags(tags)
-            self.buildings.append({'id':('osm-building-way-' if a.from_way() else 'osm-building-relation-')+str(a.orig_id()),'polygons':polygons(geom.simplify(.3,preserve_topology=True)),
+            (self.building_parts if building_part else self.buildings).append({'id':('osm-building-way-' if a.from_way() else 'osm-building-relation-')+str(a.orig_id()),'polygons':polygons(geom.simplify(.3,preserve_topology=True)),
                 'h':height,'heightSource':source,'name':name,'use':t.get('building','yes'),'tags':tags})
 
 def main():
@@ -110,7 +111,7 @@ def main():
     h=Importer();h.apply_file(str(path),locations=True,idx='flex_mem')
     reader=osmium.io.Reader(str(path));timestamp=reader.header().get('osmosis_replication_timestamp');reader.close()
     meta={'provider':'Geofabrik / OpenStreetMap','url':'https://download.geofabrik.de/asia/china/hubei-latest.osm.pbf','sha256':digest,'timestamp':timestamp,'license':'ODbL 1.0'}
-    data={'source':meta,'profileBounds':PROFILE['boundsWgs84'],'importerSha256':importer_fingerprint(),'pois':h.pois,'streetNodes':h.street_nodes,'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
+    data={'source':meta,'profileBounds':PROFILE['boundsWgs84'],'importerSha256':importer_fingerprint(),'pois':h.pois,'streetNodes':h.street_nodes,'roads':h.roads,'buildings':h.buildings,'buildingParts':h.building_parts,'areas':h.areas,'skippedGeometries':h.skipped}
     DERIVED.mkdir(exist_ok=True)
     (DERIVED/'wuhan.json').write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')))
     print(json.dumps({'roads':len(h.roads),'buildings':len(h.buildings),'areas':len(h.areas),'skippedGeometries':h.skipped,'timestamp':timestamp},ensure_ascii=False),flush=True)

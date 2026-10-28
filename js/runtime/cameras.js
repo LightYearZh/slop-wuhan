@@ -16,6 +16,9 @@ const CAMERA_PRESETS = [
   {id:'yellow-crane',name:'黄鹤楼与蛇山',short:'黄鹤楼',category:'scenic',fov:50},
   {id:'guishan',name:'龟山电视塔',short:'龟山',category:'scenic',fov:50},
   {id:'bridge',name:'武汉长江大桥',short:'大桥',category:'scenic',fov:54},
+  {id:'hankou-skyline',name:'汉口滨江天际线',short:'汉口滨江',category:'scenic',fov:50},
+  {id:'qingchuan-skyline',name:'南岸嘴与晴川饭店',short:'南岸嘴',category:'scenic',fov:50},
+  {id:'jiyuqiao-skyline',name:'积玉桥滨江楼群',short:'积玉桥',category:'scenic',fov:50},
   {id:'overview',name:'两江三镇全景',short:'全景',category:'scenic',fov:50},
   {id:'drone',name:'汉口空中环游',short:'环游',category:'scenic',fov:50}
 ];
@@ -26,6 +29,9 @@ const WUHAN_VIEWS = {
  'yellow-crane':{position:[120,120,4430],target:[400,64,4210]},
  guishan:{position:[-1250,200,3500],target:[-1730,150,3000]},
  bridge:{position:[-500,240,3100],target:[-850,20,3650]},
+ 'hankou-skyline':{position:[-600,160,2350],target:[-1400,55,1300]},
+ 'qingchuan-skyline':{position:[-500,170,2400],target:[-1250,45,2800]},
+ 'jiyuqiao-skyline':{position:[-200,240,2600],target:[1050,70,1850]},
  overview:{position:[2700,2200,6100],target:[-650,0,2300]}
 };
 

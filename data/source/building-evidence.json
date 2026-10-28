@@ -13,7 +13,11 @@
       "source": "https://www.jianghan.gov.cn/xwzx/mtbd/201808/t20180801_3416.shtml",
       "publisher": "武汉市江汉区人民政府（转载长江日报）",
       "published": "2018-08-01",
-      "massingRecipe": {"type": "podium-tower", "towerScale": 0.38, "crownFraction": 0.06},
+      "massingRecipe": {
+        "type": "podium-tower",
+        "towerScale": 0.38,
+        "crownFraction": 0.06
+      },
       "massingNote": "Podium height, tower position, setback footprint and crown proportions are visual estimates; total height is documented. The mapped footprint covers a complex, so it must not be extruded to 251m as one slab."
     },
     {
@@ -25,6 +29,140 @@
       "publisher": "武汉消防（澎湃政务号）",
       "published": "2021-06-28",
       "heightMeaning": "documented historical main-block storeys; metric height remains a floor-height estimate; roof pavilion and later alterations not reconstructed"
+    },
+    {
+      "osmId": "osm-building-way-675137406",
+      "expectedName": "",
+      "displayName": "晴川饭店主楼",
+      "totalHeightM": 88.6,
+      "heightMeaning": "documented architectural total; applied to mapped tower part, not the two-storey podium",
+      "use": "hotel",
+      "facadeProfile": "qingchuan-hotel",
+      "source": "https://www.whzx.gov.cn/zxzl/wsl/whwszl/202407/P020240712324504922948.pdf",
+      "publisher": "武汉市政协·武汉文史资料2024年第6期",
+      "published": "2024-06"
+    },
+    {
+      "osmId": "osm-building-way-1018926851",
+      "expectedName": "",
+      "displayName": "积玉桥万达公馆住宅塔楼",
+      "storeys": 42,
+      "groupStoreysRange": [
+        42,
+        43
+      ],
+      "floorHeightEstimateM": 3.2,
+      "overrideHeight": true,
+      "use": "residential",
+      "facadeProfile": "riverfront-residential",
+      "heightMeaning": "published group range 42-43 floors; conservative 42-floor display estimate, exact per-tower count unverified",
+      "source": "https://www.prnasia.com/story/44290-1.shtml",
+      "publisher": "万达项目新闻稿·美通社",
+      "published": "2011-04-17"
+    },
+    {
+      "osmId": "osm-building-way-1018926852",
+      "expectedName": "",
+      "displayName": "积玉桥万达公馆住宅塔楼",
+      "storeys": 42,
+      "groupStoreysRange": [
+        42,
+        43
+      ],
+      "floorHeightEstimateM": 3.2,
+      "overrideHeight": true,
+      "use": "residential",
+      "facadeProfile": "riverfront-residential",
+      "heightMeaning": "published group range 42-43 floors; conservative 42-floor display estimate, exact per-tower count unverified",
+      "source": "https://www.prnasia.com/story/44290-1.shtml",
+      "publisher": "万达项目新闻稿·美通社",
+      "published": "2011-04-17"
+    },
+    {
+      "osmId": "osm-building-way-1018926854",
+      "expectedName": "",
+      "displayName": "积玉桥万达公馆住宅塔楼",
+      "storeys": 42,
+      "groupStoreysRange": [
+        42,
+        43
+      ],
+      "floorHeightEstimateM": 3.2,
+      "overrideHeight": true,
+      "use": "residential",
+      "facadeProfile": "riverfront-residential",
+      "heightMeaning": "published group range 42-43 floors; conservative 42-floor display estimate, exact per-tower count unverified",
+      "source": "https://www.prnasia.com/story/44290-1.shtml",
+      "publisher": "万达项目新闻稿·美通社",
+      "published": "2011-04-17"
+    },
+    {
+      "osmId": "osm-building-way-1018926855",
+      "expectedName": "",
+      "displayName": "积玉桥万达公馆住宅塔楼",
+      "storeys": 42,
+      "groupStoreysRange": [
+        42,
+        43
+      ],
+      "floorHeightEstimateM": 3.2,
+      "overrideHeight": true,
+      "use": "residential",
+      "facadeProfile": "riverfront-residential",
+      "heightMeaning": "published group range 42-43 floors; conservative 42-floor display estimate, exact per-tower count unverified",
+      "source": "https://www.prnasia.com/story/44290-1.shtml",
+      "publisher": "万达项目新闻稿·美通社",
+      "published": "2011-04-17"
+    },
+    {
+      "osmId": "osm-building-way-1018926856",
+      "expectedName": "",
+      "displayName": "积玉桥万达公馆住宅塔楼",
+      "storeys": 42,
+      "groupStoreysRange": [
+        42,
+        43
+      ],
+      "floorHeightEstimateM": 3.2,
+      "overrideHeight": true,
+      "use": "residential",
+      "facadeProfile": "riverfront-residential",
+      "heightMeaning": "published group range 42-43 floors; conservative 42-floor display estimate, exact per-tower count unverified",
+      "source": "https://www.prnasia.com/story/44290-1.shtml",
+      "publisher": "万达项目新闻稿·美通社",
+      "published": "2011-04-17"
+    },
+    {
+      "osmId": "osm-building-way-1100564308",
+      "expectedName": "",
+      "displayName": "沿江一号北侧办公楼",
+      "displayHeightM": 54,
+      "displayHeightRangeM": [
+        43.2,
+        65
+      ],
+      "use": "mixed-commercial-office",
+      "facadeProfile": "riverfront-office",
+      "heightMeaning": "photo-calibrated envelope estimate; not surveyed; does not raise the adjacent low retail wings",
+      "source": "https://swj.wuhan.gov.cn/tzdt/jcss/202109/t20210917_1779604.html",
+      "publisher": "武汉市水务局转载长江日报航拍照片",
+      "published": "2021-09-17"
+    },
+    {
+      "osmId": "osm-building-way-1100564309",
+      "expectedName": "",
+      "displayName": "沿江一号北侧办公楼",
+      "displayHeightM": 54,
+      "displayHeightRangeM": [
+        43.2,
+        65
+      ],
+      "use": "mixed-commercial-office",
+      "facadeProfile": "riverfront-office",
+      "heightMeaning": "photo-calibrated envelope estimate; not surveyed; does not raise the adjacent low retail wings",
+      "source": "https://swj.wuhan.gov.cn/tzdt/jcss/202109/t20210917_1779604.html",
+      "publisher": "武汉市水务局转载长江日报航拍照片",
+      "published": "2021-09-17"
     }
   ]
 }

@@ -1,0 +1,7 @@
+npm run verify: PASS
+JavaScript: 80 passed, 0 failed
+Python: 27 passed, 0 failed
+Spatial audit: 0 road/building overlap, 0 centreline conflicts
+Production build: PASS (existing large bundle warning)
+Production browser: all three new camera presets rendered, 0 runtime errors
+Geography equality against da68c4f: roads, water, land, hills, tunnels, ramp cuts, bridge models, landmarks, spawn unchanged
