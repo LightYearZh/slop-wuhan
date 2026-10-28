@@ -19,7 +19,7 @@ const terrain = new THREE.Mesh(new THREE.PlaneGeometry(6000,6000),new THREE.Mesh
 terrain.rotation.x=-Math.PI/2;terrain.position.y=-.18;scene.add(terrain);
 
 const tiles = new Map();
-const terrainLimit=2500;
+
 const TILE_SIZE = 500;
 function tileFor(x,z){return `${Math.floor(x/TILE_SIZE)}_${Math.floor(z/TILE_SIZE)}`;}
 function batch(key,category){
@@ -42,13 +42,15 @@ function closeRing(points){
   if(points.length>1 && points[0][0]===points.at(-1)[0] && points[0][1]===points.at(-1)[1])return points.slice(0,-1);
   return points;
 }
-function polygon(target,points,y,color){
+function polygon(target,points,y,color,holes=[]){
   const ring=closeRing(points);
   if(ring.length<3 || ring.length>3000)return;
   const vertices=ring.map(([x,z])=>new THREE.Vector2(x,z));
   try {
-    const faces=THREE.ShapeUtils.triangulateShape(vertices,[]);
-    for(const [a,b,c] of faces)tri(target,[ring[a][0],y,ring[a][1]],[ring[b][0],y,ring[b][1]],[ring[c][0],y,ring[c][1]],color);
+    const holeRings=holes.map(closeRing).filter(r=>r.length>=3);
+    const faces=THREE.ShapeUtils.triangulateShape(vertices,holeRings.map(r=>r.map(([x,z])=>new THREE.Vector2(x,z))));
+    const all=ring.concat(...holeRings);
+    for(const [a,b,c] of faces)tri(target,[all[a][0],y,all[a][1]],[all[b][0],y,all[b][1]],[all[c][0],y,all[c][1]],color);
   }catch(e){/* malformed OSM geometry: skip polygon, don't invent shape */}
 }
 function makeRoad(road){
@@ -76,10 +78,10 @@ function makeBuilding(item){
   const materialColors=[0xcab8a3,0xbcc3ba,0xb9c9d2,0xd5ccb8,0xc4b6ab,0xbdbeb9];
   const wall=rgb(materialColors[seed%materialColors.length]);
   const roof=rgb([0x696f70,0x8c867d,0x68746d,0x8d7d76][seed%4]);
-  polygon(batch(tile,'roof'),ring,h+.07,roof);
+  polygon(batch(tile,'roof'),ring,h+.07,roof,item.holes);
   const b=batch(tile,'building');
-  for(let i=0;i<ring.length;i++){
-    const [ax,az]=ring[i],[bx,bz]=ring[(i+1)%ring.length];
+  for(const wallRing of [ring,...(item.holes||[]).map(closeRing)])for(let i=0;i<wallRing.length;i++){
+    const [ax,az]=wallRing[i],[bx,bz]=wallRing[(i+1)%wallRing.length];
     const A=[ax,0,az],B=[bx,0,bz],C=[ax,h,az],D=[bx,h,bz];
     tri(b,A,B,C,wall);tri(b,B,D,C,wall);
   }
@@ -88,10 +90,9 @@ function makeArea(obj,kind){
   const pts=closeRing(obj.points);if(pts.length<3)return;
   let cx=0,cz=0;for(const p of pts){cx+=p[0];cz+=p[1];}cx/=pts.length;cz/=pts.length;
   const isWater=kind==='water';
-  polygon(batch(tileFor(cx,cz),kind),pts,isWater?-.07:-.11,rgb(isWater?0x4c9db7:0x5e956d));
+  polygon(batch(tileFor(cx,cz),kind),pts,isWater?-.07:-.11,rgb(isWater?0x4c9db7:0x5e956d),obj.holes);
 }
 function commitBatches(){
-  const colors={building:0xffffff,roof:0xffffff,road:0xffffff,water:0xffffff,park:0xffffff};
   let draws=0,vertices=0;
   for(const groups of tiles.values())for(const [kind,data] of Object.entries(groups)){
     if(!data.positions.length)continue;
@@ -112,6 +113,7 @@ const keys = new Set();
 camera.position.set(0,115,280);
 function updateCameraRotation(){camera.rotation.set(pitch,yaw,0,'YXZ');}
 updateCameraRotation();
+$('mode').textContent='切换为步行视角（F）';
 $('mode').addEventListener('click',toggleMode);
 function toggleMode(){fly=!fly;camera.position.y=fly?85:1.75;pitch=fly?-.22:0;updateCameraRotation();$('mode').textContent=fly?'切换为步行视角（F）':'切换为飞行视角（F）';}
 window.addEventListener('keydown',e=>{keys.add(e.code);if(e.code==='KeyF'&&!e.repeat)toggleMode();if(['Space','ArrowUp','ArrowDown'].includes(e.code))e.preventDefault();});
@@ -136,22 +138,44 @@ function loop(now){
   camera.position.z+=(-Math.cos(yaw)*forward-Math.sin(yaw)*right)*speed;
   if(fly){if(keys.has('Space'))camera.position.y+=speed;if(keys.has('KeyC'))camera.position.y-=speed;camera.position.y=Math.max(2,camera.position.y);}
   else camera.position.y=1.75;
-  renderer.render(scene,camera);
+  renderer.render(scene,camera);frames++;
 }
 requestAnimationFrame(loop);
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+let cityData;
+function setView(name){
+  if(!cityData)return;
+  const roads=cityData.roads;
+  let road=roads.find(r=>r.name.includes(name==='river'?'沿江大道':'江汉路'));
+  let x=0,z=0;
+  if(road){const p=road.points[Math.floor(road.points.length/2)];[x,z]=p;}
+  else if(name!=='overview'){ $('status').textContent='当前数据未找到该路名';return; }
+  fly=name==='overview';
+  camera.position.set(x,fly?1500:1.75,z+(fly?700:0));
+  yaw=0;pitch=fly?-.95:0;updateCameraRotation();
+  $('mode').textContent=fly?'切换为步行视角（F）':'切换为飞行视角（F）';
+  keys.clear();
+}
+for(const button of document.querySelectorAll('[data-view]'))button.addEventListener('click',()=>setView(button.dataset.view));
+let frames=0,fpsStart=performance.now();
+renderer.setAnimationLoop(null);
+setInterval(()=>{
+  const now=performance.now();
+  $('performance').textContent=`${Math.round(frames*1000/(now-fpsStart))} FPS · ${renderer.info.render.calls} 绘制批次 · ${renderer.info.render.triangles.toLocaleString()} 三角形`;
+  frames=0;fpsStart=now;
+},1000);
 async function load(){
   try{
     const response=await fetch('/web/data/city.json',{cache:'no-store'});
     if(!response.ok)throw Error(`数据文件未生成（HTTP ${response.status}）`);
-    const data=await response.json();
+    const data=await response.json();cityData=data;
     if(!data.roads?.length)throw Error('OSM 数据为空或未包含道路');
     $('status').textContent='已加载真实 OSM 几何数据（高程与部分楼高为估算）';
     for(const p of data.parks||[])makeArea(p,'park');
     for(const p of data.water||[])makeArea(p,'water');
     for(const p of data.roads||[])makeRoad(p);
     for(const p of data.buildings||[])makeBuilding(p);
-    const batches=commitBatches();
+    const batches=commitBatches();setView('overview');
     const estimated=data.buildings.filter(x=>x.height_source==='visual_estimate').length;
     $('metrics').textContent=`范围 ${data.width_m} × ${data.depth_m}m · 道路 ${data.roads.length} · OSM建筑 ${data.buildings.length}（高度估算 ${estimated}） · 水面 ${data.water.length} · 图形批次 ${batches.draws}`;
     if(!data.water.length)$('metrics').textContent+=' · 注意：OSM没有返回水域面（可能为multipolygon）';

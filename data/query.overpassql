@@ -1,6 +1,7 @@
 [out:json][timeout:120];(
 way["highway"](30.576,114.2826,30.594,114.3034);
 way["building"](30.576,114.2826,30.594,114.3034);
+rel["type"="multipolygon"]["building"](30.576,114.2826,30.594,114.3034);
 way["natural"="water"](30.576,114.2826,30.594,114.3034);
 way["waterway"="riverbank"](30.576,114.2826,30.594,114.3034);
 way["landuse"="reservoir"](30.576,114.2826,30.594,114.3034);
