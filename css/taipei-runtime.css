@@ -1452,3 +1452,4 @@ body.touch-enabled .pop-item { min-height: 44px; }
 }
 
 .data-credit{position:fixed;bottom:3px;left:12px;z-index:2;max-width:calc(100vw - 24px);padding:2px 6px;border-radius:4px;background:rgba(16,17,20,.9);color:#d2d9df;font:12px/1.4 system-ui;pointer-events:none}
+@media(max-width:700px){.data-credit{top:126px;bottom:auto;max-width:calc(100vw - 24px)}}
