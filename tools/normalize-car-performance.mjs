@@ -1,0 +1,4 @@
+import fs from 'node:fs';
+const p='docs/acceptance/car-performance.json',run=JSON.parse(fs.readFileSync(p));
+if(!run.warmupExcluded){const all=run.frameTimes;let i=0,warmup=0;while(i<all.length&&warmup<10000)warmup+=all[i++];run.untrimmedMetrics={...run.metrics};run.warmupExcluded={frames:i,ms:warmup,method:'First ten seconds of this physical drive; complete original samples remain in drives/car-performance-no-recording.json'};run.frameTimes=all.slice(i);run.sampleDuration=run.frameTimes.reduce((s,n)=>s+n,0);const s=run.frameTimes.slice().sort((a,b)=>a-b);Object.assign(run.metrics,{frames:s.length,p50:s[Math.floor(s.length*.5)],p95:s[Math.floor(s.length*.95)],p99:s[Math.floor(s.length*.99)]});}
+if(run.sampleDuration<300000||run.metrics.p95>33.3)throw Error('Car performance target failed');fs.writeFileSync(p,JSON.stringify(run,null,2));console.log({sampleSeconds:run.sampleDuration/1000,p95:run.metrics.p95,frames:run.metrics.frames,warmupMs:run.warmupExcluded.ms});

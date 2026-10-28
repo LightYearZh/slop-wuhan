@@ -1,14 +1,20 @@
 {
-  "name": "slop-wuhan-phase0",
+  "name": "slop-wuhan",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Wuhan OSM to a browsable real-scale Three.js pilot; later integration into Slop runtime",
   "scripts": {
-    "start": "node tools/serve.mjs",
-    "test": ".venv/bin/python -m unittest discover -s tests -v"
+    "dev": "vite --host 127.0.0.1 --port 4799",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4187",
+    "test": "node --test tests/core.test.mjs tests/controllers.test.mjs tests/resources.test.mjs tests/material.test.mjs tests/loading-progress.test.mjs tests/vehicle-road.test.mjs tests/map-navigation.test.mjs tests/map-view.test.mjs tests/wuhan.test.mjs",
+    "start": "npm run dev",
+    "data:build": ".venv/bin/python tools/build-wuhan.py"
   },
   "dependencies": {
-    "three": "0.180.0"
+    "three": "file:vendor/three"
+  },
+  "devDependencies": {
+    "vite": "8.3.5"
   }
 }

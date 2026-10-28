@@ -1,0 +1,8 @@
+import fs from 'node:fs/promises';import crypto from 'node:crypto';import path from 'node:path';
+const version=JSON.parse(await fs.readFile('package.json')).version;
+const root=process.argv[3]||'release/shanghai-waterfront-'+version,manifest=JSON.parse(await fs.readFile(root+'/release-manifest.json'));
+const base=process.argv[2]||'http://127.0.0.1:4188';const files=[];
+for(const f of manifest.files){const bytes=await fs.readFile(path.join(root,f.path)),hash=crypto.createHash('sha256').update(bytes).digest('hex');if(hash!==f.sha256||bytes.length!==f.bytes)throw Error('hash mismatch '+f.path);}
+const necessary=manifest.files.filter(f=>f.path==='index.html'||f.path==='boot-manifest.json'||f.path.startsWith('assets/')||f.path.startsWith('data/'));
+for(let i=0;i<necessary.length;i+=4)await Promise.all(necessary.slice(i,i+4).map(async f=>{const response=await fetch(base+'/'+f.path);if(!response.ok)throw Error('HTTP '+response.status+' '+f.path);const bytes=Buffer.from(await response.arrayBuffer()),hash=crypto.createHash('sha256').update(bytes).digest('hex');if(hash!==f.sha256)throw Error('served hash mismatch '+f.path);files.push({path:f.path,status:response.status,bytes:bytes.length});}));
+const result={version:manifest.version,at:new Date().toISOString(),sourceDataSHA256:manifest.data.citySHA256,manifestFilesVerified:manifest.files.length,necessaryFilesServed:files.length,base,files},out=process.argv[4]||'docs/acceptance';await fs.mkdir(out,{recursive:true});await fs.writeFile(path.join(out,'release-audit.json'),JSON.stringify(result,null,2));console.log({files:result.manifestFilesVerified,http:result.necessaryFilesServed,failed:0});

@@ -1,0 +1,12 @@
+{
+  "name": "three",
+  "version": "0.187.0-dev",
+  "type": "module",
+  "module": "./build/three.webgpu.js",
+  "exports": {
+    ".": "./build/three.webgpu.js",
+    "./webgpu": "./build/three.webgpu.js",
+    "./tsl": "./build/three.tsl.js",
+    "./addons/*": "./examples/jsm/*"
+  }
+}

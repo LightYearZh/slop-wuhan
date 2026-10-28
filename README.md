@@ -1,110 +1,68 @@
-# Slop Wuhan — Phase 0 / 武汉漫游数据与基础三维原型
+# 武汉漫游 · Slop Wuhan
 
-本工程是 **Slop Wuhan 的第一阶段验证包**：以真实 OSM 道路及建筑占地为骨架，在浏览器中以 1:1 米制尺度展示汉口江汉路—沿江大道周边初始三维场景，并支持步行和飞行查看。
+本项目直接基于 [YakirLove/ShangHai](https://github.com/YakirLove/ShangHai) 改造，复用其 Three.js WebGPU/TSL、光照、建筑材质、角色、车辆、相机、碰撞、分块加载与中文地图系统。第一版覆盖汉口江汉路—沿江大道约 2 × 2 公里，使用真实武汉 OSM 数据。
 
-> **范围边界：** 这是独立 Three.js 数据验证器，**不是已经移植完成的 mrdoob/slop-newyork 原版运行时**。下一步才把通过验证的武汉地理数据接入 Slop 的 WebGPU/TSL、车辆和场景系统。打车玩法暂不实现。
->
-> **真实数据边界：** 本包不内置武汉 OSM 数据。运行导入命令后才会生成 `web/data/city.json`。没有联网或缺失数据时，场景会显示“需要先导入 OSM”，不会伪造城市。
+原上海参考仓库完整保存在 `../reference-shanghai/`，保持独立 Git 历史。采用的版本见 [docs/UPSTREAM.json](docs/UPSTREAM.json)。原来的独立 Phase 0 验证器保存在当前仓库的 `archive/standalone-pilot` 分支；主分支开发路线已改为上海项目的武汉改编，不再继续独立造引擎。
 
-## 0. 先决条件
+## 本地运行
 
-- macOS / Windows / Linux，Python 3.10+，Node.js 20+，npm。
-- Chrome / Edge；本原型使用 Three.js WebGLRenderer，后续 Slop 原版将使用 WebGPU。
-- 首次 `npm install` 需要联网；获取 OSM 也需要联网，或者手动下载 Geofabrik PBF。
+需要 Node.js 22.12+（本机为 24）。武汉生成数据已随项目保存，日常浏览无需下载原始 PBF。
 
-## 1. 最快捷方式：Overpass 在线提取
-
-```bash
-cd slop-wuhan-phase0
-python3 tools/fetch_osm.py
-python3 tools/convert_osm.py --input data/wuhan_overpass.json
-python3 tools/validate.py
-npm install
-npm run start
+```sh
+npm ci
+npm run dev
 ```
 
-访问 `http://127.0.0.1:4799/web/`。
+打开 http://127.0.0.1:4799/ 。也可以运行 `npm start`。旧地址 `/web/` 已停用。
 
-Windows PowerShell 将上述 `python3` 替换为 `py -3` 或 `python`，具体取决于安装方式。
+- `1 / 2 / 3 / 4`：步行、驾驶、骑行、直升机。
+- `W / S`：前后移动；`A / D`：转向；`Shift`：加速；拖动鼠标：环视。
+- 飞行 `E / Q`：上升、下降；`V`：切换相机。
+- `M`：地图。地点菜单可到达江汉路、沿江大道、中山大道、北京路、南京路和洞庭街。
+- 右上角切换白天、黄昏、夜间或画质。
 
-**操作：** 点击画面锁定鼠标；鼠标环视，WASD 移动，Shift 加速，F 切换步行/飞行，飞行时 Space 上升、C 下降，Esc 释放鼠标。
+## 真实数据与当前限制
 
-首次提取使用预设范围（WGS84）：
+当前生成 383 段道路、290 栋 OSM 建筑体量、4 片水域、16 个 500m 建筑块。数据快照为 2026-10-27 21:23:59 UTC。原始轮廓、道路方向、对象 ID 和来源标签由上海 PBF 导入器读取；局部坐标原点为 WGS84 `[114.293, 30.585]`，1 单位为 1 米，x 向东、z 向南。
 
-- 南 `30.576`，西 `114.2826`，北 `30.594`，东 `114.3034`
-- 约 2.0 × 2.0 公里，覆盖江汉路及向沿江大道的区域（实际几何覆盖以 OSM 返回为准）
-- 中心经度纬度约 `114.2930, 30.5850`；不使用 GCJ-02/BD-09
+当前建筑数据稀疏，**284 栋楼高为 12m 估值，5 栋由层数换算，1 栋直接读取高度**。沿用上海运行时的旋转矩形建筑体量，不能当成精确建筑形状。132 个矩形包围盒会挤占道路的建筑被排除；不以虚构建筑掩盖数据空白。
 
-若端点返回限流／网络错误，等待再试，或采用下一节离线流程。程序包含多端点回退，但不应大规模并发查询公共 Overpass 服务。
+地面平坦，未接 DEM；19 条桥梁、隧道或非地面层级道路暂不开放。长江水面来自 OSM 面几何与内环，不用直线代替岸线；有 5 个源几何在导入时跳过，需后续专项核查。没有手工地标、武汉地铁数据或网约车任务。车辆造型沿用上海资源，尚未还原武汉实际车型与涂装。
 
-## 2. 更可靠的方式：Geofabrik 湖北 PBF + Osmium
+完整统计、来源、SHA-256 和限制见 [public/data/wuhan-audit.json](public/data/wuhan-audit.json)。
 
-1. 从 Geofabrik 下载湖北数据： https://download.geofabrik.de/asia/china/hubei.html
-2. 安装 Osmium 命令行工具： https://osmcode.org/osmium-tool/
-3. 执行（PBF 放在 `data/hubei-latest.osm.pbf`）：
+## 重建武汉数据
 
-```bash
-osmium extract --bbox=114.2826,30.576,114.3034,30.594 --strategy=complete_ways data/hubei-latest.osm.pbf -o data/wuhan-cut.osm.pbf
-osmium cat data/wuhan-cut.osm.pbf -o data/wuhan-cut.osm
-python3 tools/convert_osm.py --input data/wuhan-cut.osm
-python3 tools/validate.py
+首次下载已完成，原始湖北文件放在 `data/hubei-latest.osm.pbf`（约 53MB，未提交 Git）。如果换机器或需要你手动下载：
+
+1. 打开 https://download.geofabrik.de/asia/china/hubei.html 。
+2. 下载 **hubei-latest.osm.pbf**，不是 Shapefile ZIP。
+3. 将文件放到项目 `data/` 目录，保持上述文件名。
+4. 运行以下命令；不需要你手动裁剪、坐标转换或使用 Osmium 命令行。
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+npm run data:build
+npm test
+npm run build
 ```
 
-如果 `osmium` 命令提示输出已存在，可先删除以前生成的 `wuhan-cut` 文件再重试。`complete_ways` 会保留途经 AOI 的完整 OSM way，因此可略微超出场景边界。
+Python 3.9+；Windows 可使用 `.venv/Scripts/python tools/build-wuhan.py`。生成器沿用上海的 OSM/pyosmium 提取逻辑，使用 Shapely 组装内外环、裁剪水域和道路，并输出上海运行系统的数据契约。`data/derived/wuhan.json` 是按源文件哈希检查的缓存，调试导入逻辑后可删除它重新生成。
 
-**注意：** Geofabrik 湖北数据是整个湖北省，千万不要把 PBF 直接送入浏览器。请在本地裁剪后转换为静态 JSON。OSM XML 转换支持普通 `way` 和可拼接的 multipolygon 外环，但仍未处理洞孔和不完整的 relation。
+## 后续顺序
 
-## 3. 数据流和文件
+1. 核查武汉江岸、道路宽度、缺失建筑与来源几何；改善沿江空间与出发视角。
+2. 在原系统内改善建筑轮廓、补可靠建筑数据，逐项检查桥隧高差。
+3. 逐步扩展武汉范围与地标；最后再参考 London Loop 加入接单、导航与任务。
 
-```text
-OSM Overpass JSON / Geofabrik PBF
-  -> tools/fetch_osm.py (仅 Overpass 方式)
-  -> osmium extract/cat (仅 PBF 方式)
-  -> tools/convert_osm.py
-  -> web/data/city.json + report.json
-  -> web/main.js (500m 地块几何批处理、建筑体量、道路、水面、步行/飞行)
+## 测试与许可
+
+```sh
+npm test
+npm run build
 ```
 
-`data/source.json` 由 Overpass 下载流程生成，记录源、时间和查询内容。`web/data/report.json` 记录统计与模型缺陷。原始 OSM 下载数据请自行保留以确保可复现。
+当前测试包含上海的通用控制器、碰撞、加载、材质、地图导航测试以及武汉的数据与出发点检查。`tests/` 中保留的其他上海专用验收测试不属于武汉的默认测试集；原始上海发布工具仅作参考，武汉使用 `tools/build-wuhan.py`。
 
-## 4. 已实现 / 未实现
-
-### 已实现
-
-- WGS84 转本地米制 `x=东，z=南`，以江汉路片区为原点。
-- 真实 OSM 普通道路、步行街、部分建筑占地、水面及绿地处理；模型体量和道路宽度可视化。
-- 解析 `height` / `building:levels`，无高度数据的建筑暂时使用 **12m 视觉占位值**，并记录来源。
-- 基于 500m 网格对渲染几何进行批次合并，支持相机漫游。
-- 批量数据有效性检查和 Python 单元测试。
-
-### 尚未实现（不要误当成成品）
-
-- **不是 Slop New York 原版引擎的直接武汉移植**。车辆、NPC、WebGPU/TSL 材质等将在下阶段集成。
-- 目前平坦地面，不是武汉真实 DEM；没有桥梁、隧道、立交高差和精确岸线高程。
-- 支持拼接 multipolygon relation 的外环，但暂未正确绘制内环（岛屿/孔洞）；复杂关系仍可能缺失或有误。长江水体必须通过实际数据质量检查。
-- 高度数据缺失时是估算值；没有凭空补不存在于 OSM 的建筑轮廓，因而可能看到大片空白。
-- 未处理准确建筑洞孔、楼顶轮廓、纹理与特色地标。
-- 没有物理碰撞、可导航路网和接送乘客任务。
-
-## 5. 后续移植到 Slop 的集成任务
-
-- 阶段 1a：完成真实数据导入检查，完善 OSM multipolygon 水面孔洞和地图边界，并生成数据质量报告。
-- 阶段 1b：审查 Slop 原版 `geo-*`、`buildings.js`、`road-network.js`，编写 Wuhan adapter，复用原来的角色和自由漫游系统。不要强行移植曼哈顿专用的道路网格逻辑。
-- 阶段 1c：为有缺口的建筑引入 Overture 建筑轮廓；保持来源许可与高度可信度标签。
-- 阶段 1d：引入具有合法使用许可的高程 DEM；用桥隧层级恢复立交，避免公路与江面穿插。
-- 阶段 2：以伦敦项目为参考，增添网约车和任务系统（此时才进入游戏性）。
-
-## 6. 许可与出处
-
-- 本原型的新增脚本与实现代码为 MIT（见 LICENSE）。
-- 真实地理数据来自 © OpenStreetMap contributors，ODbL 1.0。公开发布派生数据库时必须遵守 ODbL 相应要求。地理数据不因为应用代码 MIT 就自动变为 MIT。
-- 参考项目： [mrdoob/slop-newyork](https://github.com/mrdoob/slop-newyork)（MIT）、[YakirLove/ShangHai](https://github.com/YakirLove/ShangHai)（MIT）、[Nelsonchris1/london-loop](https://github.com/Nelsonchris1/london-loop)（MIT）。本阶段没有复制这些项目源代码；只参考了公开架构思路。
-
-## 7. 测试
-
-```bash
-python3 -m unittest discover -s tests -v
-python3 tools/validate.py
-```
-
-第一次运行 `validate.py` 前需取得真实数据。以上脚本不会测试浏览器 WebGL 实际绘制，须人工在本机启动浏览器验证。
+代码保留上海项目和 mrdoob/Slop New York 的 MIT 声明，详见 [LICENSE](LICENSE)、[docs/upstream/SOURCES.md](docs/upstream/SOURCES.md) 与 `vendor/slop-newyork/`。地理数据库为 © OpenStreetMap contributors，采用 ODbL 1.0，见 [public/data/DATA-LICENSE.md](public/data/DATA-LICENSE.md)。

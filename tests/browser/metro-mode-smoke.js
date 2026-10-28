@@ -1,0 +1,12 @@
+const fs=await import('node:fs/promises'),results=[];
+await metroPerformancePromise;expect(metroAcceptance.done).toBe(true);expect(metroAcceptance.error).toBe(null);
+const path=JSON.parse(await fs.readFile(evidenceRoot+'/dense-metro-performance.json','utf8')).points.slice(0,2);
+for(const [index,mode]of ['person','car','cyclist','helicopter'].entries()){
+ await page.evaluate(async({path,mode})=>{const a=shanghai;a.controllers.resetInput();a.controllers.clearGamepadInput();await a.setMode(mode);await a.teleport(path[0][0],path[0][2],Math.atan2(path[1][0]-path[0][0],path[1][2]-path[0][2]));a.follow();}, {path,mode});
+ await page.keyboard.press(String(index+1));await page.waitForFunction(mode=>shanghai.controllers.activeMode===mode,mode);
+ const before=await page.evaluate(()=>shanghai.controllers.getActiveEntity().position.toArray());await page.keyboard.down('w');await page.waitForFunction(before=>{const p=shanghai.controllers.getActiveEntity().position;return Math.hypot(p.x-before[0],p.z-before[2])>4;},before,{timeout:8000});await page.keyboard.up('w');await page.waitForFunction(()=>Math.abs(shanghai.controllers.getActiveEntity().speed)<.1,null,{timeout:10000});
+ const cameras=[];for(let i=0;i<3;i++){await page.keyboard.press('v');cameras.push(await page.evaluate(()=>shanghai.cameras.activePresetId));}expect(new Set(cameras).size).toBe(3);
+ const after=await page.evaluate(()=>({mode:shanghai.controllers.activeMode,position:shanghai.controllers.getActiveEntity().position.toArray(),speed:shanghai.controllers.getActiveEntity().speed,ready:shanghai.loader.readyAt(shanghai.controllers.getActiveEntity().position),errors:shanghai.errors.slice()}));expect(after.mode).toBe(mode);expect(after.ready).toBe(true);expect(after.errors).toEqual([]);results.push({before,...after,cameras});
+}
+await page.keyboard.press('1');await page.waitForFunction(()=>shanghai.controllers.activeMode==='person');const landed=await page.evaluate(()=>({height:shanghai.controllers.getActiveEntity().position.y,ready:shanghai.loader.readyAt(shanghai.controllers.getActiveEntity().position),water:shanghai.surface.isWater(shanghai.controllers.getActiveEntity().position.x,shanghai.controllers.getActiveEntity().position.z)}));expect(landed.ready).toBe(true);expect(landed.water).toBe(false);expect(landed.height).toBeLessThan(30);
+await fs.writeFile(evidenceRoot+'/mode-smoke.json',JSON.stringify({results,landed,passed:true},null,2));return {modes:results.map(r=>r.mode),landed,passed:true};

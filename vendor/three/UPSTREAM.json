@@ -1,0 +1,21 @@
+{
+  "repository": "https://github.com/mrdoob/three.js",
+  "revision": "8d737d9ceb701eedff7bba3086cefcbfb7fea9c5",
+  "files": [
+    "build/three.core.js",
+    "build/three.tsl.js",
+    "build/three.webgpu.js",
+    "examples/jsm/lights/SunLight.js",
+    "examples/jsm/lights/SunLightNode.js",
+    "examples/jsm/lights/SunLightShadow.js",
+    "examples/jsm/lights/SunShadowNode.js",
+    "examples/jsm/objects/SkyMesh.js",
+    "examples/jsm/tsl/display/BloomNode.js",
+    "examples/jsm/tsl/display/ImportanceSampledEnvironment.js",
+    "examples/jsm/tsl/display/SSRNode.js",
+    "examples/jsm/tsl/display/boxBlur.js",
+    "examples/jsm/tsl/utils/RNoise.js",
+    "examples/jsm/tsl/utils/SpecularHelpers.js",
+    "examples/jsm/utils/BufferGeometryUtils.js"
+  ]
+}
