@@ -3,7 +3,7 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {buildStrip} from './road-geometry.js';
 
 // Street furniture is illustrative dressing, not a surveyed street inventory.
-export function buildWuhanStreetscape(scene,data,placement){
+export function buildWuhanStreetscape(scene,data,placement,options={}){
  const focus=data.landmarks.find(l=>l.id==='jianghanguan');if(!focus)return;
  const buckets=new Map();
  const materials={stone:new THREE.MeshStandardNodeMaterial({color:0x8c8e83,roughness:.9}),paving:new THREE.MeshStandardNodeMaterial({color:0x847c6b,roughness:.95}),metal:new THREE.MeshStandardNodeMaterial({color:0x304241,roughness:.6,metalness:.35}),wood:new THREE.MeshStandardNodeMaterial({color:0x69513a,roughness:.88}),glass:new THREE.MeshStandardNodeMaterial({color:0xe9dab1,emissive:0x75623f,emissiveIntensity:.25,roughness:.5}),leaf:new THREE.MeshStandardNodeMaterial({color:0x506344,roughness:.95})};
@@ -33,8 +33,11 @@ export function buildWuhanStreetscape(scene,data,placement){
     const px=x+nx*side*(road.width/2+1.35),pz=z+nz*side*(road.width/2+1.35);
     if(placement.reserve('planter-tree',px,pz,2)){
     add(new THREE.BoxGeometry(2.8,.35,2.8),'stone',px,2.22,pz);
-    add(new THREE.CylinderGeometry(.12,.2,3.7,7),'wood',px,4.02,pz);
-    const crown=new THREE.IcosahedronGeometry(1.7,1);crown.scale(1,1.25,1);add(crown,'leaf',px,6.5,pz);
+    if(options.treeSites){options.treeSites.push({x:px,z:pz,y:.4,scale:.65,species:0,tier:0});}
+    else{
+     add(new THREE.CylinderGeometry(.12,.2,3.7,7),'wood',px,4.02,pz);
+     const crown=new THREE.IcosahedronGeometry(1.7,1);crown.scale(1,1.25,1);add(crown,'leaf',px,6.5,pz);
+    }
     }
     const lx=px-dx*4,lz=pz-dz*4;
     if(placement.reserve('heritage-lamp',lx,lz,.55)){add(new THREE.CylinderGeometry(.06,.12,5.5,7),'metal',lx,4.85,lz);
@@ -53,5 +56,6 @@ export function buildWuhanStreetscape(scene,data,placement){
  }
  const group=new THREE.Group();group.name='江汉路示范段 · 装饰性街具';
  for(const [key,geos]of buckets){const merged=mergeGeometries(geos);for(const geo of geos)geo.dispose();const m=new THREE.Mesh(merged,materials[key]);m.castShadow=true;m.receiveShadow=true;group.add(m);}
+ group.userData.lampMaterial=materials.glass;
  scene.add(group);return group;
 }

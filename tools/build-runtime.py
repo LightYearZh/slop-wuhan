@@ -7,6 +7,8 @@ import collections, hashlib, json, math
 from shapely.geometry import Polygon, LineString
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
+from runtime_streets import road_graph,road_details
+from runtime_signs import build_signs
 
 ROOT = Path(__file__).resolve().parents[1]
 CLASSES = ['motorway','trunk','primary','secondary','tertiary','unclassified','residential','living_street','service','pedestrian']
@@ -52,24 +54,8 @@ def encode_building(rings,h,base,kind):
     return out
 
 def convert(city):
-    names=['']; nodes=[]; links=[]; node_index={}; road_sources=[]
-    def node(identifier,x,z,w):
-        # Keep original OSM node identity; never join nearby unconnected streets.
-        if identifier not in node_index:
-            node_index[identifier]=len(nodes)//4;nodes.extend([x,z,0,min(7,w/2+.5)])
-        return node_index[identifier]
-    for road in city['roads']:
-        if road['name'] not in names:names.append(road['name'])
-        cls=CLASSES.index(road['highway']) if road['highway'] in CLASSES else (9 if road['mode']=='person' else 8)
-        if road['mode']=='person':cls=9
-        for i in range(1,len(road['points'])):
-            p,q=road['points'][i-1:i+1]
-            if math.hypot(q[0]-p[0],q[2]-p[2])<.1:continue
-            a=node(road['nodeIds'][i-1],p[0],p[2],road['width']);b=node(road['nodeIds'][i],q[0],q[2],road['width'])
-            if a==b:continue
-            lanes=max(1,round(road['width']/3.25))
-            links.append([a,b,names.index(road['name']),cls,road['width'],lanes,1 if road['oneway'] else 0,4 if road['mode']=='person' else 0,[p[0],p[2],q[0],q[2]]])
-            road_sources.append(road['id'])
+    graph=road_graph(city['roads'],city.get('streetNodes',[]));details=road_details(graph,city.get('streetNodes',[]))
+    names,nodes,links,road_sources=[graph[k] for k in ('names','nodes','links','roadSourceIds')]
     buildings=[];meta=[];heights=collections.Counter();signs=[];sign_names=[]
     for b in city['buildings']:
         h,source=display_height(b);heights[source]+=1
@@ -83,15 +69,8 @@ def convert(city):
             meta.append({'sourceId':b['id'],'category':b['category'],'sourceHeight':None if b['heightSource']=='visual-estimate' else b['h'],
                          'sourceHeightType':b['heightSource'],'displayHeight':top,'displayHeightSource':source,'baseY':base,
                          'role':part.get('role'),'name':b['name']})
-        if b['category'] not in ('retail','historic'):continue
-        for f in b.get('frontages',[])[:2]:
-            if f['kind']!='shop':continue
-            a,c=f['a'],f['b'];nx,nz=f['normal'];name=b['name']
-            ni=0
-            if name:
-                if name not in sign_names:sign_names.append(name)
-                ni=sign_names.index(name)+1
-            signs.append([round((a[0]+c[0])/2,2),round((a[1]+c[1])/2,2),round(math.atan2(nx,nz),4),0,ni,h])
+    sign_data,sign_rejected=build_signs(city,display_height)
+    signs=sign_data['signs']
     water=polygons(city['water']);asphalt=polygons(city['asphalt']);ped=polygons(city['pedestrian'])
     sides=polygons(city['shoulders']).difference(asphalt).difference(ped).difference(water)
     landmark=city['landmarks'][0];spawn=city['spawn'];bounds=city['bounds']
@@ -106,16 +85,16 @@ def convert(city):
          'roadSourceIds':road_sources,'carriageway':flat_polys(asphalt),'pedestrian':flat_polys(ped),'sidewalks':flat_polys(sides),
          'water':flat_polys(water),'ground':flat_polys(polygons(city['land'])),'park':flat_polys(polygons(city['parks'])),
          'grass':[],'forest':[],'pitch':[],'apron':[],'airfield':[],'runways':[],'parking':[],'plaza':[],
-         'crossings':[],'signals':[],'hills':{'nx':2,'nz':2,'x0':bounds[0],'z0':bounds[1],'res':5000,'tile':2,'tiles':[]},
+         **graph,**{k:v for k,v in details.items() if k!='detailRejected'},'hills':{'nx':2,'nz':2,'x0':bounds[0],'z0':bounds[1],'res':5000,'tile':2,'tiles':[]},
          'buildingKinds':KINDS,'buildings':buildings,'buildingMeta':meta,'landmarks':{'jianghanguan':landmark},'wuhanLandmarks':city['landmarks'],
-         'viaducts':[],'mrtStations':[],'stations':[],'signCats':['shop'],'signs':signs,'signNames':sign_names,
+         'viaducts':[],'mrtStations':[],'stations':[],**sign_data,
          'districts':[['汉口',flat_polys(polygons(city['land']))[0]]] if city['land'] else [],'places':places,
          'namedBuildings':[[b['name'],b['x'],b['z'],display_height(b)[0]] for b in city['buildings'] if b['name']],
          'teleports':teleports,'placementData':{k:city[k] for k in ['bounds','land','water','roads','buildings','landmarks']}}
     lat=city['origin'][1]*math.pi/180;e2=6.69437999014e-3;s=math.sin(lat);rad=math.pi/180
     geo['frame'].update(mLon=rad*6378137/math.sqrt(1-e2*s*s)*math.cos(lat),mLat=rad*6378137*(1-e2)/(1-e2*s*s)**1.5)
     report={'runtimeBase':'shwang1979/slop-taipei','ruleVersion':RULE,'sourceBuildings':len(city['buildings']),
-            'renderedParts':len(meta),'roadLinks':len(links),'heightSources':dict(heights),'signRecords':len(signs),
+            'renderedParts':len(meta),'roadLinks':len(links),'curvedRoadLinks':sum(len(l[8])>4 for l in links),'crossings':len(details['crossings']),'signals':len(details['signals']),'streetDetailRejected':details['detailRejected'],'heightSources':dict(heights),'signRecords':len(signs),'verticalSignCandidates':sum(m['verticalAllowed'] for m in sign_data['signMeta']),'signTextSources':dict(collections.Counter(m['textSource'] for m in sign_data['signMeta'])),'signRejected':sign_rejected,
             'limits':['Missing heights are visual estimates, not surveyed','No Taipei geography or landmarks imported',
                       'Flat terrain; no bridges/tunnels/MRT','Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas']}
     return geo,report

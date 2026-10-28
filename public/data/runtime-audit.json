@@ -3,7 +3,11 @@
   "ruleVersion": "hankou-display-v1",
   "sourceBuildings": 2097,
   "renderedParts": 2099,
-  "roadLinks": 2111,
+  "roadLinks": 1039,
+  "curvedRoadLinks": 409,
+  "crossings": 0,
+  "signals": 17,
+  "streetDetailRejected": {},
   "heightSources": {
     "visual-estimate:hankou-display-v1": 2081,
     "reference:architectural-total": 1,
@@ -11,12 +15,24 @@
     "OSM:height": 3,
     "reference:storeys-derived": 1
   },
-  "signRecords": 212,
+  "signRecords": 204,
+  "verticalSignCandidates": 184,
+  "signTextSources": {
+    "OSM:POI": 26,
+    "generic:business-category": 163,
+    "OSM:building-name": 15
+  },
+  "signRejected": {
+    "unsafe_horizontal_sign": 32,
+    "short_wall": 2,
+    "poi_without_nearby_street_wall": 18,
+    "near_another_sign": 12
+  },
   "limits": [
     "Missing heights are visual estimates, not surveyed",
     "No Taipei geography or landmarks imported",
     "Flat terrain; no bridges/tunnels/MRT",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "2e4c96e11d8233fe06291d38524416c14d21a97110d78b80dd04e4ffef0f6aae"
+  "sourceCitySha256": "3fe41a1602ff3b984d8842d7b903fb894c111679caa01caa1634ab8a76a106ad"
 }

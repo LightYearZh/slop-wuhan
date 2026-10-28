@@ -662,7 +662,7 @@ async function initApp() {
   window.addEventListener('error',e=>runtimeErrors.push(e.message));
   window.addEventListener('unhandledrejection',e=>runtimeErrors.push(String(e.reason)));
   window.wuhan={ready:false,base:'slop-taipei',data:GEO,scene,renderer,controllers:controllerManager,cameraSystem,map:mapSystem,
-    placement:streetProps.placement,stats:streetProps.stats,setMode:mode=>{controllerManager.setMode(mode);selectCamera('chase',true)},
+    placement:streetProps.placement,stats:{...streetProps.stats,buildings:cityBlocks.stats},setMode:mode=>{controllerManager.setMode(mode);selectCamera('chase',true)},
     setView:id=>selectCamera(typeof id==='number'?CAMERA_PRESETS[id].id:id,true),
     gotoLandmark:(id,{mode='person'}={})=>{const l=TELEPORT_LOCATIONS[id]||GEO.landmarks[id];if(!l)return false;controllerManager.setMode(mode);teleportTo(l.x,l.z,l.heading||0);return true},
     metrics:()=>({errors:runtimeErrors,frames:frameTimes.slice(-180),render:renderer.info.render,base:'slop-taipei'})};

@@ -169,7 +169,8 @@ def main():
     city={'schemaVersion':2,'origin':ORIGIN,'bounds':bounds,'region':{'id':profile['id'],'name':profile['name'],'boundsWgs84':profile['boundsWgs84']},
         'source':raw['source'],'water':polygons(water),'waterAreaM2':round(water.area),'parks':polygons(parks),
         'land':polygons(region.difference(water)),'asphalt':polygons(asphalt),'shoulders':polygons(shoulders),
-        'roads':roads,'pedestrian':polygons(pedestrian),'tunnels':[],'rampCuts':[],'landmarks':[landmark],'buildings':buildings,'places':places,'controlPoints':[],'spawn':spawn}
+        'roads':roads,'pedestrian':polygons(pedestrian),'tunnels':[],'rampCuts':[],'landmarks':[landmark],'buildings':buildings,'places':places,'controlPoints':[],'spawn':spawn,
+        'pois':raw.get('pois',[]),'streetNodes':raw.get('streetNodes',[])}
     road_audit=audit_roads(roads,bounds,landmark)
     city['streetFocus']={'roadIds':[r['id'] for r in roads if r['name'] in ('江汉路','江汉路步行街')],'landmarkId':'jianghanguan'}
     city['supplement']={'provider':'Overture Maps','release':json.loads((overture_path.with_suffix('.geojson.state')).read_text())['last_release'],'sha256':hashlib.sha256(overture_path.read_bytes()).hexdigest(),'license':'ODbL 1.0'}

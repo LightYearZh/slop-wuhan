@@ -1,11 +1,11 @@
-import {pointInPolygon} from '../core.js';
+import {roofRings,roofRectangleFits,fitRoofShed} from './roof-layout.js';
 import * as THREE from 'three/webgpu';
 import { attribute } from 'three/tsl';
 import { BUILDINGS, BUILDING_KIND, nearestLink, LINK_FLAG, CLS } from './city-config.js';
 import { BUILDING_STYLE, createWuhanBuildingMaterial, createCorrugatedMetalMaterial } from './tsl-materials.js';
 
 // js/buildings.js
-// Every OSM building footprint of central Wuhan (~45,000) extruded to its height: walls & roofs merged into chunk
+// Every OSM building footprint of the Wuhan pilot extruded to its height: walls & roofs merged into chunk
 // meshes with the facade attributes the Wuhan building material reads (tsl-materials.js), curved tile roofs on the
 // temples, corrugated steel sheds (铁皮屋加盖) & water tanks on the walk-up roofs, and a polygon collider per building.
 
@@ -130,11 +130,13 @@ function buildCityBlocks(scene) {
   const colliders = [];
   const roofSites = [];
   const temples = [];
+  const detailStats={frontWalls:0,backWalls:0,styles:{},roofSites:0};
 
   const streetFilter = (l) => l.cls <= CLS.pedestrian && !(l.flags & LINK_FLAG.ELEVATED);
 
   for (const b of BUILDINGS) {
     const style = styleOf(b);
+    detailStats.styles[style]=(detailStats.styles[style]||0)+1;
     const g0 = b.ground;
     const canopy = b.kind === K.CANOPY;
     // skybridges & covered walkways (base above the street) & canopies are slabs; everything else stands on the ground
@@ -164,6 +166,7 @@ function buildCityBlocks(scene) {
           const near = nearestLink(mx, mz, 9, streetFilter);
           if (near && near.d < near.link.w / 2 + 6) front = 1;
         }
+        detailStats[front?'frontWalls':'backWalls']++;
         const wb = style * 2 + front + seed;
         // u restarts on each wall so every wall holds whole bays (the shader lays out bays per wall length)
         const i0 = gb.vert(ax, yBot, az, nx, 0, nz, 0, L, g0, b.h, wb);
@@ -239,6 +242,7 @@ function buildCityBlocks(scene) {
 
   return {
     group,
+    stats:{...detailStats,roofSites:roofSites.length,roofs},
     colliders,
     allBlocks: BUILDINGS,
     update() {},
@@ -262,18 +266,11 @@ function buildRooftops(group, sites) {
     const roofY = b.ground + b.h;
     const yaw = Math.atan2(box.ux, box.uz); // turns local +z onto the box's u axis
     const walkup = b.h <= 17.5;
-    const inside=(x,z)=>pointInPolygon(x,z,b.rings.map(r=>Array.from({length:r.length/2},(_,i)=>[r[i*2],r[i*2+1]])));
-    const fits=(x,z,hx,hz)=>[[-hx,-hz],[-hx,hz],[hx,-hz],[hx,hz],[0,0]].every(([u,v])=>inside(x+box.ux*u-box.uz*v,z+box.uz*u+box.ux*v));
-    // A shed covering part of the roof, against one end
+    const rings=roofRings(b.rings);
+    const fits=(x,z,hx,hz)=>roofRectangleFits(rings,x,z,box.ux,box.uz,hx,hz);
     if (r1 < (walkup ? 0.72 : 0.3)) {
-      const sx = box.hx * (0.55 + r2 * 0.35);
-      const sz = box.hz * (0.6 + r3 * 0.3);
-      const off = (box.hx - sx) * (r3 < 0.5 ? -1 : 1);
-      const sx0=box.cx+box.ux*off,sz0=box.cz+box.uz*off;
-      if(fits(sx0,sz0,sx,sz)) sheds.push({
-        x: box.cx + box.ux * off, z: box.cz + box.uz * off, y: roofY,
-        w: sx * 2, d: sz * 2, h: 2.5 + r2 * 0.6, yaw, tint: walkup ? SHED_TINTS[Math.floor(r2 * SHED_TINTS.length)] : 0xc8c4bc
-      });
+      const site=fitRoofShed(rings,box,r2,r3);
+      if(site) sheds.push({...site,y:roofY,h:2.5+r2*.6,yaw,tint:walkup?SHED_TINTS[Math.floor(r2*SHED_TINTS.length)]:0xc8c4bc});
     }
     // 1-3 water tanks on the free end
     const nt = 1 + Math.floor(r3 * Math.min(3, box.hx * box.hz / 20));
@@ -328,7 +325,7 @@ function buildRooftops(group, sites) {
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
   // the box's local x runs across (w), local z along (d): yaw turns local z onto the roof's long axis
   mk(boxGeo, sheds, (s) => [V(s.x, s.y, s.z), V(s.d, s.h, s.w), s.tint]).name = 'RoofSheds';
-  mk(prism, sheds, (s) => [V(s.x, s.y + s.h, s.z), V(s.d, s.d * 0.9, s.w), s.tint]).name = 'RoofShedRoofs';
+  mk(prism, sheds, (s) => [V(s.x, s.y + s.h, s.z), V(s.d, Math.min(s.d*.16,1.4)/.18, s.w), s.tint]).name = 'RoofShedRoofs';
 
   // Water tanks: stainless steel (shiny), blue plastic, white plastic
   const tankGeo = new THREE.CylinderGeometry(1, 1, 1, 14, 1).translate(0, 0.5, 0);

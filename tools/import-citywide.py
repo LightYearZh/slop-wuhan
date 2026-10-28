@@ -38,11 +38,15 @@ class Importer(osmium.SimpleHandler):
     def __init__(self):
         super().__init__()
         self.factory=osmium.geom.WKBFactory()
-        self.pois=[]; self.roads=[]; self.coast=[]; self.buildings=[]; self.areas=[]; self.districts=[]; self.boundary=None
+        self.pois=[]; self.street_nodes=[]; self.roads=[]; self.coast=[]; self.buildings=[]; self.areas=[]; self.districts=[]; self.boundary=None
         self.skipped=0
 
     def node(self,n):
         if not(PILOT_WGS84.bounds[0]<=n.lon<=PILOT_WGS84.bounds[2] and PILOT_WGS84.bounds[1]<=n.lat<=PILOT_WGS84.bounds[3]):return
+        if n.tags.get('highway') in ('crossing','traffic_signals'):
+            x,z=project(n.lon,n.lat)
+            self.street_nodes.append({'id':str(n.id),'x':round(x,2),'z':round(z,2),
+                'tags':{k:v for k,v in n.tags if k in ('highway','crossing','crossing:signals','crossing:markings','traffic_signals','name')}})
         tags={k:v for k,v in n.tags if k in RETAINED_TAGS}
         if not any(tags.get(k) for k in ('shop','amenity','office','tourism')):return
         x,z=project(n.lon,n.lat)
@@ -106,7 +110,7 @@ def main():
     h=Importer();h.apply_file(str(path),locations=True,idx='flex_mem')
     reader=osmium.io.Reader(str(path));timestamp=reader.header().get('osmosis_replication_timestamp');reader.close()
     meta={'provider':'Geofabrik / OpenStreetMap','url':'https://download.geofabrik.de/asia/china/hubei-latest.osm.pbf','sha256':digest,'timestamp':timestamp,'license':'ODbL 1.0'}
-    data={'source':meta,'profileBounds':PROFILE['boundsWgs84'],'importerSha256':importer_fingerprint(),'pois':h.pois,'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
+    data={'source':meta,'profileBounds':PROFILE['boundsWgs84'],'importerSha256':importer_fingerprint(),'pois':h.pois,'streetNodes':h.street_nodes,'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
     DERIVED.mkdir(exist_ok=True)
     (DERIVED/'wuhan.json').write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')))
     print(json.dumps({'roads':len(h.roads),'buildings':len(h.buildings),'areas':len(h.areas),'skippedGeometries':h.skipped,'timestamp':timestamp},ensure_ascii=False),flush=True)

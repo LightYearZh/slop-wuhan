@@ -33,7 +33,7 @@ import {
 // 3. Scooter (a 125 cc 电动车 with its helmeted rider, see scooter-model.js)
 // 4. Helicopter (sightseeing twin-turbine chopper over the basin)
 
-// Spawn on 信义路五段 in front of Wuhan 101
+// Spawn on the audited Wuhan riverside arrival.
 const SPAWN = TELEPORT_LOCATIONS.jianghanguan;
 const groundCollider = { type: 'ground' };
 
@@ -201,7 +201,7 @@ class ThirdPersonControllerManager {
 
     this.bindKeyboard();
 
-    // Start everyone at 101 on clear ground: the taxi on 信义路, the others on the sidewalk next to it
+    // Place the taxi on the Wuhan arrival road and other modes on nearby clear ground.
     const starts = { person: [-6, 10], car: [0, 0], scooter: [3.5, 7], helicopter: [-30, 50] };
     for (const mode of Object.keys(this.entities)) {
       const [side, back] = starts[mode];

@@ -1,4 +1,5 @@
 import {SpatialPlacement} from '../spatial-placement.js';
+import {buildWuhanStreetscape} from '../wuhan-streetscape.js';
 import * as THREE from 'three/webgpu';
 import { Fn, attribute, float, vec2, vec3, mix, step, mod, fract, color, uniform, texture, uv, smoothstep, abs, normalLocal } from 'three/tsl';
 import { GEO } from './wuhan-geodata.js';
@@ -90,7 +91,7 @@ function treeSites() {
   const rand = mulberry32(2024);
   const sites = [];
   const streetLink = (l) => l.cls <= CLS.tertiary && !(l.flags & (LINK_FLAG.ELEVATED | LINK_FLAG.SLIP | LINK_FLAG.NO_CARS)) && l.len > 20;
-  // Street trees: the species is the road's (Wuhan plants a road with one species: 樟树, 武汉栾树, 榕树 ...)
+  // Stable visual species per road; this is not a surveyed Wuhan species inventory.
   alongKerbs(streetLink, LITE ? 30 : 11, (l, x, z, dx, dz, rx, rz) => {
     const sw = SIDEWALK_WIDTH[l.cls] || 2.5;
     const off = l.w / 2 + Math.min(1.1, sw * 0.4);
@@ -331,15 +332,9 @@ function buildSignals(group, clock) {
 
 // --- Shop signs -----------------------------------------------------------------------------------------------------------
 const GENERIC = {
-  convenience: ['便利商店', '超商'],
-  food: ['小吃', '牛肉面', '卤肉饭', '水饺', '便当', '火锅', '热炒', '面店', '早餐', '咸酥鸡', '烧腊', '自助餐'],
-  drink: ['手摇饮', '咖啡', '珍珠奶茶', '果汁', '豆花'],
-  health: ['药局', '诊所', '牙医', '眼镜', '中医', '药妆'],
-  bank: ['银行', '彩券', '当舖'],
-  beauty: ['发廊', '美容', '按摩', '美甲'],
-  hotel: ['旅馆', '大饭店', '旅社', '商旅'],
-  karaoke: ['KTV', '卡拉OK'],
-  shop: ['服装', '餐饮', '书店', '五金', '鞋店', '电器', '面包', '水果', '文具', '便利店', '咖啡', '小吃']
+ convenience:['便利店','超市'],food:['餐饮','小吃','面馆','早餐'],drink:['咖啡','茶饮','饮品'],
+ health:['药店','诊所','眼镜'],bank:['银行','金融服务'],beauty:['理发','美容'],hotel:['酒店','旅馆'],
+ karaoke:['KTV'],shop:['服装','书店','五金','鞋店','电器','面包','水果','文具']
 };
 const SIGN_STYLES = [
   ['#c8161e', '#ffffff'], ['#ffffff', '#c8161e'], ['#f6c400', '#b0101a'], ['#1450a0', '#ffffff'], ['#0a7a40', '#ffffff'],
@@ -454,19 +449,20 @@ function buildSigns(group) {
 
   const vert = [];
   const horiz = [];
-  for (const [x, z, ang, cat, ni, h] of GEO.signs) {
+  for (const [signIndex, [x, z, ang, cat, ni, h]] of GEO.signs.entries()) {
+    const meta=GEO.signMeta?.[signIndex]||{};
     const r = hash(x, z);
     const catName = GEO.signCats[cat] || 'shop';
     const ti = textIndex.get(ni) ?? genericIndex[catName][Math.floor(r * genericIndex[catName].length)];
     const nx = Math.sin(ang);
     const nz = Math.cos(ang);
     const ground = hillHeight(x, z);
-    if (false) { // Keep Wuhan signs flat against verified source walls in this pilot.
+    if (h >= 9 && r < .62 && meta.verticalAllowed) {
       const H = Math.min(9, Math.max(2.6, (h - 5) * (0.5 + r * 0.5)));
       const y0 = ground + 3.7 + (h - 5 - H) * hash(z, x) * 0.6;
       vert.push({ x: x + nx * 0.62, z: z + nz * 0.62, y: y0 + H / 2, yaw: ang, w: 0.95, h: H, t: 0.2, ti });
     } else {
-      horiz.push({ x: x + nx * 0.12, z: z + nz * 0.12, y: ground + 3.9 + hash(z, x) * 0.6, yaw: ang, w: 3.6 + r * 2.4, h: 1.05, t: 0.16, ti });
+      horiz.push({ x: x + nx * 0.12, z: z + nz * 0.12, y: ground + 3.9 + hash(z, x) * 0.6, yaw: ang, w: meta.width || 3.6 + r * 2.4, h: 1.05, t: 0.16, ti });
     }
   }
   const mk = (list, vertical, name) => {
@@ -548,9 +544,11 @@ function buildStreetProps(scene, skip = new Set()) {
   scene.add(group);
   const signalClock = uniform(0);
 
-  const trees = skip.has('trees') ? null : createTreeField(scene, treeSites());
-  const lamps = skip.has('lamps') ? 0 : buildLamps(group);
   const signals = skip.has('signals') ? { count: 0, audio: [] } : buildSignals(group, signalClock);
+  const focusTrees=[],focusHolder=new THREE.Group();focusHolder.position.y=-2;group.add(focusHolder);
+  const focus=buildWuhanStreetscape(focusHolder,GEO.placementData,placement,{treeSites:focusTrees});
+  const trees = skip.has('trees') ? null : createTreeField(scene, [...treeSites(),...focusTrees]);
+  const lamps = skip.has('lamps') ? 0 : buildLamps(group);
   const signs = skip.has('signs') ? { vertical: 0, horizontal: 0, names: 0 } : buildSigns(group);
   const parked = skip.has('parked') ? 0 : buildParkedScooters(group);
   console.info(`[streetProps] ${lamps} lamps, ${signals.count} signal heads, ${signs.vertical + signs.horizontal} shop signs (${signs.names} real names in the atlas), ${parked} parked scooters in ${Math.round(performance.now() - t0)} ms`);
@@ -559,12 +557,13 @@ function buildStreetProps(scene, skip = new Set()) {
     group,
     trees,
     placement,
-    stats:{trees:trees?placement.sites.filter(p=>p.kind==='tree').length:0,lamps,signs,parked},
-    colliders: placement.sites.map(p=>{const r=p.kind==='tree'?.25:p.kind==='parked-scooter'?.65:.18;return {minX:p.x-r,maxX:p.x+r,minZ:p.z-r,maxZ:p.z+r,minY:0,maxY:p.kind==='tree'?4:2,poly:new Float32Array([p.x-r,p.z-r,p.x+r,p.z-r,p.x+r,p.z+r,p.x-r,p.z+r])}}),
+    stats:{trees:trees?placement.sites.filter(p=>p.kind==='tree'||p.kind==='planter-tree').length:0,focusTrees:focusTrees.length,lamps,signals:signals.count,signs,parked},
+    colliders: placement.sites.map(p=>{const r=({tree:.25,lamp:.18,signal:.18,'parked-scooter':.65}[p.kind]??p.radius);return {minX:p.x-r,maxX:p.x+r,minZ:p.z-r,maxZ:p.z+r,minY:0,maxY:({tree:8,lamp:9.2,signal:6.6,'parked-scooter':1.6,'planter-tree':8,'heritage-lamp':6.5,bench:1.3,bollard:.95}[p.kind]||2),poly:new Float32Array([p.x-r,p.z-r,p.x+r,p.z-r,p.x+r,p.z+r,p.x-r,p.z+r])}}),
     audioSignals: signals.audio,
     signalClock,
     update(dt, elapsed) {
       signalClock.value = elapsed;
+      if(focus)focus.userData.lampMaterial.emissiveIntensity=.15+Math.max(0,cityUniforms.uInteriorGlow.value-.6)*1.4;
     }
   };
 }

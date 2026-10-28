@@ -5,6 +5,7 @@ import {createHash} from 'node:crypto';
 import {GEO} from '../js/runtime/wuhan-geodata.js';
 import {BUILDINGS,ROAD_LINKS,ROAD_NODES,TELEPORT_LOCATIONS,WATER} from '../js/runtime/city-config.js';
 import {circleFootprint} from '../js/runtime/collision-footprint.js';
+import {roofRectangleFits,fitRoofShed} from '../js/runtime/roof-layout.js';
 const city=JSON.parse(fs.readFileSync(new URL('../public/data/city.json',import.meta.url)));
 
 test('Taipei runtime is the active entry and includes only Wuhan geography',()=>{
@@ -53,4 +54,29 @@ test('migrated collision retains open courtyards and produces finite corrective 
  const hit=circleFootprint(1,1,.4,c);assert.ok(hit&&hit.depth>0);
  assert.ok([hit.depth,hit.nx,hit.nz].every(Number.isFinite));
  const edge=circleFootprint(-.2,5,.4,c);assert.ok(edge&&edge.nx<0);
+});
+
+test('roof detail fits inside the real roof rather than touching its bounding-box edge',()=>{
+ const rings=[[[0,0],[20,0],[20,12],[0,12]]];
+ const box={cx:10,cz:6,ux:1,uz:0,hx:10,hz:6};
+ assert.equal(roofRectangleFits(rings,3,6,1,0,3,2),false);
+ const site=fitRoofShed(rings,box,.5,.3);assert.ok(site);
+ assert.equal(roofRectangleFits(rings,site.x,site.z,1,0,site.w/2*1.04,site.d/2*1.08),true);
+});
+
+test('roof equipment rejects courtyards and concave notches even when all four corners fit',()=>{
+ const courtyard=[[[0,0],[20,0],[20,20],[0,20]],[[9,9],[9,11],[11,11],[11,9]]];
+ assert.equal(roofRectangleFits(courtyard,10,10,1,0,5,5),false);
+ const notch=[[[0,0],[20,0],[20,20],[12,20],[12,6],[8,6],[8,20],[0,20]]];
+ assert.equal(roofRectangleFits(notch,10,10,1,0,7,2),false);
+});
+
+test('real OSM signal nodes and POI signs reach the runtime with provenance',()=>{
+ assert.ok(GEO.signals.length>0);assert.equal(GEO.signals.length,GEO.signalMeta.length);
+ const sourceSignals=new Set(city.streetNodes.filter(n=>n.tags.highway==='traffic_signals').map(n=>'osm-node-'+n.id));
+ for(const s of GEO.signalMeta)for(const p of s.sources)assert.ok(sourceSignals.has(p.sourceId));
+ assert.equal(GEO.signs.length,GEO.signMeta.length);
+ assert.ok(GEO.signMeta.some(m=>m.verticalAllowed));
+ assert.ok(GEO.signMeta.some(m=>m.textSource==='OSM:POI'));
+ assert.ok(GEO.signCats.includes('bank'));assert.ok(GEO.links.some(l=>l[8].length>4));
 });
