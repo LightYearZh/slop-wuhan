@@ -4,9 +4,10 @@ Source heights stay unchanged in city.json; display estimates are explicit metad
 """
 from pathlib import Path
 import collections, hashlib, json, math
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import Polygon, LineString,box,Point
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
+from shapely import make_valid
 from runtime_streets import road_graph,road_details
 from runtime_signs import build_signs
 
@@ -35,7 +36,7 @@ def display_height(b):
     return round(floors*(3.6 if category=='historic' else 3.2),1),'visual-estimate:'+RULE
 
 def polygons(rows):
-    return unary_union([Polygon(p[0],p[1:]) for p in rows])
+    return unary_union([make_valid(Polygon(p[0],p[1:])) for p in rows])
 
 def flat_polys(geom):
     if geom.is_empty: return []
@@ -43,6 +44,19 @@ def flat_polys(geom):
         return [p for part in getattr(geom,'geoms',[]) for p in flat_polys(part)]
     p=orient(geom,sign=1)
     return [[[round(v,3) for point in list(r.coords)[:-1] for v in point] for r in [p.exterior,*p.interiors]]]
+
+def terrain_polys(geom,hills):
+    if not hills:return flat_polys(geom)
+    # Add vertices over the ridges so a large flat triangle cannot cut through a hill.
+    tiles=[box(hills['x0']+i*hills['tile']*hills['res'],hills['z0']+j*hills['tile']*hills['res'],
+               hills['x0']+(i+1)*hills['tile']*hills['res'],hills['z0']+(j+1)*hills['tile']*hills['res']) for i,j,_ in hills['tiles']]
+    mask=unary_union(tiles);out=flat_polys(geom.difference(mask));local=geom.intersection(mask)
+    if local.is_empty:return out
+    w,s,e,n=local.bounds;size=50
+    for i in range(math.floor(w/size),math.ceil(e/size)):
+        for j in range(math.floor(s/size),math.ceil(n/size)):
+            out+=flat_polys(local.intersection(box(i*size,j*size,(i+1)*size,(j+1)*size)))
+    return out
 
 def encode_building(rings,h,base,kind):
     p=orient(Polygon(rings[0],rings[1:]),sign=1)
@@ -54,6 +68,7 @@ def encode_building(rings,h,base,kind):
     return out
 
 def convert(city):
+    print('Adapting road topology...',flush=True)
     graph=road_graph(city['roads'],city.get('streetNodes',[]));details=road_details(graph,city.get('streetNodes',[]))
     names,nodes,links,road_sources=[graph[k] for k in ('names','nodes','links','roadSourceIds')]
     buildings=[];meta=[];heights=collections.Counter();signs=[];sign_names=[]
@@ -69,8 +84,10 @@ def convert(city):
             meta.append({'sourceId':b['id'],'category':b['category'],'sourceHeight':None if b['heightSource']=='visual-estimate' else b['h'],
                          'sourceHeightType':b['heightSource'],'displayHeight':top,'displayHeightSource':source,'baseY':base,
                          'role':part.get('role'),'name':b['name']})
+    print('Matching storefront signs...',flush=True)
     sign_data,sign_rejected=build_signs(city,display_height)
     signs=sign_data['signs']
+    print('Preparing surfaces and terrain...',flush=True)
     water=polygons(city['water']);asphalt=polygons(city['asphalt']);ped=polygons(city['pedestrian'])
     sides=polygons(city['shoulders']).difference(asphalt).difference(ped).difference(water)
     landmark=city['landmarks'][0];spawn=city['spawn'];bounds=city['bounds']
@@ -80,23 +97,38 @@ def convert(city):
         if p['name'] in ('江汉路','中山大道','沿江大道') or p.get('arrival'):
             arrival=p.get('arrival',p)
             teleports.append({'id':p['id'],'name':p['name'],'sub':'汉口核心区','x':arrival['x'],'z':arrival['z'],'heading':spawn['heading'],'road':p.get('road','')})
+    for l in city['landmarks'][1:]:
+        a=l['arrival'];teleports.append({'id':l['id'],'name':l['name'],'sub':l['district'],'x':a['x'],'z':a['z'],'y':a['y'],'heading':0,'road':a['road']})
+    for model in city.get('bridgeModels',[]):
+        if any(t['name']==model['name'] for t in teleports):continue
+        p=model['points'][0];teleports.append({'id':'bridge-'+model['sourceId'],'name':model['name'],'sub':'真实位置 · 桥面高度为估计','x':p[0],'z':p[2],'y':p[1]-2.12,'heading':0,'road':model['name']})
+    hills=city.get('hills');flat=lambda g:terrain_polys(g,hills)
+    land=polygons(city['land']);districts=[]
+    # Town labels follow the actual connected land pieces separated by the two rivers.
+    anchors=[('汉口',Point(-200,0)),('汉阳',Point(-2400,3200)),('武昌',Point(1700,4000))]
+    pieces=[land] if land.geom_type=='Polygon' else list(land.geoms)
+    for piece in pieces:
+        if piece.geom_type!='Polygon' or piece.area<10000:continue
+        name=next((name for name,p in anchors if piece.covers(p)),None)
+        if name:districts.extend([[name,p] for p in flat_polys(piece)])
     geo={'version':1,'city':'wuhan','frame':{'lon0':city['origin'][0],'lat0':city['origin'][1],'units':'m'},
          'bounds':dict(zip(['minX','minZ','maxX','maxZ'],bounds)),'roadClasses':CLASSES,'names':names,'nodes':nodes,'links':links,
-         'roadSourceIds':road_sources,'carriageway':flat_polys(asphalt),'pedestrian':flat_polys(ped),'sidewalks':flat_polys(sides),
-         'water':flat_polys(water),'ground':flat_polys(polygons(city['land'])),'park':flat_polys(polygons(city['parks'])),
-         'grass':[],'forest':[],'pitch':[],'apron':[],'airfield':[],'runways':[],'parking':[],'plaza':[],
-         **graph,**{k:v for k,v in details.items() if k!='detailRejected'},'hills':{'nx':2,'nz':2,'x0':bounds[0],'z0':bounds[1],'res':5000,'tile':2,'tiles':[]},
-         'buildingKinds':KINDS,'buildings':buildings,'buildingMeta':meta,'landmarks':{'jianghanguan':landmark},'wuhanLandmarks':city['landmarks'],
+         'roadSourceIds':road_sources,'carriageway':flat(asphalt),'pedestrian':flat(ped),'sidewalks':flat(sides),
+         'water':flat_polys(water),'ground':flat(polygons(city['land'])),'park':flat(polygons(city['parks'])),
+         'grass':[],'forest':flat(polygons(city.get('forest',[]))),'pitch':[],'apron':[],'airfield':[],'runways':[],'parking':[],'plaza':[],
+         **graph,**{k:v for k,v in details.items() if k!='detailRejected'},'hills':hills or {'nx':2,'nz':2,'x0':bounds[0],'z0':bounds[1],'res':5000,'tile':2,'tiles':[]},
+         'buildingKinds':KINDS,'buildings':buildings,'buildingMeta':meta,'landmarks':{l['id']:l for l in city['landmarks']},'wuhanLandmarks':city['landmarks'],'bridgeModels':city.get('bridgeModels',[]),
          'viaducts':[],'mrtStations':[],'stations':[],**sign_data,
-         'districts':[['汉口',flat_polys(polygons(city['land']))[0]]] if city['land'] else [],'places':places,
+         'districts':districts,'places':places,
          'namedBuildings':[[b['name'],b['x'],b['z'],display_height(b)[0]] for b in city['buildings'] if b['name']],
          'teleports':teleports,'placementData':{k:city[k] for k in ['bounds','land','water','roads','buildings','landmarks']}}
     lat=city['origin'][1]*math.pi/180;e2=6.69437999014e-3;s=math.sin(lat);rad=math.pi/180
     geo['frame'].update(mLon=rad*6378137/math.sqrt(1-e2*s*s)*math.cos(lat),mLat=rad*6378137*(1-e2)/(1-e2*s*s)**1.5)
     report={'runtimeBase':'shwang1979/slop-taipei','ruleVersion':RULE,'sourceBuildings':len(city['buildings']),
             'renderedParts':len(meta),'roadLinks':len(links),'curvedRoadLinks':sum(len(l[8])>4 for l in links),'crossings':len(details['crossings']),'signals':len(details['signals']),'streetDetailRejected':details['detailRejected'],'heightSources':dict(heights),'signRecords':len(signs),'verticalSignCandidates':sum(m['verticalAllowed'] for m in sign_data['signMeta']),'signTextSources':dict(collections.Counter(m['textSource'] for m in sign_data['signMeta'])),'signRejected':sign_rejected,
-            'limits':['Missing heights are visual estimates, not surveyed','No Taipei geography or landmarks imported',
-                      'Flat terrain; no bridges/tunnels/MRT','Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas']}
+            'region':city['region'],'hillTiles':len(geo['hills']['tiles']),'elevatedLinks':sum(bool(l[7]&2) for l in links),'terrainLinks':sum(bool(l[7]&8) for l in links),
+            'limits':['Missing heights and 3D-GloBFP heights are estimates, not surveyed','No Taipei geography or landmarks imported',
+                      'Only two masked ridges and three named crossings; deck engineering profiles estimated','Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas']}
     return geo,report
 
 def main():

@@ -7,10 +7,11 @@ from shapely.strtree import STRtree
 from city_profile import load_profile,importer_fingerprint
 from building_attributes import BuildingEnricher
 from road_audit import audit_roads
+from core_geometry import HeightMatcher,hill_grid,sample_hill,landmark_from_building,named_crossings
 from spatial_rules import resolve_ground_layout
 from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union
-from shapely import make_valid
+from shapely import make_valid,set_precision
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'public/data'
@@ -27,6 +28,7 @@ def parts(g,kind='Polygon'):
     return [p for sub in getattr(g,'geoms',[]) for p in parts(sub,kind)]
 
 def polygons(g):
+    g=set_precision(make_valid(g),.001)
     return [[[[round(x,3),round(z,3)] for x,z in ring.coords] for ring in [p.exterior,*p.interiors]] for p in parts(g)]
 
 def geometry(rows):
@@ -44,7 +46,7 @@ def road_width(r):
     return {'expy':12,'major':10,'minor':8,'local':6,'link':5}[r['class']],'class-estimate'
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--profile',help='JSON area profile; defaults to config/wuhan-pilot.json')
+    parser=argparse.ArgumentParser();parser.add_argument('--profile',help='JSON area profile; defaults to config/wuhan-core.json')
     args=parser.parse_args();profile=load_profile(args.profile);os.environ['WUHAN_PROFILE']=profile['_file']
     if not SOURCE.exists():raise SystemExit('Missing data/hubei-latest.osm.pbf; see README.md')
     digest=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
@@ -60,7 +62,10 @@ def main():
     a=project(west,north);b=project(east,south)
     bounds=[*a,*b];region=box(*bounds)
     water=unary_union([geometry(v['polygons']) for v in raw['areas'] if v['kind']=='water']).intersection(region).buffer(0)
+    hills=hill_grid(ROOT/profile['terrainExtract'],water) if profile.get('terrainExtract') else None
+    height_matcher=HeightMatcher(ROOT/profile['heightExtract'],project) if profile.get('heightExtract') else None
     parks=unary_union([geometry(v['polygons']) for v in raw['areas'] if v['kind'] in ('park','green')]).intersection(region).difference(water).buffer(0)
+    forest=unary_union([geometry(v['polygons']) for v in raw['areas'] if v.get('natural')=='wood']).intersection(region).difference(water).buffer(0)
     roads=[];excluded=collections.Counter()
     for r in raw['roads']:
         if r['tunnel'] or r['bridge'] or r['layer']!=0:
@@ -90,12 +95,22 @@ def main():
     theta=math.atan2(q[1][1]-q[0][1],q[1][0]-q[0][0])
     landmark={'id':'jianghanguan','name':'江汉关博物馆','type':'jianghanguan','x':cx,'z':cz,'height':45.85,'w':math.dist(q[0],q[1]),'d':math.dist(q[1],q[2]),'ry':-theta,'footprint':polygons(landmark_poly)[0],
         'source':landmark_source['id'],'modelSource':'OSM footprint + Wuhan government photo reference; simplified exterior','heightSource':'https://3g.wuhan.gov.cn/sy/kwh/202401/t20240122_2347703.shtml','aliases':['江汉关','江汉关大楼','钟楼'],'district':'汉口试验区'}
+    landmarks=[landmark]
+    if profile['id']=='wuhan-three-towns-core':
+        for name,kind,identifier,height,url in [
+            ('黄鹤楼','yellow-crane','yellow-crane',51.4,'https://english.wuhan.gov.cn/travel/tourist4attractions4an4incomplete4list/202110/t20211026_1819226.shtml'),
+            ('龟山电视塔','tv-tower','guishan-tower',221.2,'https://www.wuhan.gov.cn/zjwh/whly/202602/t20260215_2730613.shtml'),
+            ('晴川阁','qingchuange','qingchuange',18,'visual-estimate:two-storey-hall')]:
+            item=next((b for b in raw['buildings'] if b['name']==name),None)
+            if not item:raise ValueError('Required core landmark missing from source: '+name)
+            landmarks.append(landmark_from_building(item,kind,identifier,height,hills,url))
+    landmark_shapes=[Polygon(l['footprint'][0],l['footprint'][1:]) for l in landmarks]
     evidence=json.loads((ROOT/'data/source/building-evidence.json').read_text())
     enricher=BuildingEnricher(raw,roads,evidence)
     road_tree=STRtree(road_lines)
     def add_building(item,poly,i,provider):
         if poly.area<16 or poly.intersection(water).area>poly.area*.1:return
-        if poly.intersection(landmark_poly).area>poly.area*.15:return
+        if any(poly.intersection(g).area>poly.area*.15 for g in landmark_shapes):return
         key=poly.normalize().wkb_hex
         if key in seen:return
         # Compare the actual footprint with narrowly buffered source centrelines, never its bounding rectangle.
@@ -109,6 +124,14 @@ def main():
         h=item.get('h',0)
         if not (2<=h<=650):h=12
         attributes=enricher.enrich(item,poly,provider)
+        candidate=height_matcher.match(poly) if height_matcher else None
+        if candidate:
+            attributes['heightCandidate']=candidate
+            if attributes['heightSource']=='visual-estimate':
+                attributes.update({'h':candidate['heightM'],'heightSource':'3D-GloBFP:model-estimate',
+                    'heightEvidence':{**candidate,'confidence':'model-estimate;conservative-footprint-match','meaning':'2020 remote-sensing height estimate; not measured'}})
+                height_matcher.stats['applied_to_missing_height']+=1
+            else:height_matcher.stats['retained_existing_height']+=1
         buildings.append({'id':item['id']+f'-{i}','name':item.get('name',''),'x':round(x,2),'z':round(z,2),'w':round(w,2),'d':round(d,2),'h':h,
             'ry':round(-math.atan2(q[1][1]-q[0][1],q[1][0]-q[0][0]),5),'style':0 if h>70 else 1 if h>24 else 3,
             'source':provider,'sourceDatasets':item.get('sourceDatasets',[]),'heightSource':item['heightSource'] if h==item.get('h') else 'visual-estimate',
@@ -138,7 +161,20 @@ def main():
                   'name':(props.get('names') or {}).get('primary',''),'tags':{'building':props.get('class') or 'yes'},
                   'sourceDatasets':sorted(set(s.get('dataset') or s.get('resource','unknown') for s in props.get('sources',[])))}
             add_building(item,poly,i,'Overture:footprint')
-    roads,asphalt,pedestrian,shoulders,spatial_audit=resolve_ground_layout(roads,buildings,[landmark],region,water)
+    roads,asphalt,pedestrian,shoulders,spatial_audit=resolve_ground_layout(roads,buildings,landmarks,region,water)
+    crossings,bridge_models=named_crossings(raw['roads'],region,road_width,hills) if hills else ([],[])
+    # Ground roads drape on the same hill sampler as buildings and the player; bridge decks stay independent.
+    for r in roads:
+        r['points']=[[p[0],round(2.12+sample_hill(hills,p[0],p[2]),3),p[2]] for p in r['points']]
+        if any(p[1]>2.121 for p in r['points']):r['elevationMode']='terrain';r['heightSource']='Terrain-Tiles:masked-relief-estimate'
+    # Join ground approaches to their mapped deck endpoints with identical shared-node elevations.
+    bridge_ends={n:p[1] for r in crossings for n,p in zip(r['nodeIds'],r['points'])}
+    for r in roads:
+        for n,p in zip(r['nodeIds'],r['points']):
+            if n in bridge_ends:p[1]=bridge_ends[n]
+        if any(p[1]>2.121 for p in r['points']):r['elevationMode']='terrain'
+    roads+=crossings
+    excluded['bridge_tunnel_or_layer']-=len(crossings)
     road_lines=[LineString([(p[0],p[2]) for p in r['points']]) for r in roads]
     places=[]
     for name in ['江汉路','沿江大道','中山大道','北京路','南京路','洞庭街']:
@@ -166,11 +202,26 @@ def main():
     _,walking_line=min(walking,key=lambda value:value[1].distance(museum_target))
     p=walking_line.interpolate(walking_line.project(museum_target))
     landmark['arrival']={'x':p.x,'z':p.y}
+    for l in landmarks[1:]:
+        target=Point(l['x'],l['z']);options=[]
+        for r,line in zip(roads,road_lines):
+            if r.get('bridge') or r.get('elevationMode')=='terrain' and l['type']=='qingchuange':continue
+            point=line.interpolate(line.project(target))
+            if point.distance(target)>500 or water.covers(point):continue
+            if any(g.buffer(3).covers(point) for g in landmark_shapes):continue
+            if any(Polygon(b['rings'][0],b['rings'][1:]).covers(point) for b in buildings if abs(b['x']-point.x)<100 and abs(b['z']-point.y)<100):continue
+            options.append((point.distance(target)+(50 if r['mode']=='car' else 0),point,r))
+        if not options:raise ValueError('No safe landmark arrival: '+l['name'])
+        _,point,r=min(options,key=lambda row:row[0]);l['arrival']={'x':point.x,'z':point.y,'y':sample_hill(hills,point.x,point.y),'road':r['name']}
     city={'schemaVersion':2,'origin':ORIGIN,'bounds':bounds,'region':{'id':profile['id'],'name':profile['name'],'boundsWgs84':profile['boundsWgs84']},
-        'source':raw['source'],'water':polygons(water),'waterAreaM2':round(water.area),'parks':polygons(parks),
+        'source':raw['source'],'water':polygons(water),'waterAreaM2':round(water.area),'parks':polygons(parks.difference(forest)),'forest':polygons(forest),
         'land':polygons(region.difference(water)),'asphalt':polygons(asphalt),'shoulders':polygons(shoulders),
-        'roads':roads,'pedestrian':polygons(pedestrian),'tunnels':[],'rampCuts':[],'landmarks':[landmark],'buildings':buildings,'places':places,'controlPoints':[],'spawn':spawn,
+        'roads':roads,'pedestrian':polygons(pedestrian),'tunnels':[],'rampCuts':[],'landmarks':landmarks,'buildings':buildings,'places':places,'controlPoints':[],'spawn':spawn,
         'pois':raw.get('pois',[]),'streetNodes':raw.get('streetNodes',[])}
+    if hills:
+        hills.pop('_values',None);city['hills']=hills;city['bridgeModels']=bridge_models
+    city['region'].update({'widthM':round(bounds[2]-bounds[0],1),'heightM':round(bounds[3]-bounds[1],1),'areaKm2':round(region.area/1e6,3),'scale':'1:1'})
+    if height_matcher:city['heightSupplement']={**height_matcher.source,'matching':dict(height_matcher.stats)}
     road_audit=audit_roads(roads,bounds,landmark)
     city['streetFocus']={'roadIds':[r['id'] for r in roads if r['name'] in ('江汉路','江汉路步行街')],'landmarkId':'jianghanguan'}
     city['supplement']={'provider':'Overture Maps','release':json.loads((overture_path.with_suffix('.geojson.state')).read_text())['last_release'],'sha256':hashlib.sha256(overture_path.read_bytes()).hexdigest(),'license':'ODbL 1.0'}
@@ -187,8 +238,8 @@ def main():
     dump(stage/'manifest.json',manifest);dump(stage/'metro.json',{'stations':[],'lines':[]})
     report={'source':raw['source'],'roads':len(roads),'buildings':len(buildings),'heightSources':dict(collections.Counter(b['heightSource'] for b in buildings)),
         'waterAreaM2':round(water.area),'waterPolygons':len(city['water']),'tiles':len(manifest['tiles']),'places':[p['name'] for p in places],
-        'buildingSources':dict(collections.Counter(b['source'] for b in buildings)),'supplement':city['supplement'],'landmarks':['江汉关博物馆'],'roadAudit':road_audit,'spatialAudit':spatial_audit,'excluded':dict(excluded),'skippedSourceGeometries':raw['skippedGeometries'],
-        'limitations':['Flat ground, no DEM','Actual building footprints extruded; facade styles and missing heights are estimates','Jianghanguan is a photo-referenced simplified exterior, not surveyed detail','Bridge/tunnel/layer roads excluded pending elevation verification','Vehicle visuals inherited from Shanghai, not an authentic Wuhan fleet','No metro data or ride-hailing tasks yet']}
+        'buildingSources':dict(collections.Counter(b['source'] for b in buildings)),'supplement':city['supplement'],'landmarks':[l['name'] for l in landmarks],'region':city['region'],'heightSupplement':city.get('heightSupplement'),'bridges':{'sourceSegments':len(crossings),'names':sorted(set(r['bridgeGroup'] for r in crossings))},'roadAudit':road_audit,'spatialAudit':spatial_audit,'excluded':dict(excluded),'skippedSourceGeometries':raw['skippedGeometries'],
+        'limitations':['Only Guishan/Sheshan relief enabled from coarse global terrain; other lowland remains flat','Actual footprints extruded; facade details and missing heights remain estimates','Landmarks are simplified exteriors, not surveyed models','Three named crossings enabled with estimated terrain-tied deck profiles; other elevated/tunnel roads remain excluded','No metro data or ride-hailing tasks yet']}
     attributes_report={'categoryCounts':dict(collections.Counter(b['category'] for b in buildings)),
         'categorySources':dict(collections.Counter(b['categorySource'] for b in buildings)),
         'heightSources':dict(collections.Counter(b['heightSource'] for b in buildings)),

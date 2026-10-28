@@ -80,7 +80,7 @@ async function initApp() {
   await setStatus('正在铺设街道、河川与山坡…');
   buildGround(scene);
   markInit('ground');
-  await setStatus('正在生成汉口建筑与屋顶细节…');
+  await setStatus('正在生成两江三镇建筑与屋顶细节…');
   const cityBlocks = buildCityBlocks(scene);
   markInit('buildings');
   await setStatus('正在准备武汉道路系统…');
@@ -88,7 +88,7 @@ async function initApp() {
   markInit('elevated');
   if (!skip.has('paint')) buildRoadPaint(scene);
   markInit('roadPaint');
-  await setStatus('正在构建江汉关钟楼…');
+  await setStatus('正在构建江汉关、黄鹤楼与龟山电视塔…');
   const { colliders: landmarkColliders, system: wuhanLandmarkSystem } = skip.has('landmarks') ? { colliders: [] } : buildLandmarks(scene);
   markInit('landmarks');
   await setStatus('正在种行道树、挂招牌、装红绿灯…');
@@ -468,8 +468,8 @@ async function initApp() {
     elLocation.replaceChildren(...nodes);
   }
 
-  function teleportTo(x, z, heading = Math.PI) {
-    const destination = controllerManager.teleportActiveTo(x, z, heading);
+  function teleportTo(x, z, heading = Math.PI, y = null) {
+    const destination = controllerManager.teleportActiveTo(x, z, heading,y);
     touchControls.reset();
     gamepadControls.reset();
     cameraSystem.resetForTeleport();
@@ -501,7 +501,7 @@ async function initApp() {
   teleportButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const loc = TELEPORT_LOCATIONS[btn.getAttribute('data-teleport')];
-      if (loc) teleportTo(loc.x, loc.z, loc.heading);
+      if (loc) teleportTo(loc.x, loc.z, loc.heading,loc.y??null);
       closePopovers();
     });
   });
@@ -572,7 +572,7 @@ async function initApp() {
   if (params.get('at') && TELEPORT_LOCATIONS[params.get('at')]) {
     const loc = TELEPORT_LOCATIONS[params.get('at')];
     controllerManager.setMode(MODES.includes(params.get('mode')) ? params.get('mode') : controllerManager.activeMode);
-    controllerManager.teleportActiveTo(loc.x, loc.z, loc.heading);
+    controllerManager.teleportActiveTo(loc.x, loc.z, loc.heading,loc.y??null);
   }
   selectMode(MODES.includes(params.get('mode')) ? params.get('mode') : controllerManager.activeMode);
   selectCamera(CAMERA_PRESETS.some((p) => p.id === params.get('camera')) ? params.get('camera') : 'chase', true);
@@ -662,9 +662,9 @@ async function initApp() {
   window.addEventListener('error',e=>runtimeErrors.push(e.message));
   window.addEventListener('unhandledrejection',e=>runtimeErrors.push(String(e.reason)));
   window.wuhan={ready:false,base:'slop-taipei',data:GEO,scene,renderer,controllers:controllerManager,cameraSystem,map:mapSystem,
-    placement:streetProps.placement,stats:{...streetProps.stats,buildings:cityBlocks.stats},setMode:mode=>{controllerManager.setMode(mode);selectCamera('chase',true)},
+    placement:streetProps.placement,stats:{...streetProps.stats,buildings:cityBlocks.stats},setMode:mode=>selectMode(mode),
     setView:id=>selectCamera(typeof id==='number'?CAMERA_PRESETS[id].id:id,true),
-    gotoLandmark:(id,{mode='person'}={})=>{const l=TELEPORT_LOCATIONS[id]||GEO.landmarks[id];if(!l)return false;controllerManager.setMode(mode);teleportTo(l.x,l.z,l.heading||0);return true},
+    gotoLandmark:(id,{mode='person'}={})=>{const l=TELEPORT_LOCATIONS[id]||GEO.landmarks[id];if(!l)return false;selectMode(mode);teleportTo(l.x,l.z,l.heading||0,l.y??null);return true},
     metrics:()=>({errors:runtimeErrors,frames:frameTimes.slice(-180),render:renderer.info.render,base:'slop-taipei'})};
   await precompileShaders();
   markInit('compile');

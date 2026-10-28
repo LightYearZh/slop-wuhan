@@ -3,6 +3,8 @@ import collections,math
 from shapely.geometry import Polygon,Point,LineString
 from shapely.ops import unary_union
 from shapely.strtree import STRtree
+from shapely.prepared import prep
+from shapely import make_valid
 
 CATS=['convenience','food','drink','health','bank','beauty','hotel','karaoke','shop']
 
@@ -25,10 +27,12 @@ def sign_footprint(x,z,nx,nz,width,depth,offset):
 
 def build_signs(city,height_of):
     shapes=[Polygon(b['rings'][0],b['rings'][1:]) for b in city['buildings']]
-    obstacles=unary_union(shapes+[Polygon(l['footprint'][0],l['footprint'][1:]) for l in city['landmarks']])
-    water=unary_union([Polygon(p[0],p[1:]) for p in city['water']])
+    obstacle_shapes=shapes+[Polygon(l['footprint'][0],l['footprint'][1:]) for l in city['landmarks']]
+    obstacle_tree=STRtree(obstacle_shapes)
+    water=prep(unary_union([make_valid(Polygon(p[0],p[1:])) for p in city['water']]))
     corridors=unary_union([LineString([(p[0],p[2]) for p in r['points']]).buffer(
         (r['width'] if r['mode']=='car' else max(2,r['width']-4))/2+.15) for r in city['roads']])
+    corridors=prep(corridors)
     roads=[LineString([(p[0],p[2]) for p in r['points']]) for r in city['roads']];road_tree=STRtree(roads)
     edges=[];lines=[]
     for bi,(b,poly) in enumerate(zip(city['buildings'],shapes)):
@@ -51,7 +55,8 @@ def build_signs(city,height_of):
         if any(math.hypot(x-s[0],z-s[1])<4 for s in records):rejected['near_another_sign']+=1;return
         width=min(5.2,length-.7,2*min(t,1-t)*length-.2)
         if width<2.2:rejected['short_wall']+=1;return
-        def clear(p):return p.intersection(obstacles).area<1e-7 and not p.intersects(water) and not p.intersects(corridors)
+        def clear(p):
+            return not water.intersects(p) and not corridors.intersects(p) and all(p.intersection(obstacle_shapes[int(i)]).area<1e-7 for i in obstacle_tree.query(p))
         horizontal=sign_footprint(x,z,nx,nz,width,.16,.12)
         vertical=sign_footprint(x,z,nx,nz,.2,.95,.62)
         if not clear(horizontal):rejected['unsafe_horizontal_sign']+=1;return

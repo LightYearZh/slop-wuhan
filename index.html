@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Slop 武汉</title>
   <link rel="icon" href="data:," />
-  <meta name="description" content="武汉漫游：江汉路、沿江大道与江汉关。真实城市轮廓与程序化街景。" />
+  <meta name="description" content="武汉两江三镇漫游：江汉关、长江大桥、黄鹤楼与龟山。真实距离、公开地理数据与程序化街景。" />
   <!-- three.js r186 (served by jsDelivr) -->
   <!-- Fetch the city modules in parallel before stylesheets; the module graph controls evaluation order. -->
-  <link rel="modulepreload" href="./js/runtime/wuhan-geodata.js" />
   <link rel="modulepreload" href="./js/runtime/city-config.js" />
   <link rel="modulepreload" href="./js/runtime/tsl-materials.js" />
   <link rel="modulepreload" href="./js/runtime/trees.js" />
@@ -121,7 +120,7 @@
       <button id="btn-teleport" class="tool-btn" type="button" popovertarget="teleport-popover" title="把目前的角色传送到…">
         <svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span class="tool-label">传送</span><svg class="icon icon-sm" aria-hidden="true"><use href="#i-chevron-down"/></svg>
       </button>
-      <button id="btn-open-map" class="tool-btn" type="button" title="武汉汉口街道地图 [M]">
+      <button id="btn-open-map" class="tool-btn" type="button" title="武汉两江三镇街道地图 [M]">
         <svg class="icon" aria-hidden="true"><use href="#i-map"/></svg><span class="tool-label">地图</span><kbd>M</kbd>
       </button>
       <span class="toolbar-divider" aria-hidden="true"></span>
@@ -142,7 +141,7 @@
   <!-- Bottom-Left: Street-Name Signs & Live GPS Radar Minimap -->
   <div class="hud hud-bottom-left">
     <div id="hud-location" class="location" aria-live="off"></div>
-    <aside id="minimap-card" class="panel radar" aria-label="即时街道小地图" title="开启武汉汉口街道地图 [M]">
+    <aside id="minimap-card" class="panel radar" aria-label="即时街道小地图" title="开启武汉两江三镇街道地图 [M]">
       <canvas id="minimap-canvas"></canvas>
       <span class="radar-north" aria-hidden="true">N</span>
       <kbd class="radar-key">M</kbd>
@@ -222,7 +221,7 @@
   </div>
 
   <!-- Full-Screen Interactive Wuhan Street Map ([M]) -->
-  <section id="fullmap-modal" class="fullmap-modal hidden" role="dialog" aria-modal="true" aria-label="武汉汉口互动街道地图">
+  <section id="fullmap-modal" class="fullmap-modal hidden" role="dialog" aria-modal="true" aria-label="武汉两江三镇互动街道地图">
     <div id="fullmap-canvas-wrap" class="fullmap-canvas-wrap">
       <canvas id="fullmap-canvas"></canvas>
     </div>
@@ -231,13 +230,13 @@
       <div class="panel fullmap-title">
         <span class="mta-bullet" aria-hidden="true">汉</span>
         <div>
-          <h2>武汉汉口街道图</h2>
+          <h2>武汉两江三镇街道图</h2>
           <p id="fullmap-player-info" class="fullmap-subtitle">汉口 · 沿江大道</p>
         </div>
       </div>
       <label class="panel fullmap-search-wrap">
         <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
-        <input id="fullmap-search" class="fullmap-search" type="text" placeholder="搜索路名与地标：江汉路、沿江大道、江汉关…" aria-label="搜索路名或地标" autocomplete="off" spellcheck="false" />
+        <input id="fullmap-search" class="fullmap-search" type="text" placeholder="搜索路名与地标：黄鹤楼、龟山电视塔、江汉关…" aria-label="搜索路名或地标" autocomplete="off" spellcheck="false" />
       </label>
       <button id="close-fullmap-btn" class="panel tool-btn fullmap-close" type="button" title="关闭地图 [M / Esc]">
         <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg><span class="tool-label">关闭</span><kbd>Esc</kbd>
@@ -260,7 +259,7 @@
       </div>
       <div class="panel map-zoom">
         <button id="map-center-player" class="icon-btn" type="button" title="回到你的位置" aria-label="回到你的位置"><svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg></button>
-        <button id="map-view-all" class="icon-btn" type="button" title="显示汉口试验区" aria-label="显示全部"><svg class="icon" aria-hidden="true"><use href="#i-fit"/></svg></button>
+        <button id="map-view-all" class="icon-btn" type="button" title="显示两江三镇核心区" aria-label="显示全部"><svg class="icon" aria-hidden="true"><use href="#i-fit"/></svg></button>
       </div>
     </div>
 
@@ -279,6 +278,6 @@
     </div>
   </section>
 
-<div class="data-credit">地理数据 © OpenStreetMap contributors · Overture Maps · 缺失楼高与通用外观为推断</div>
+<div class="data-credit">数据：© OpenStreetMap contributors · Overture Maps · 3D-GloBFP · Terrain Tiles / USGS；高度与外观含估计</div>
 </body>
 </html>

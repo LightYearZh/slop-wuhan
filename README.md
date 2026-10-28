@@ -1,63 +1,55 @@
-# 武汉漫游 · Slop Wuhan 0.4.1
+# 武汉漫游 · Slop Wuhan 0.5.0
 
-当前运行基础已切换为 [shwang1979/slop-taipei](https://github.com/shwang1979/slop-taipei)，复用其建筑与屋顶细节、街道、交通、角色、车辆、相机、地图、光照与音效系统。界面使用简体中文，地理内容使用武汉江汉路—沿江大道约 2×2 公里试验区。
+基于 [Slop Taipei](https://github.com/shwang1979/slop-taipei) 的真实距离漫游。范围扩展为**东西8.06公里、南北6.01公里，48.41平方公里外框（含江面）**。WGS84原点不变，每单位1米；没有压缩街区或改变地标间的距离。
 
-台北参考仓库完整保存在 `../reference-taipei/`；上海参考仍保存在 `../reference-shanghai/`。上游版本见 [来源记录](docs/UPSTREAM.json)。上海运行版本保存在 `archive/shanghai-runtime-0.3.0` 分支，独立 Phase 0 保存在 `archive/standalone-pilot`。现有旧 `js/` 文件与测试暂时保留供数据工具和回退使用，当前网页入口是 `js/runtime/main.js`。
+保留江汉路、江汉关与沿江大道，新增两江交汇、龟山、蛇山、黄鹤楼、龟山电视塔、晴川阁，以及武汉长江大桥、晴川桥、江汉桥。不包含全武汉或整个二环，二七滨江与鹦鹉洲大桥留待后续。
 
 ## 本地运行
 
-需要 Node.js 22.12+。地理数据已经随仓库保存，日常浏览无需下载 PBF。
+需要Node.js 22.12+；生成数据随仓库保存，浏览不需要另行下载。
 
 ```sh
 npm ci
 npm run dev
 ```
 
-打开 http://127.0.0.1:4799/ 。已有页面请刷新。
+打开 http://127.0.0.1:4799/ ，旧页面请刷新。生产检查使用 `npm run build`、`npm run preview`，地址 http://127.0.0.1:4187/ 。
 
-- `WASD` 移动，`Shift` 加速，鼠标拖动环顾。
-- `1/2/3/4` 切换步行、汽车、踏板车、直升机；飞行时 `E/Space` 上升，`Q/C` 下降。
-- `M` 打开地图，可搜索江汉路、沿江大道、江汉关等地点；地图点击传送。
-- 顶部“传送”选择目的地；右下角相机菜单可选择江汉关、江汉路、江岸、汉口全景和空中环游。
-- 顶部切换黄昏、正午、蓝调、夜晚，`N` 切换声音，`H` 隐藏界面。
+- WASD移动，Shift加速，拖动鼠标环顾。
+- 1/2/3/4切换步行、汽车、踏板车、直升机；E/Space上升，Q/C下降。
+- M打开地图，可搜索黄鹤楼、龟山电视塔、江汉关或路名；顶部“传送”提供安全落点。
+- 相机菜单新增黄鹤楼、龟山、长江大桥、两江三镇全景。
+- 顶部切换天色，N切换声音，H隐藏界面。
 
-## 0.4.1：台北效果链路复查
+## 数据与局限
 
-详细检查见 [台北运行效果复查](docs/TAIPEI_PARITY_AUDIT.md)。修复将道路折点当路口的问题，恢复源信号灯导入、POI 分类与安全竖招牌，修复屋顶房被边界检查几乎全部过滤的问题，并重新接回江汉路特色街具。运行接口现在保留 1,039 条路口间连接，其中 409 条含完整折线。
+普通建筑23,465栋：3,149栋OSM、20,316栋去重后的Overture。4,065段道路适配为9,560条路口间连接；水域约11.38平方公里。保留514条POI、317条交通设施源节点，转换得到154处横道和102组信号控制。街灯、树木和通用立面仍为程序化表现，不是实景设施清单。
 
-## 这版实际做了什么
+新增3D-GloBFP **2020年遥感估计高度**：20,127栋缺高建筑采用严格轮廓匹配后的模型值；已有高度、层数和文献资料优先。仍有2,808栋使用显示估算。模型可能明显低估高楼，不能称为可靠实测楼高；对照结果和处理方法见[扩区记录](docs/CORE_EXPANSION.md)。
 
-武汉源层保留 404 段道路、2,097 栋普通建筑、江汉关地标和 4 片水域。422 栋建筑轮廓来自 OSM，1,675 栋来自去重后的 Overture。源层有空间审计，保留对象 ID、院落、已有高度与文献依据。江汉关沿用已有简化模型；平安大厦保留裙房、塔楼、顶部三个体量，转换到台北运行接口后共 2,099 条建筑分部记录。
+公开Terrain Tiles高程用于龟山、蛇山起伏，建筑、道路和玩家共用高度采样。其余低地尚未完整接入DEM；山体边缘、显示高程基准、桥面与坡道仍含估计。黄鹤楼、电视塔、晴川阁是程序化简化外观；江汉关保留。普通历史建筑的汉口专属立面仍待完善。
 
-缺失高度的 2,081 栋在源层仍保留 12m 占位与缺失标记；**显示层改为按用途、面积和固定种子估算层数**，真实高度始终优先。推断高度不是逐栋实景数据，详见 `public/data/runtime-audit.json` 与生成模块的 `buildingMeta`。没有为了丰富度更改真实轮廓或添加虚构建筑。
+## 数据重建
 
-立面、窗格、空调、屋顶设备、店面等复用台北的程序规则；建筑用途、现有资料与高度参与样式选择。204 条招牌记录混合源 POI 名称、建筑名称与通用业态文字，按完整外挑占地检查后启用横向／竖向牌，外观及安装位置不是实测店招。通用细节仍保留上游风格，后续需继续校准为汉口建筑语言。
-
-街树、路灯及停车候选使用武汉的建筑／水域／全路网／步行中部／其他街具统一避让。地面碰撞保留院落，地标坐标与专用景点相机换成武汉。没有导入台北地形、101、纪念堂或台北店名。车辆为上游简化模型，修改了文字与部分密度，尚非真实武汉车队。
-
-## 数据重建与自动化
-
-第一次在新机器生成需准备 Python 3.9+ 和湖北 PBF：
-
-1. 从 https://download.geofabrik.de/asia/china/hubei.html 下载 `hubei-latest.osm.pbf`。
-2. 放在项目 `data/hubei-latest.osm.pbf`。当前机器已有约 53MB 文件，不必重新下载。
-3. 执行：
+Python依赖见requirements.txt。固定湖北PBF放到data/hubei-latest.osm.pbf后：
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/pip install -r requirements.txt
 npm run data:build
 npm run verify
 ```
 
-`tools/build-wuhan.py` 保留上海来源的 PBF 提取和武汉合并、空间审计流程，输出可追溯源层。`tools/build-runtime.py` 接着转换为台北运行接口，生成 `js/runtime/wuhan-geodata.js`，分离源高度与显示推断。仅调整外观／显示规则可运行 `npm run data:runtime`。
+默认config/wuhan-core.json；旧config/wuhan-pilot.json保留。使用 `WUHAN_PROFILE=config/wuhan-pilot.json npm run data:build` 会将生成数据替换为旧试验区。完整回退优先用Git基线。
 
-固定版本 Overture 小范围提取已提交于 `data/source/overture-buildings.geojson`，不需要再次联网。来源快照：OSM 2026-10-27 21:23:59 UTC，Overture 2026-10-21.0。扩区入口仍是 `config/wuhan-pilot.json`，扩区前需要覆盖新范围的 Overture 文件，并验证新运行系统的性能。
+裁剪后的Overture、3D-GloBFP和高程均已保存。若从原始大包重新裁剪，用 `npm run data:prepare`；下载、校验和与文件位置见扩区记录。普通构建不需要省级高度ZIP。
 
-## 验证与当前边界
+## 版本与来源
 
-`npm run verify` 运行 57 项 JavaScript 测试、17 项 Python 测试、源层空间审计和生产构建。包括保留的通用回归测试与新增的台北运行契约、来源／推断高度、建筑分部、路网方向及院落碰撞检查。还需浏览器验收实际加载、地图、模式和视角；构建通过不能替代画面验证。
+- 扩展前基线：baseline/0.4.1-hankou，指向8f6de1c。
+- 当前入口js/runtime/main.js；复用台北的渲染、角色、车辆、交通、地图和音效。
+- 原上海运行版本：archive/shanghai-runtime-0.3.0；独立Phase 0：archive/standalone-pilot。
+- 0.4.1效果复查见docs/TAIPEI_PARITY_AUDIT.md；上游版本见docs/UPSTREAM.json。
+- 应用MIT；地理数据库ODbL；3D-GloBFP为CC BY 4.0；高程保留Terrain Tiles／USGS归属。[数据许可](public/data/DATA-LICENSE.md)。
 
-当前仍是平地试验区，没有 DEM、跨江桥隧、武汉地铁或网约车任务；23 条非地面层级源道路未开放。台北运行系统将本试验区整体加载后分块合批／裁剪，**旧版 500m 流式加载不是当前运行路径**，不宜直接扩大全市。下一步先校准汉口普通建筑、店招与可靠楼高，再扩区。
-
-代码保留 MIT 许可，来源见 [LICENSE](LICENSE)、[台北许可](docs/upstream/TAIPEI-LICENSE)、[运行系统迁移记录](docs/TAIPEI_RUNTIME_MIGRATION.md)。地理数据 © OpenStreetMap contributors、Overture Maps，见 [数据许可](public/data/DATA-LICENSE.md)。
+当前仍整体构建核心区静态场景，再按空间块和距离裁剪显示；旧500米文件尚不是当前运行入口的按需下载系统。初始数据包明显增加，低配置设备仍需实测。

@@ -100,7 +100,7 @@ function treeSites() {
     if (!SIDEWALKS.contains(tx, tz) || buildingAt(tx, tz, 0) || nearCrossing(tx, tz, 5) || buildingAt(tx + rx * 1.2, tz + rz * 1.2)) return;
     if(!placement.reserve('tree',tx,tz,.65))return;
     const sp = Math.floor(strHash(l.name || String(l.id)) * 3);
-    sites.push({ x: tx, y: SIDEWALK_HEIGHT, z: tz, species: sp, scale: 0.75 + rand() * 0.3, tier: 0 });
+    sites.push({ x: tx, y: hillHeight(tx,tz)+SIDEWALK_HEIGHT, z: tz, species: sp, scale: 0.75 + rand() * 0.3, tier: 0 });
   }, { margin: 9 });
   // Boulevard medians (仁爱路, 敦化南路 ...): trees between the two one-way carriageways
   for (const l of ROAD_LINKS) {
@@ -119,7 +119,7 @@ function treeSites() {
       for (let d = 5; d <= 22; d += 3.5) if (CARRIAGEWAY.contains(p.x + lx * (off + d), p.z + lz * (off + d))) other = true;
       if (!other) continue;
       if(!placement.reserve('tree',mx,mz,.65))continue;
-      sites.push({ x: mx, y: 0.15, z: mz, species: 0, scale: 1.05 + rand() * 0.3, tier: 0 });
+      sites.push({ x: mx, y: hillHeight(mx,mz)+0.15, z: mz, species: 0, scale: 1.05 + rand() * 0.3, tier: 0 });
     }
   }
   const street = sites.length;
@@ -166,7 +166,7 @@ function buildLamps(group) {
     const pz = z + rz * off;
     if (buildingAt(px, pz, 0) || nearCrossing(px, pz, 3)) return;
     if(!placement.reserve('lamp',px,pz,.2))return;
-    sites.push({ x: px, z: pz, y: SIDEWALK_HEIGHT, yaw: Math.atan2(-rx, -rz) });
+    sites.push({ x: px, z: pz, y: hillHeight(px,pz)+SIDEWALK_HEIGHT, yaw: Math.atan2(-rx, -rz) });
   }, { margin: 6 });
   // pole, arm & head in one mesh (one draw per chunk): `glow` marks the head, lit from below at night
   const parts = [

@@ -13,14 +13,20 @@ const CAMERA_PRESETS = [
   {id:'jianghanguan',name:'江汉关钟楼',short:'江汉关',category:'scenic',fov:50},
   {id:'jianghan',name:'江汉路步行街',short:'江汉路',category:'scenic',fov:58},
   {id:'river',name:'沿江大道 · 汉口江岸',short:'江岸',category:'scenic',fov:48},
-  {id:'overview',name:'汉口全景',short:'全景',category:'scenic',fov:50},
+  {id:'yellow-crane',name:'黄鹤楼与蛇山',short:'黄鹤楼',category:'scenic',fov:50},
+  {id:'guishan',name:'龟山电视塔',short:'龟山',category:'scenic',fov:50},
+  {id:'bridge',name:'武汉长江大桥',short:'大桥',category:'scenic',fov:54},
+  {id:'overview',name:'两江三镇全景',short:'全景',category:'scenic',fov:50},
   {id:'drone',name:'汉口空中环游',short:'环游',category:'scenic',fov:50}
 ];
 const WUHAN_VIEWS = {
  jianghanguan:{position:[-63.65,22,644.59],target:[-95.65,22,711.59]},
  jianghan:{position:[-187.747,5,632.529],target:[-95.65,18,711.59]},
  river:{position:[200,70,900],target:[-280,38,430]},
- overview:{position:[850,620,1100],target:[-250,30,160]}
+ 'yellow-crane':{position:[120,120,4430],target:[400,64,4210]},
+ guishan:{position:[-1250,200,3500],target:[-1730,150,3000]},
+ bridge:{position:[-500,240,3100],target:[-850,20,3650]},
+ overview:{position:[2700,2200,6100],target:[-650,0,2300]}
 };
 
 class CameraSystem {

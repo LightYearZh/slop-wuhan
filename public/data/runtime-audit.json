@@ -1,38 +1,58 @@
 {
   "runtimeBase": "shwang1979/slop-taipei",
   "ruleVersion": "hankou-display-v1",
-  "sourceBuildings": 2097,
-  "renderedParts": 2099,
-  "roadLinks": 1039,
-  "curvedRoadLinks": 409,
-  "crossings": 0,
-  "signals": 17,
-  "streetDetailRejected": {},
+  "sourceBuildings": 23465,
+  "renderedParts": 23467,
+  "roadLinks": 9560,
+  "curvedRoadLinks": 4471,
+  "crossings": 154,
+  "signals": 102,
+  "streetDetailRejected": {
+    "crossing_not_on_carriageway": 8
+  },
   "heightSources": {
-    "visual-estimate:hankou-display-v1": 2081,
+    "visual-estimate:hankou-display-v1": 2808,
+    "OSM:height": 46,
+    "3D-GloBFP:model-estimate": 20127,
+    "OSM:levels": 482,
     "reference:architectural-total": 1,
-    "OSM:levels": 11,
-    "OSM:height": 3,
     "reference:storeys-derived": 1
   },
-  "signRecords": 204,
-  "verticalSignCandidates": 184,
+  "signRecords": 675,
+  "verticalSignCandidates": 570,
   "signTextSources": {
-    "OSM:POI": 26,
-    "generic:business-category": 163,
-    "OSM:building-name": 15
+    "generic:business-category": 555,
+    "OSM:POI": 71,
+    "OSM:building-name": 49
   },
   "signRejected": {
-    "unsafe_horizontal_sign": 32,
-    "short_wall": 2,
-    "poi_without_nearby_street_wall": 18,
-    "near_another_sign": 12
+    "poi_without_nearby_street_wall": 80,
+    "unsafe_horizontal_sign": 86,
+    "short_wall": 4,
+    "near_another_sign": 34
   },
+  "region": {
+    "id": "wuhan-three-towns-core",
+    "name": "武汉·两江三镇核心区",
+    "boundsWgs84": [
+      114.252,
+      30.54,
+      114.336,
+      30.5942
+    ],
+    "widthM": 8056.9,
+    "heightM": 6008.7,
+    "areaKm2": 48.412,
+    "scale": "1:1"
+  },
+  "hillTiles": 26,
+  "elevatedLinks": 32,
+  "terrainLinks": 657,
   "limits": [
-    "Missing heights are visual estimates, not surveyed",
+    "Missing heights and 3D-GloBFP heights are estimates, not surveyed",
     "No Taipei geography or landmarks imported",
-    "Flat terrain; no bridges/tunnels/MRT",
+    "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "3fe41a1602ff3b984d8842d7b903fb894c111679caa01caa1634ab8a76a106ad"
+  "sourceCitySha256": "546734c8a435f20ab7198f07419334939c6cd365c5240ce1fcccec09975be88c"
 }

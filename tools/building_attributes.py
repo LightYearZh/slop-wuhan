@@ -5,7 +5,7 @@ from shapely.affinity import scale
 from shapely.strtree import STRtree
 
 RETAINED_TAGS=('building','building:use','height','building:height','building:levels','roof:height','roof:shape','roof:colour','roof:material',
- 'building:material','building:colour','historic','heritage','start_date','shop','amenity','office','tourism','name','name:zh','old_name')
+ 'building:material','building:colour','historic','heritage','start_date','shop','amenity','office','tourism','name','name:zh','old_name','natural','man_made','ele')
 
 def height_value(raw):
     if raw is None:return None

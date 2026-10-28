@@ -21,6 +21,7 @@ def main():
     overlap=surfaces.intersection(blockers).area
     conflicts=[]
     for road in city['roads']:
+        if road.get('bridge'):continue  # Ground-surface gate; crossing deck clearance is checked separately.
         line=LineString([(p[0],p[2]) for p in road['points']])
         for i in tree.query(line):
             length=line.intersection(footprints[int(i)]).length

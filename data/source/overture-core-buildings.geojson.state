@@ -1,0 +1,14 @@
+{
+  "last_release": "2026-10-21.0",
+  "last_run": "2026-10-28T13:09:21.046580+00:00",
+  "theme": "buildings",
+  "type": "building",
+  "bbox": {
+    "xmin": 114.252,
+    "ymin": 30.54,
+    "xmax": 114.336,
+    "ymax": 30.5942
+  },
+  "backend": "geojson",
+  "output": "/Users/longyao/Workspace/Bianjing3D/slop-wuhan/data/source/overture-core-buildings.geojson"
+}

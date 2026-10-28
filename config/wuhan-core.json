@@ -1,0 +1,11 @@
+{
+  "id": "wuhan-three-towns-core",
+  "name": "武汉·两江三镇核心区",
+  "boundsWgs84": [114.252, 30.54, 114.336, 30.5942],
+  "origin": [114.293, 30.585],
+  "tileSizeM": 500,
+  "overtureExtract": "data/source/overture-core-buildings.geojson",
+  "heightExtract": "data/source/globfp-core-buildings.geojson",
+  "terrainExtract": "data/source/wuhan-core-terrain.json",
+  "description": "Approximately 8.06 km east-west by 6.01 km north-south; true WGS84 positions and metre distances, no geographic compression."
+}

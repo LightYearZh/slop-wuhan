@@ -48,7 +48,7 @@ class Importer(osmium.SimpleHandler):
             self.street_nodes.append({'id':str(n.id),'x':round(x,2),'z':round(z,2),
                 'tags':{k:v for k,v in n.tags if k in ('highway','crossing','crossing:signals','crossing:markings','traffic_signals','name')}})
         tags={k:v for k,v in n.tags if k in RETAINED_TAGS}
-        if not any(tags.get(k) for k in ('shop','amenity','office','tourism')):return
+        if not any(tags.get(k) for k in ('shop','amenity','office','tourism','historic','man_made')) and n.tags.get('natural') not in ('peak','hill'):return
         x,z=project(n.lon,n.lat)
         self.pois.append({'id':'osm-node-'+str(n.id),'x':round(x,2),'z':round(z,2),'tags':tags})
 
@@ -96,7 +96,7 @@ class Importer(osmium.SimpleHandler):
         if admin:
             if a.orig_id()==913067:self.boundary=polygons(geom)
             elif name in DISTRICTS:self.districts.append({'id':'osm-relation-'+str(a.orig_id()),'name':name,'polygons':polygons(geom)})
-        if kind:self.areas.append({'id':('way-' if a.from_way() else 'relation-')+str(a.orig_id()),'kind':kind,'polygons':polygons(geom.simplify(1,preserve_topology=True))})
+        if kind:self.areas.append({'id':('way-' if a.from_way() else 'relation-')+str(a.orig_id()),'name':name,'kind':kind,'natural':t.get('natural'),'polygons':polygons(geom.simplify(1,preserve_topology=True))})
         if building:
             tags={k:v for k,v in t if k in RETAINED_TAGS}
             height,source=height_from_tags(tags)

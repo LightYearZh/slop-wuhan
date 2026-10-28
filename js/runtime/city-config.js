@@ -11,7 +11,7 @@ const SIDEWALK_HEIGHT = 0.15;
 const WATER_LEVEL = -2.4;
 const ROAD_CLASSES = GEO.roadClasses; // motorway, trunk, primary, secondary, tertiary, unclassified, residential, ...
 const CLS = Object.fromEntries(ROAD_CLASSES.map((c, i) => [c, i]));
-const LINK_FLAG = { SLIP: 1, ELEVATED: 2, NO_CARS: 4 };
+const LINK_FLAG = { SLIP: 1, ELEVATED: 2, NO_CARS: 4, TERRAIN: 8 };
 
 const flatPts = (a) => {
   const out = [];
@@ -27,7 +27,7 @@ for (let i = 0; i < GEO.nodes.length; i += 4) {
   ROAD_NODES.push({ id: i / 4, x: GEO.nodes[i], z: GEO.nodes[i + 1], y: GEO.nodes[i + 2], r: GEO.nodes[i + 3], links: [], signal: -1 });
 }
 const ROAD_LINKS = GEO.links.map(([a, b, name, cls, w, lanes, oneway, flags, shape], id) => {
-  const stride = flags & LINK_FLAG.ELEVATED ? 3 : 2;
+  const stride = flags & (LINK_FLAG.ELEVATED | LINK_FLAG.TERRAIN) ? 3 : 2;
   const n = shape.length / stride;
   const pts = new Float32Array(n * 3);
   const cum = new Float32Array(n);

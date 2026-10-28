@@ -317,7 +317,7 @@ class ThirdPersonControllerManager {
     this.resetInput();
     if (!Number.isFinite(heading)) heading = ent.heading;
     const heli = this.activeMode === 'helicopter';
-    const altitude = heli ? Math.max(0.25, Math.min(900, savedAltitude ?? Math.max(92, ent.position.y))) : 0;
+    const altitude = heli ? Math.max(0.25, Math.min(900, savedAltitude ?? Math.max(92, ent.position.y))) : savedAltitude;
     const destination = this.findTeleportPosition(x, z, heading, altitude);
     if (destination) {
       ent.position.x = destination.x;
@@ -377,13 +377,13 @@ class ThirdPersonControllerManager {
     const clampPoint = (px, pz) => {
       pz = Math.max(BOUNDS.minZ + 20 - margin, Math.min(BOUNDS.maxZ - 20 + margin, pz));
       px = Math.max(BOUNDS.minX + 20 - margin, Math.min(BOUNDS.maxX - 20 + margin, px));
-      if (!heli && WATER.contains(px, pz)) return null;
+      if (!heli && WATER.contains(px, pz) && deckHeightAt(px,pz,(altitude??0)+1.2)<.6) return null;
       return { x: px, z: pz };
     };
     const clear = (p) => {
       if (!p) return false;
-      const baseY = heli ? altitude : this.getGroundHeight(p.x, p.z, this.activeMode);
-      const y = heli ? altitude : this.activeMode === 'person' ? baseY + 1 : 1;
+      const baseY = heli ? altitude : this.getGroundHeight(p.x, p.z, this.activeMode,altitude);
+      const y = heli ? altitude : this.activeMode === 'person' ? baseY + 1 : baseY + 1;
       // Keep other player models out of both the arrival and its default chase view. A corridor also prevents a
       // parked car between camera and character from hiding the character even when the camera itself is outside it.
       const viewTop = baseY + Math.max(body[entity.type][1], cameraUp);

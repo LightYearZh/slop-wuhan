@@ -253,19 +253,20 @@ function buildGround(scene) {
   group.name = 'WuhanGround';
   scene.add(group);
 
-  flatLayer(group, GEO.ground, -0.03, createLotGroundMaterial(), 'Lots');
+  const terrain={yAt:hillHeight};
+  flatLayer(group, GEO.ground, -0.03, createLotGroundMaterial(), 'Lots',terrain);
   const lawn = createParkLawnMaterial(false);
-  flatLayer(group, GEO.park, 0.0, createParkLawnMaterial(true), 'Parks');
+  flatLayer(group, GEO.park, 0.0, createParkLawnMaterial(true), 'Parks',terrain);
   flatLayer(group, GEO.grass, 0.008, lawn, 'Lawns');
   flatLayer(group, GEO.forest, 0.012, createForestFloorMaterial(), 'Woods', { yAt: (x, z) => Math.max(0, hillHeight(x, z) - 0.03) });
   const paving = createParkPavingMaterial();
   flatLayer(group, GEO.plaza, 0.02, paving, 'Plazas', { style: 1 });
   flatLayer(group, GEO.parking, 0.006, createLotGroundMaterial(), 'Parking');
   const road = createRoadSurfaceMaterial();
-  flatLayer(group, GEO.carriageway, 0.03, road, 'Carriageway');
+  flatLayer(group, GEO.carriageway, 0.03, road, 'Carriageway',terrain);
   flatLayer(group, GEO.apron, 0.02, road, 'Apron');
   flatLayer(group, GEO.airfield, 0.025, road, 'Runway');
-  flatLayer(group, GEO.pedestrian, 0.035, paving, 'PedestrianStreets', { style: 1 });
+  flatLayer(group, GEO.pedestrian, 0.035, paving, 'PedestrianStreets', { style: 1,...terrain });
 
   // Sports grounds
   const byColor = new Map();
@@ -280,7 +281,7 @@ function buildGround(scene) {
 
   // Raised sidewalks with their kerbs
   const sidewalk = createWuhanSidewalkMaterial();
-  flatLayer(group, GEO.sidewalks, SIDEWALK_HEIGHT, sidewalk, 'Sidewalks');
+  flatLayer(group, GEO.sidewalks, SIDEWALK_HEIGHT, sidewalk, 'Sidewalks',terrain);
   edgeWalls(group, GEO.sidewalks, 0.0, SIDEWALK_HEIGHT, createCurbMaterial(), 'Kerbs');
 
   // Rivers & ponds between concrete embankments

@@ -1,5 +1,7 @@
 """Topology diagnostics using retained OSM node IDs, with no guessed connectors."""
 import collections, math
+from shapely.geometry import Point,box
+from shapely.strtree import STRtree
 
 
 def audit_roads(roads,bounds,landmark):
@@ -21,6 +23,7 @@ def audit_roads(roads,bounds,landmark):
             components.append(group)
         return graph,positions,names,components,owner
     graph,positions,names,components,owner=graph_for(roads)
+    position_ids=list(positions);position_tree=STRtree([Point(*positions[n]) for n in position_ids])
     car=graph_for([r for r in roads if r['mode']=='car'])
     terminal=[];boundary_ends=0
     for n,edges in graph.items():
@@ -29,7 +32,8 @@ def audit_roads(roads,bounds,landmark):
         if min(abs(x-bounds[0]),abs(x-bounds[2]),abs(z-bounds[1]),abs(z-bounds[3]))<2:
             boundary_ends+=1;continue
         near=[]
-        for m,q in positions.items():
+        for index in position_tree.query(box(x-4,z-4,x+4,z+4)):
+            m=position_ids[int(index)];q=positions[m]
             if m==n or m in edges:continue
             d=math.dist((x,z),q)
             if d<4:near.append({'node':m,'distanceM':round(d,2),'roads':sorted(names[m])})

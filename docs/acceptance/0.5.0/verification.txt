@@ -1,0 +1,7 @@
+npm run verify
+JavaScript: 61 passed, 0 failed
+Python: 21 passed
+Spatial audit: road/building overlap 0, centreline conflicts 0
+Production build passed; large initial bundle warning remains (~8MB gzip).
+Browser: 0 runtime errors; inherited nonfatal empty draw warning remains.
+Bridge drive: actual vehicle physics with heading guided along mapped road, ~2196m; 30m/40m end margins; not a manual keyboard driving test.

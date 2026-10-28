@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {GEO} from '../js/runtime/wuhan-geodata.js';
-import {BUILDINGS,ROAD_LINKS,ROAD_NODES,TELEPORT_LOCATIONS,WATER} from '../js/runtime/city-config.js';
+import {BUILDINGS,ROAD_LINKS,ROAD_NODES,TELEPORT_LOCATIONS,WATER,hillHeight,deckHeightAt,linkPointAt} from '../js/runtime/city-config.js';
 import {circleFootprint} from '../js/runtime/collision-footprint.js';
 import {roofRectangleFits,fitRoofShed} from '../js/runtime/roof-layout.js';
 const city=JSON.parse(fs.readFileSync(new URL('../public/data/city.json',import.meta.url)));
@@ -12,8 +12,8 @@ test('Taipei runtime is the active entry and includes only Wuhan geography',()=>
  const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
  assert.match(html,/src="\.\/js\/runtime\/main.js"/);assert.match(html,/lang="zh-CN"/);
  assert.equal(GEO.city,'wuhan');assert.equal(GEO.frame.lon0,114.293);
- assert.deepEqual(Object.keys(GEO.landmarks),['jianghanguan']);
- assert.ok(TELEPORT_LOCATIONS.jianghanguan);assert.equal(GEO.viaducts.length,0);
+ assert.deepEqual(Object.keys(GEO.landmarks),['jianghanguan','yellow-crane','guishan-tower','qingchuange']);
+ assert.ok(TELEPORT_LOCATIONS.jianghanguan);assert.ok(GEO.links.some(l=>l[7]&2));
  assert.ok(!html.includes('武汉101'));assert.ok(!html.includes('信义'));
  const audit=JSON.parse(fs.readFileSync(new URL('../public/data/runtime-audit.json',import.meta.url)));
  assert.equal(audit.sourceCitySha256,createHash('sha256').update(fs.readFileSync(new URL('../public/data/city.json',import.meta.url))).digest('hex'));
@@ -79,4 +79,43 @@ test('real OSM signal nodes and POI signs reach the runtime with provenance',()=
  assert.ok(GEO.signMeta.some(m=>m.verticalAllowed));
  assert.ok(GEO.signMeta.some(m=>m.textSource==='OSM:POI'));
  assert.ok(GEO.signCats.includes('bank'));assert.ok(GEO.links.some(l=>l[8].length>4));
+});
+
+test('expanded core preserves metre scale, the pilot and the four mapped landmarks',()=>{
+ const b=GEO.bounds;assert.ok(b.maxX-b.minX>8000&&b.maxX-b.minX<8100);assert.ok(b.maxZ-b.minZ>6000&&b.maxZ-b.minZ<6100);
+ assert.equal(city.region.scale,'1:1');assert.deepEqual(city.origin,[114.293,30.585]);
+ assert.equal(GEO.landmarks['yellow-crane'].source,'osm-building-way-81641900');
+ assert.equal(GEO.landmarks['guishan-tower'].source,'osm-building-way-99463468');
+ assert.equal(GEO.landmarks['guishan-tower'].height,221.2); // OSM's 311.4m is the conflicting absolute-altitude label.
+ assert.deepEqual(new Set(GEO.districts.map(d=>d[0])),new Set(['汉口','汉阳','武昌']));
+});
+
+test('hill sampling, landmark foundations and building foundations share a single heightfield',()=>{
+ assert.ok(GEO.hills.tiles.length>0);assert.match(GEO.hills.source.sha256,/^[a-f0-9]{64}$/);
+ for(const id of ['yellow-crane','guishan-tower']){
+  const l=GEO.landmarks[id];assert.ok(hillHeight(l.x,l.z)>15);
+  assert.ok(Math.abs(hillHeight(l.x,l.z)-l.groundY)<.02);
+ }
+ assert.equal(hillHeight(0,0),0); // no urban building-height noise is promoted to terrain in the old pilot.
+ for(const b of BUILDINGS)assert.equal(b.ground,hillHeight(b.cx,b.cz));
+});
+
+test('remote-sensing heights preserve source identity, thresholds, age and uncertainty',()=>{
+ const models=city.buildings.filter(b=>b.heightSource==='3D-GloBFP:model-estimate');assert.ok(models.length>19000);
+ for(const b of models){const e=b.heightEvidence;assert.ok(e.iou>=.65&&e.areaRatio>=.7);assert.equal(e.referenceYear,2020);assert.match(e.confidence,/model-estimate/);assert.equal(b.h,e.heightM);}
+ assert.ok(city.buildings.some(b=>b.heightCandidate&&b.heightSource.startsWith('OSM:')));
+ assert.equal(city.heightSupplement.referenceYear,2020);assert.match(city.heightSupplement.archiveSha256,/^[a-f0-9]{64}$/);
+});
+
+test('bridge decks retain actual shared node elevations and clear the mapped water',()=>{
+ const elevated=ROAD_LINKS.filter(l=>l.flags&2);assert.ok(elevated.length>0);
+ for(const l of ROAD_LINKS){
+  assert.ok(Math.abs(l.pts[1]-ROAD_NODES[l.a].y)<.02);
+  assert.ok(Math.abs(l.pts[l.pts.length-2]-ROAD_NODES[l.b].y)<.02);
+ }
+ for(const l of elevated)for(let s=10;s<l.len-10;s+=20){
+  const p=linkPointAt(l,s);if(!WATER.contains(p.x,p.z))continue;
+  assert.ok(p.y>.6,`${l.name} deck at ${s.toFixed(0)}m must clear water`);
+  assert.ok(Math.abs(deckHeightAt(p.x,p.z)-p.y)<.5);
+ }
 });

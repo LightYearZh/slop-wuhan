@@ -1,6 +1,6 @@
 {
   "name": "slop-wuhan",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,8 @@
     "test:data": ".venv/bin/python -m unittest discover -s tests -p 'test_*rules.py' -v",
     "audit:data": ".venv/bin/python tools/audit-spatial.py",
     "verify": "npm test && npm run test:data && npm run audit:data && npm run build",
-    "data:runtime": ".venv/bin/python tools/build-runtime.py"
+    "data:runtime": ".venv/bin/python tools/build-runtime.py",
+    "data:prepare": ".venv/bin/python tools/prepare-core-data.py"
   },
   "dependencies": {
     "three": "file:vendor/three"

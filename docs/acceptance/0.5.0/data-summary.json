@@ -1,0 +1,226 @@
+{
+  "baseline": {
+    "commit": "8f6de1c",
+    "tag": "baseline/0.4.1-hankou"
+  },
+  "region": {
+    "id": "wuhan-three-towns-core",
+    "name": "武汉·两江三镇核心区",
+    "boundsWgs84": [
+      114.252,
+      30.54,
+      114.336,
+      30.5942
+    ],
+    "widthM": 8056.9,
+    "heightM": 6008.7,
+    "areaKm2": 48.412,
+    "scale": "1:1"
+  },
+  "sourceCitySha256": "546734c8a435f20ab7198f07419334939c6cd365c5240ce1fcccec09975be88c",
+  "roads": 4065,
+  "buildings": 23465,
+  "buildingSources": {
+    "OSM:footprint": 3149,
+    "Overture:footprint": 20316
+  },
+  "heightSources": {
+    "visual-estimate": 2808,
+    "OSM:height": 46,
+    "3D-GloBFP:model-estimate": 20127,
+    "OSM:levels": 482,
+    "reference:architectural-total": 1,
+    "reference:storeys-derived": 1
+  },
+  "heightMatching": {
+    "no_conservative_match": 3323,
+    "matched": 20140,
+    "applied_to_missing_height": 20127,
+    "retained_existing_height": 13,
+    "ambiguous_match": 2
+  },
+  "heightComparison": {
+    "reference": "non-random OSM floor-derived subset; not surveyed ground truth",
+    "count": 13,
+    "medianAbsoluteDifferenceM": 8.72,
+    "records": [
+      {
+        "id": "osm-building-way-99447611-0",
+        "name": "",
+        "retainedHeightM": 6.4,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 15.12,
+        "candidateId": "globfp-2322-675694"
+      },
+      {
+        "id": "osm-building-way-629397582-0",
+        "name": "",
+        "retainedHeightM": 108.8,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 36.572,
+        "candidateId": "globfp-2322-731242"
+      },
+      {
+        "id": "osm-building-way-629397620-0",
+        "name": "",
+        "retainedHeightM": 9.6,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 18.5,
+        "candidateId": "globfp-2322-728735"
+      },
+      {
+        "id": "osm-building-way-630215707-0",
+        "name": "",
+        "retainedHeightM": 80.0,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 17.879,
+        "candidateId": "globfp-2322-695406"
+      },
+      {
+        "id": "osm-building-way-630215710-0",
+        "name": "万达环球国际中心万达尊B座",
+        "retainedHeightM": 121.6,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 9.412,
+        "candidateId": "globfp-2322-695401"
+      },
+      {
+        "id": "osm-building-way-630379212-0",
+        "name": "",
+        "retainedHeightM": 6.4,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 11.588,
+        "candidateId": "globfp-2322-684361"
+      },
+      {
+        "id": "osm-building-way-630379233-0",
+        "name": "",
+        "retainedHeightM": 76.8,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 50.632,
+        "candidateId": "globfp-2322-697056"
+      },
+      {
+        "id": "osm-building-way-633612800-0",
+        "name": "毛泽东词亭",
+        "retainedHeightM": 3.2,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 9.034,
+        "candidateId": "globfp-2322-676231"
+      },
+      {
+        "id": "osm-building-way-675342054-0",
+        "name": "",
+        "retainedHeightM": 6.4,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 7.468,
+        "candidateId": "globfp-2322-681713"
+      },
+      {
+        "id": "osm-building-way-683638833-0",
+        "name": "武昌广东商城",
+        "retainedHeightM": 12.8,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 20.166,
+        "candidateId": "globfp-2322-679341"
+      },
+      {
+        "id": "osm-building-way-927232847-0",
+        "name": "",
+        "retainedHeightM": 96.0,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 33.514,
+        "candidateId": "globfp-2322-698018"
+      },
+      {
+        "id": "osm-building-way-927232876-0",
+        "name": "",
+        "retainedHeightM": 19.2,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 24.663,
+        "candidateId": "globfp-2322-698588"
+      },
+      {
+        "id": "osm-building-relation-15407236-0",
+        "name": "议员公所旧址",
+        "retainedHeightM": 6.4,
+        "retainedSource": "OSM:levels",
+        "candidateHeightM": 11.149,
+        "candidateId": "globfp-2322-676097"
+      }
+    ]
+  },
+  "landmarks": [
+    {
+      "id": "jianghanguan",
+      "name": "江汉关博物馆",
+      "heightM": 45.85,
+      "groundY": 0,
+      "source": "osm-building-way-128400530"
+    },
+    {
+      "id": "yellow-crane",
+      "name": "黄鹤楼",
+      "heightM": 51.4,
+      "groundY": 34.33,
+      "source": "osm-building-way-81641900"
+    },
+    {
+      "id": "guishan-tower",
+      "name": "龟山电视塔",
+      "heightM": 221.2,
+      "groundY": 64.0,
+      "source": "osm-building-way-99463468"
+    },
+    {
+      "id": "qingchuange",
+      "name": "晴川阁",
+      "heightM": 18,
+      "groundY": 11.69,
+      "source": "osm-building-way-675321040"
+    }
+  ],
+  "terrain": {
+    "nx": 324,
+    "nz": 242,
+    "res": 25,
+    "source": {
+      "provider": "Mapzen / Tilezen Terrain Tiles, global USGS SRTM/GMTED sources",
+      "url": "https://elevation-tiles-prod.s3.amazonaws.com/skadi/N30/N30E114.hgt.gz",
+      "sha256": "6771bf0c7235b55d2d25278a80022a47e8398d8c1fb0e573b273e84cda02ba81",
+      "sourceGridSamples": 3601,
+      "verticalUnits": "m",
+      "gridFormat": "HGT, big-endian int16, north-to-south rows",
+      "attribution": "Terrain Tiles / Mapzen; global terrain data courtesy of the U.S. Geological Survey",
+      "terms": "https://github.com/tilezen/joerd/blob/master/docs/attribution.md",
+      "limitations": [
+        "Coarse global terrain, not a local survey",
+        "Building/canopy returns may affect urban samples; apply only inside explicitly declared hill masks"
+      ]
+    },
+    "processing": {
+      "datumOffsetM": 24,
+      "datumMeaning": "display datum estimate near lowland streets; not an absolute height calibration",
+      "filter": "3x3 median",
+      "masks": [
+        {
+          "id": "guishan",
+          "x": -1420,
+          "z": 3090,
+          "rx": 1050,
+          "rz": 390
+        },
+        {
+          "id": "sheshan",
+          "x": 1100,
+          "z": 4225,
+          "rx": 1200,
+          "rz": 300
+        }
+      ],
+      "maskMethod": "declared visual ridge envelopes with feathered edges, not surveyed hill boundaries",
+      "outsideMask": "flat lowland pending terrain/road integration"
+    }
+  },
+  "waterAreaM2": 11383346
+}

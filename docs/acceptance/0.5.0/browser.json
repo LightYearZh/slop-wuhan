@@ -1,0 +1,91 @@
+{
+  "landings": [
+    {
+      "id": "jianghanguan",
+      "distanceToSafeArrivalM": 0,
+      "heightM": 0,
+      "expectedGroundM": 0
+    },
+    {
+      "id": "yellow-crane",
+      "distanceToSafeArrivalM": 0,
+      "heightM": 36.71440000000001,
+      "expectedGroundM": 36.71440000000001
+    },
+    {
+      "id": "guishan-tower",
+      "distanceToSafeArrivalM": 0,
+      "heightM": 63.31229005267346,
+      "expectedGroundM": 63.31229005267346
+    },
+    {
+      "id": "qingchuange",
+      "distanceToSafeArrivalM": 0,
+      "heightM": 0,
+      "expectedGroundM": 0
+    }
+  ],
+  "searchIncludesYellowCrane": true,
+  "ready": true,
+  "errors": [],
+  "frameSampleCount": 180,
+  "frameP50Ms": 16.69999999999709,
+  "frameP95Ms": 32.39999999999418,
+  "stats": {
+    "trees": 41183,
+    "focusTrees": 9,
+    "lamps": 6378,
+    "signals": 195,
+    "signs": {
+      "vertical": 361,
+      "horizontal": 314,
+      "names": 96
+    },
+    "parked": 4496,
+    "buildings": {
+      "frontWalls": 14246,
+      "backWalls": 101300,
+      "styles": {
+        "0": 13787,
+        "1": 9052,
+        "2": 269,
+        "3": 326,
+        "4": 33
+      },
+      "roofSites": 18438,
+      "roofs": {
+        "sheds": 9795,
+        "tanks": 25871
+      }
+    }
+  },
+  "placement": {
+    "accepted": 52345,
+    "byKind": {
+      "signal": 195,
+      "planter-tree": 9,
+      "heritage-lamp": 13,
+      "bench": 11,
+      "bollard": 69,
+      "tree": 41174,
+      "lamp": 6378,
+      "parked-scooter": 4496
+    },
+    "rejected": {
+      "building": 649,
+      "carriageway": 10757,
+      "outside-land": 81,
+      "water": 75,
+      "walking-corridor": 738,
+      "other-prop": 13239,
+      "boundary": 24
+    },
+    "remainingConflicts": 0
+  },
+  "forestPolygons": 393,
+  "districtNames": [
+    "汉口",
+    "武昌",
+    "汉阳"
+  ]
+}

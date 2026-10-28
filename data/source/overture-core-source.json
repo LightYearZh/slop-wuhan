@@ -1,0 +1,15 @@
+{
+  "provider": "Overture Maps Foundation",
+  "release": "2026-10-21.0",
+  "type": "building",
+  "boundsWgs84": [
+    114.252,
+    30.54,
+    114.336,
+    30.5942
+  ],
+  "features": 24719,
+  "sha256": "bdc0805f77e144011c7d9a632aa32b4d09859ec193677aa8d8c9ef8b5a41f3ea",
+  "license": "ODbL 1.0",
+  "reference": "https://docs.overturemaps.org/guides/buildings/"
+}

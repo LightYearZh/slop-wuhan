@@ -10,7 +10,7 @@ def road_graph(roads,street_nodes=()):
     def node(identifier,p):
         identifier=str(identifier)
         if identifier not in indices:
-            indices[identifier]=len(nodes)//4;nodes.extend([p[0],p[2],0,0]);node_ids.append(identifier)
+            indices[identifier]=len(nodes)//4;nodes.extend([p[0],p[2],round(p[1]-2.12,3),0]);node_ids.append(identifier)
         return indices[identifier]
     for r in roads:
         if r['name'] not in names:names.append(r['name'])
@@ -28,7 +28,10 @@ def road_graph(roads,street_nodes=()):
             raw_lanes=r.get('lanesTag') or ''
             lanes=int(raw_lanes) if raw_lanes.isdigit() and 1<=int(raw_lanes)<=10 else max(1,round(r['width']/3.25))
             flags=(4 if r['mode']=='person' else 0)|(1 if r['highway'].endswith('_link') else 0)
-            links.append([a,b,names.index(r['name']),cls,r['width'],lanes,1 if r['oneway'] else 0,flags,[v for p in shape for v in (p[0],p[2])]])
+            if r.get('elevationMode')=='bridge':flags|=2
+            elif r.get('elevationMode')=='terrain':flags|=8
+            encoded=[v for p in shape for v in ((p[0],p[2],round(p[1]-2.12,3)) if flags&10 else (p[0],p[2]))]
+            links.append([a,b,names.index(r['name']),cls,r['width'],lanes,1 if r['oneway'] else 0,flags,encoded])
             sources.append(r['id']);shape_ids.append(ids[start:end+1])
     attached=collections.defaultdict(list)
     for i,l in enumerate(links):attached[l[0]].append(i);attached[l[1]].append(i)
@@ -41,8 +44,9 @@ def road_details(graph,street_nodes):
     nodes=graph['nodes'];links=graph['links'];segments=[];attached=collections.defaultdict(list)
     for li,l in enumerate(links):
         attached[l[0]].append(li);attached[l[1]].append(li)
-        if l[7]&4 or l[3]>6:continue
-        pts=list(zip(l[8][::2],l[8][1::2]))
+        if l[7]&6 or l[3]>6:continue
+        stride=3 if l[7]&10 else 2
+        pts=list(zip(l[8][::stride],l[8][1::stride]))
         for a,b in zip(pts,pts[1:]):segments.append((li,a,b))
     def nearest(x,z):
         best=None

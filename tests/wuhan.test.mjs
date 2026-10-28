@@ -10,7 +10,8 @@ test('Wuhan source, origin and pilot roads replace Shanghai geography',()=>{
  for(const name of ['江汉路','沿江大道'])assert.ok(data.roads.some(r=>r.name.includes(name)),name);
  assert.ok(data.waterAreaM2>10000);assert.equal(data.landmarks[0].id,'jianghanguan');assert.equal(data.tunnels.length,0);
  assert.ok(data.buildings.every(b=>['OSM:footprint','Overture:footprint'].includes(b.source)));
- assert.ok(data.roads.every(r=>!r.bridge&&!r.tunnel&&r.layer===0));
+ assert.ok(data.roads.every(r=>!r.tunnel&&(r.layer===0||r.elevationMode==='bridge')));
+ assert.deepEqual([...new Set(data.roads.filter(r=>r.bridge).map(r=>r.bridgeGroup))].sort(),['晴川桥','武汉长江大桥','江汉桥']);
 });
 test('arrival point sits on a drivable road on land and has a collision tile',()=>{
  const surface=new SurfaceProvider(data.roads,data.water);

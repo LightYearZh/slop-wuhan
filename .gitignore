@@ -12,3 +12,5 @@ data/derived/
 
 .data-venv/
 data/reference/
+
+.impeccable/hook.cache.json

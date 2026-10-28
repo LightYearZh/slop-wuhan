@@ -159,7 +159,8 @@ function buildRoadDecks(group, colliders) {
       // a pier every ~30 m where the deck is high enough to pass under
       const y = (a[1] + b[1]) / 2;
       const nearEnd = (s < 12 && endA.links.length > 2) || (l.len - s < 12 && endB.links.length > 2);
-      if (y > 4.5 && !nearEnd && Math.floor((s - segLen) / 30) !== Math.floor(s / 30)) {
+      const pierStep=l.name==='武汉长江大桥'?160:30;
+      if (y > 4.5 && !nearEnd && Math.floor((s - segLen) / pierStep) !== Math.floor(s / pierStep)) {
         const dx = (b[0] - a[0]) / segLen;
         const dz = (b[2] - a[2]) / segLen;
         const cx = (a[0] + b[0]) / 2;

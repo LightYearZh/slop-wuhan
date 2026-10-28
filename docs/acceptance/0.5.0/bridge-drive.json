@@ -1,0 +1,15 @@
+{
+  "bridge": "武汉长江大桥",
+  "lengthM": 2266,
+  "travelledM": 2196,
+  "completed": true,
+  "steps": 5656,
+  "maxLateralM": 0.4750654873352411,
+  "maxSurfaceErrorM": 0.12714797725791271,
+  "position": [
+    -1732.1130113697677,
+    29.712248425981667,
+    3153.709124777692
+  ],
+  "errors": []
+}

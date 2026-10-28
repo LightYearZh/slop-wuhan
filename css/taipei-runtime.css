@@ -4,7 +4,7 @@
 
 :root {
   /* Surfaces */
-  --glass: rgba(18, 19, 22, 0.62);
+  --glass: rgba(18, 19, 22, 0.88);
   --glass-strong: rgba(16, 17, 20, 0.88);
   --glass-border: rgba(255, 255, 255, 0.09);
   --glass-highlight: rgba(255, 255, 255, 0.08);
@@ -14,8 +14,8 @@
 
   /* Text */
   --text: #f6f5f2;
-  --text-2: rgba(246, 245, 242, 0.68);
-  --text-3: rgba(246, 245, 242, 0.44);
+  --text-2: #c8c7c4;
+  --text-3: #b4b3b0;
 
   /* Accents */
   --taxi: #ffc21a;
@@ -106,7 +106,7 @@ kbd {
   padding: 0 5px;
   border-radius: 5px;
   font-family: var(--font-sans);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 650;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -366,7 +366,7 @@ body.hud-minimized .toolbar > :not(#btn-toggle-hud) {
   flex: none;
   padding: 3px 0;
   color: var(--text-2);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
@@ -380,7 +380,7 @@ body.hud-minimized .toolbar > :not(#btn-toggle-hud) {
 }
 
 .brand-subtitle {
-  font-size: 11.5px;
+  font-size: 12px;
   line-height: 1.4;
   color: var(--text-3);
   font-variant-numeric: tabular-nums;
@@ -566,7 +566,7 @@ body.hud-minimized .icon-show {
 
 .pop-title {
   padding: 9px 10px 6px;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -617,7 +617,7 @@ body.hud-minimized .icon-show {
 }
 
 .pop-sub {
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--text-3);
 }
@@ -638,7 +638,7 @@ body.hud-minimized .icon-show {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -655,7 +655,7 @@ body.hud-minimized .icon-show {
 }
 
 .location-near {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -726,7 +726,7 @@ body.hud-minimized .icon-show {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1;
   color: #ffffff;
@@ -880,7 +880,7 @@ body.hud-minimized .icon-show {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 650;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -902,7 +902,7 @@ body[data-mode='helicopter'] .gauge-alt {
 }
 
 .gauge-alt-label {
-  font-size: 10.5px;
+  font-size: 12px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-3);
@@ -1365,7 +1365,7 @@ body.is-boosting #hud-speed-meter {
 .touch-caption,
 .touch-look-hint {
   color: var(--text-2);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 550;
   text-shadow: 0 1px 5px #000;
 }
@@ -1395,7 +1395,7 @@ body.is-boosting #hud-speed-meter {
   border: 1px solid rgba(255, 255, 255, 0.22);
   background: var(--glass-strong);
   box-shadow: var(--shadow);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 650;
   pointer-events: auto;
   touch-action: none;
@@ -1418,7 +1418,7 @@ body.touch-enabled .time-btn.active { height: 44px; min-width: 44px; padding: 0 
 body.touch-enabled .tool-btn { min-width: 44px; min-height: 44px; }
 body.touch-enabled .tool-label { display: none; }
 body.touch-enabled .hud-bottom-center { bottom: max(var(--edge), env(safe-area-inset-bottom)); }
-body.touch-enabled .mode-label { display: block; font-size: 10px; }
+body.touch-enabled .mode-label { display: block; font-size: 12px; }
 body.touch-enabled .mode-btn { width: 62px; height: 48px; padding: 0; flex-direction: column; justify-content: center; gap: 3px; }
 body.touch-enabled .hud-bottom-right { top: calc(max(var(--edge), env(safe-area-inset-top)) + 62px); right: max(var(--edge), env(safe-area-inset-right)); bottom: auto; }
 body.touch-enabled .cluster { width: 230px; }
@@ -1451,4 +1451,4 @@ body.touch-enabled .pop-item { min-height: 44px; }
   }
 }
 
-.data-credit{position:fixed;bottom:3px;left:12px;z-index:2;color:#c8d0d7;font:10px system-ui;pointer-events:none;text-shadow:0 1px 3px #000}@media(max-width:700px){.data-credit{font-size:8px;max-width:90vw}}
+.data-credit{position:fixed;bottom:3px;left:12px;z-index:2;max-width:calc(100vw - 24px);padding:2px 6px;border-radius:4px;background:rgba(16,17,20,.9);color:#d2d9df;font:12px/1.4 system-ui;pointer-events:none}
