@@ -1,10 +1,11 @@
+import {buildTunnels} from './tunnels.js';
 import {GEO} from './wuhan-geodata.js';
 import * as THREE from 'three/webgpu';
 import { pass, mrt, output, normalView, positionView, metalness, roughness, vec2, smoothstep } from 'three/tsl';
 import { ssr } from 'three/addons/tsl/display/SSRNode.js';
 import { createPostProcessing } from './post-processing.js';
 import { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';
-import { getLocationLabel, isTypingInField, TELEPORT_LOCATIONS } from './city-config.js';
+import { TUNNELS, getLocationLabel, isTypingInField, TELEPORT_LOCATIONS } from './city-config.js';
 import { buildGround } from './ground.js';
 import { buildCityBlocks } from './buildings.js';
 import { buildRoadPaint } from './road-paint.js';
@@ -85,6 +86,7 @@ async function initApp() {
   markInit('buildings');
   await setStatus('正在准备武汉道路系统…');
   const elevated = skip.has('elevated') ? { colliders: [], update() {} } : buildElevated(scene);
+  buildTunnels(scene,TUNNELS);
   markInit('elevated');
   if (!skip.has('paint')) buildRoadPaint(scene);
   markInit('roadPaint');
@@ -321,6 +323,7 @@ async function initApp() {
 
   function selectMode(mode) {
     controllerManager.setMode(mode);
+    mode=controllerManager.activeMode;
     touchControls.setMode(controllerManager.activeMode);
     gamepadControls.reset();
     modeButtons.forEach((btn) => {
@@ -501,7 +504,7 @@ async function initApp() {
   teleportButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const loc = TELEPORT_LOCATIONS[btn.getAttribute('data-teleport')];
-      if (loc) teleportTo(loc.x, loc.z, loc.heading,loc.y??null);
+      if (loc) {if(loc.mode)selectMode(loc.mode);teleportTo(loc.x, loc.z, loc.heading,loc.y??null);}
       closePopovers();
     });
   });
@@ -571,7 +574,7 @@ async function initApp() {
   const params = new URLSearchParams(location.search);
   if (params.get('at') && TELEPORT_LOCATIONS[params.get('at')]) {
     const loc = TELEPORT_LOCATIONS[params.get('at')];
-    controllerManager.setMode(MODES.includes(params.get('mode')) ? params.get('mode') : controllerManager.activeMode);
+    controllerManager.setMode(MODES.includes(params.get('mode')) ? params.get('mode') : loc.mode||controllerManager.activeMode);
     controllerManager.teleportActiveTo(loc.x, loc.z, loc.heading,loc.y??null);
   }
   selectMode(MODES.includes(params.get('mode')) ? params.get('mode') : controllerManager.activeMode);
@@ -664,7 +667,7 @@ async function initApp() {
   window.wuhan={ready:false,base:'slop-taipei',data:GEO,scene,renderer,controllers:controllerManager,cameraSystem,map:mapSystem,
     placement:streetProps.placement,stats:{...streetProps.stats,buildings:cityBlocks.stats},setMode:mode=>selectMode(mode),
     setView:id=>selectCamera(typeof id==='number'?CAMERA_PRESETS[id].id:id,true),
-    gotoLandmark:(id,{mode='person'}={})=>{const l=TELEPORT_LOCATIONS[id]||GEO.landmarks[id];if(!l)return false;selectMode(mode);teleportTo(l.x,l.z,l.heading||0,l.y??null);return true},
+    gotoLandmark:(id,{mode=null}={})=>{const l=TELEPORT_LOCATIONS[id]||GEO.landmarks[id];if(!l)return false;selectMode(mode||l.mode||'person');teleportTo(l.x,l.z,l.heading||0,l.y??null);return true},
     metrics:()=>({errors:runtimeErrors,frames:frameTimes.slice(-180),render:renderer.info.render,base:'slop-taipei'})};
   await precompileShaders();
   markInit('compile');
@@ -695,6 +698,8 @@ async function initApp() {
     gamepadControls.update(dt);
     controllerManager.update(dt, elapsed);
     cameraSystem.update(dt, elapsed);
+    const tunnelCamera=controllerManager.activeMode==='car'&&TUNNELS.camera(cameraSystem.camera.position,controllerManager.entities.car);
+    if(tunnelCamera){cameraSystem.camera.position.set(tunnelCamera.x,tunnelCamera.y,tunnelCamera.z);cameraSystem.currentPos.copy(cameraSystem.camera.position);cameraSystem.camera.lookAt(controllerManager.entities.car.position.clone().add(new THREE.Vector3(Math.sin(controllerManager.entities.car.heading)*6,1.4,Math.cos(controllerManager.entities.car.heading)*6)));}
     streetProps.update(dt, elapsed, cameraSystem.camera);
     trafficSystem.update(dt, elapsed, cameraSystem.currentPos, controllerManager.getActiveEntity(), controllerManager.activeMode, cameraSystem.camera);
     elevated.update(dt, elapsed);
@@ -772,7 +777,7 @@ async function initApp() {
       if (elAltitude) elAltitude.textContent = altM.toLocaleString('zh-CN');
       // The street corner of the player on the follow cameras, of the camera itself on the scenic ones
       const where = cameraSystem.getActivePreset().category === 'follow' ? activeEnt.position : cameraSystem.currentPos;
-      renderLocation(getLocationLabel(where.x, where.z));
+      renderLocation(activeEnt.tunnelId?'武汉长江隧道':getLocationLabel(where.x, where.z));
     }
   });
 }

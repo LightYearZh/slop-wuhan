@@ -171,7 +171,7 @@ function buildRoadDecks(group, colliders) {
         piers.push({ x: cx, z: cz, h: top, yaw: Math.atan2(dx, dz), w: wide ? l.w * 0.75 : 0 });
         const hw2 = 0.9;
         colliders.push({
-          minX: cx - 1.2, maxX: cx + 1.2, minZ: cz - 1.2, maxZ: cz + 1.2, minY: -Infinity, maxY: top,
+          minX: cx - 1.2, maxX: cx + 1.2, minZ: cz - 1.2, maxZ: cz + 1.2, minY: 0, maxY: top,
           poly: new Float32Array([cx - hw2, cz - hw2, cx + hw2, cz - hw2, cx + hw2, cz + hw2, cx - hw2, cz + hw2])
         });
       }
@@ -200,7 +200,7 @@ function buildRoadDecks(group, colliders) {
       const spacing=surface.name==='武汉长江大桥'?160:30;
       if(p[1]>4.5&&Math.floor(previous/spacing)!==Math.floor(travelled/spacing)){
         const h=p[1]-DECK;piers.push({x:p[0],z:p[2],h,yaw:Math.atan2(p[0]-q[0],p[2]-q[2]),w:Math.hypot(L[i][0]-R[i][0],L[i][2]-R[i][2])*.75});
-        colliders.push({minX:p[0]-1.2,maxX:p[0]+1.2,minZ:p[2]-1.2,maxZ:p[2]+1.2,minY:-Infinity,maxY:h,
+        colliders.push({minX:p[0]-1.2,maxX:p[0]+1.2,minZ:p[2]-1.2,maxZ:p[2]+1.2,minY:0,maxY:h,
           poly:new Float32Array([p[0]-.9,p[2]-.9,p[0]+.9,p[2]-.9,p[0]+.9,p[2]+.9,p[0]-.9,p[2]+.9])});
       }
     }
@@ -326,7 +326,7 @@ function buildMRT(group, colliders) {
         const cx = (a[0] + b[0]) / 2;
         const cz = (a[2] + b[2]) / 2;
         piers.push({ x: cx, z: cz, h: y - d });
-        colliders.push({ minX: cx - 1.1, maxX: cx + 1.1, minZ: cz - 1.1, maxZ: cz + 1.1, minY: -Infinity, maxY: y - d,
+        colliders.push({ minX: cx - 1.1, maxX: cx + 1.1, minZ: cz - 1.1, maxZ: cz + 1.1, minY: 0, maxY: y - d,
           poly: new Float32Array([cx - 0.8, cz - 0.8, cx + 0.8, cz - 0.8, cx + 0.8, cz + 0.8, cx - 0.8, cz + 0.8]) });
       }
     }

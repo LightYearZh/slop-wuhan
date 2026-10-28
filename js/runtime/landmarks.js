@@ -11,7 +11,7 @@ export function buildLandmarks(scene){
   const colliders=GEO.wuhanLandmarks.map(l=>{
     const ring=l.footprint[0],xs=ring.map(p=>p[0]),zs=ring.map(p=>p[1]);
     return {minX:Math.min(...xs),maxX:Math.max(...xs),minZ:Math.min(...zs),maxZ:Math.max(...zs),
-      minY:-Infinity,maxY:(l.groundY||0)+l.height,poly:ring.flat(),rings:l.footprint.map(r=>new Float32Array(r.flat()))};
+      minY:(l.groundY||0)-1.5,maxY:(l.groundY||0)+l.height,poly:ring.flat(),rings:l.footprint.map(r=>new Float32Array(r.flat()))};
   });
   return {group,colliders,system,core};
 }

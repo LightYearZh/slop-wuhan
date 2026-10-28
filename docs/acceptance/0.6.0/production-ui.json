@@ -1,0 +1,15 @@
+{
+  "mode": "car",
+  "position": {
+    "x": 2320.67,
+    "y": 0,
+    "z": 1351.15
+  },
+  "errors": [],
+  "bores": 2,
+  "minimumWidths": [
+    5.405,
+    5.343
+  ],
+  "method": "Production build at port 4187; actual teleport menu click from walking mode to Wuchang tunnel entry; automatic car mode verified."
+}

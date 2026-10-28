@@ -1,13 +1,13 @@
 {
   "name": "slop-wuhan",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 4799",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4187",
-    "test": "node --test tests/core.test.mjs tests/controllers.test.mjs tests/resources.test.mjs tests/material.test.mjs tests/loading-progress.test.mjs tests/vehicle-road.test.mjs tests/map-navigation.test.mjs tests/map-view.test.mjs tests/wuhan.test.mjs tests/footprint.test.mjs tests/spatial-placement.test.mjs tests/taipei-runtime.test.mjs tests/surfaces.test.mjs",
+    "test": "node --test tests/core.test.mjs tests/controllers.test.mjs tests/resources.test.mjs tests/material.test.mjs tests/loading-progress.test.mjs tests/vehicle-road.test.mjs tests/map-navigation.test.mjs tests/map-view.test.mjs tests/wuhan.test.mjs tests/footprint.test.mjs tests/spatial-placement.test.mjs tests/taipei-runtime.test.mjs tests/surfaces.test.mjs tests/tunnels.test.mjs",
     "start": "npm run dev",
     "data:build": ".venv/bin/python tools/build-wuhan.py && .venv/bin/python tools/build-runtime.py",
     "test:data": ".venv/bin/python -m unittest discover -s tests -p 'test_*rules.py' -v",

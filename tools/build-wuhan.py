@@ -8,6 +8,7 @@ from city_profile import load_profile,importer_fingerprint
 from building_attributes import BuildingEnricher
 from road_audit import audit_roads
 from core_geometry import HeightMatcher,hill_grid,sample_hill,landmark_from_building,named_crossings
+from tunnel_routes import build_tunnels
 from spatial_rules import resolve_ground_layout
 from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union
@@ -175,6 +176,8 @@ def main():
         if any(p[1]>2.121 for p in r['points']):r['elevationMode']='terrain'
     roads+=crossings
     excluded['bridge_tunnel_or_layer']-=len(crossings)
+    tunnels,ramp_cuts=build_tunnels(raw,region,water) if profile['id']=='wuhan-three-towns-core' else ([],Polygon())
+    excluded['bridge_tunnel_or_layer']-=sum(len(t['sourceIds']) for t in tunnels)
     road_lines=[LineString([(p[0],p[2]) for p in r['points']]) for r in roads]
     places=[]
     for name in ['江汉路','沿江大道','中山大道','北京路','南京路','洞庭街']:
@@ -216,7 +219,7 @@ def main():
     city={'schemaVersion':2,'origin':ORIGIN,'bounds':bounds,'region':{'id':profile['id'],'name':profile['name'],'boundsWgs84':profile['boundsWgs84']},
         'source':raw['source'],'water':polygons(water),'waterAreaM2':round(water.area),'parks':polygons(parks.difference(forest)),'forest':polygons(forest),
         'land':polygons(region.difference(water)),'asphalt':polygons(asphalt),'shoulders':polygons(shoulders),
-        'roads':roads,'pedestrian':polygons(pedestrian),'tunnels':[],'rampCuts':[],'landmarks':landmarks,'buildings':buildings,'places':places,'controlPoints':[],'spawn':spawn,
+        'roads':roads,'pedestrian':polygons(pedestrian),'tunnels':tunnels,'rampCuts':polygons(ramp_cuts),'landmarks':landmarks,'buildings':buildings,'places':places,'controlPoints':[],'spawn':spawn,
         'pois':raw.get('pois',[]),'streetNodes':raw.get('streetNodes',[])}
     if hills:
         hills.pop('_values',None);city['hills']=hills;city['bridgeModels']=bridge_models
@@ -239,7 +242,7 @@ def main():
     report={'source':raw['source'],'roads':len(roads),'buildings':len(buildings),'heightSources':dict(collections.Counter(b['heightSource'] for b in buildings)),
         'waterAreaM2':round(water.area),'waterPolygons':len(city['water']),'tiles':len(manifest['tiles']),'places':[p['name'] for p in places],
         'buildingSources':dict(collections.Counter(b['source'] for b in buildings)),'supplement':city['supplement'],'landmarks':[l['name'] for l in landmarks],'region':city['region'],'heightSupplement':city.get('heightSupplement'),'bridges':{'sourceSegments':len(crossings),'names':sorted(set(r['bridgeGroup'] for r in crossings))},'roadAudit':road_audit,'spatialAudit':spatial_audit,'excluded':dict(excluded),'skippedSourceGeometries':raw['skippedGeometries'],
-        'limitations':['Only Guishan/Sheshan relief enabled from coarse global terrain; other lowland remains flat','Actual footprints extruded; facade details and missing heights remain estimates','Landmarks are simplified exteriors, not surveyed models','Three named crossings enabled with estimated terrain-tied deck profiles; other elevated/tunnel roads remain excluded','No metro data or ride-hailing tasks yet']}
+        'limitations':['Only Guishan/Sheshan relief enabled from coarse global terrain; other lowland remains flat','Actual footprints extruded; facade details and missing heights remain estimates','Landmarks are simplified exteriors, not surveyed models','Three named bridge crossings and Wuhan Yangtze Tunnel main bores enabled with estimated engineering profiles; other elevated/tunnel roads remain excluded','No metro data or ride-hailing tasks yet']}
     attributes_report={'categoryCounts':dict(collections.Counter(b['category'] for b in buildings)),
         'categorySources':dict(collections.Counter(b['categorySource'] for b in buildings)),
         'heightSources':dict(collections.Counter(b['heightSource'] for b in buildings)),
@@ -250,6 +253,7 @@ def main():
         'rules':'Documented height > floor-derived estimate > marked 12m fallback; classification has its own source; facade appearance remains illustrative'}
     report['attributes']=attributes_report
     dump(stage/'building-attributes-audit.json',attributes_report)
+    report['tunnels']=[{k:t[k] for k in ['id','direction','sourceIds','length','width','widthSource','depthEstimateM','heightSource','portalConnections']} for t in tunnels]
     dump(stage/'wuhan-audit.json',report)
     OUT.mkdir(parents=True,exist_ok=True)
     for p in stage.iterdir():

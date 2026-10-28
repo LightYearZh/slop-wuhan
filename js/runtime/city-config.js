@@ -1,3 +1,4 @@
+import {createTunnelSystem} from './tunnel-surfaces.js';
 import { GEO } from './wuhan-geodata.js';
 import {sampleTerrain} from './terrain-surface.js';
 import {createBridgeSurfaces} from './bridge-surfaces.js';
@@ -6,6 +7,7 @@ import {createBridgeSurfaces} from './bridge-surfaces.js';
 // Source: audited Hankou pilot with explicit display-height and semantic estimates.
 // The original Taipei spatial indexes / controllers consume this generated contract.
 
+export const TUNNELS=createTunnelSystem(GEO.tunnels||[],GEO.rampCuts||[]);
 const BOUNDS = { ...GEO.bounds };
 // ?lite: fewer trees, parked scooters & traffic (slower devices, software renderers)
 const LITE = typeof location !== 'undefined' && new URLSearchParams(location.search).has('lite');

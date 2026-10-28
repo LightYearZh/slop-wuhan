@@ -17,7 +17,7 @@ class SpatialIndex{
 const bounds=rings=>rings[0].reduce((b,p)=>[Math.min(b[0],p[0]),Math.min(b[1],p[1]),Math.max(b[2],p[0]),Math.max(b[3],p[1])],[Infinity,Infinity,-Infinity,-Infinity]);
 export class SpatialPlacement{
  constructor(data){
-  this.bounds=data.bounds;this.land=data.land;this.water=data.water;
+  this.bounds=data.bounds;this.land=data.land;this.water=data.water;this.rampCuts=data.rampCuts||[];
   this.buildings=new SpatialIndex();this.roads=new SpatialIndex();this.occupied=new SpatialIndex();
   this.sites=[];this.rejected={};
   for(const b of data.buildings){const rings=b.rings||[b.footprint];this.buildings.insert({rings},bounds(rings));}
@@ -32,6 +32,7 @@ export class SpatialPlacement{
   if(![x,z,radius].every(Number.isFinite)||radius<0)return 'invalid';
   const b=this.bounds;if(x-radius<b[0]||x+radius>b[2]||z-radius<b[1]||z+radius>b[3])return 'boundary';
   if(this.land?.length&&!this.land.some(p=>pointInPolygon(x,z,p)))return 'outside-land';
+  for(const p of this.rampCuts)if(pointInPolygon(x,z,p)||ringDistance(x,z,p)<radius+.25)return 'tunnel-ramp';
   for(const p of this.water)if(pointInPolygon(x,z,p)||ringDistance(x,z,p)<radius+.2)return 'water';
   for(const {rings}of this.buildings.query(x,z,radius+.25))if(pointInPolygon(x,z,rings)||ringDistance(x,z,rings)<radius+.25)return 'building';
   for(const s of this.roads.query(x,z,radius+.35)){

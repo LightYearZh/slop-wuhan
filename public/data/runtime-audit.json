@@ -31,6 +31,9 @@
     "short_wall": 4,
     "near_another_sign": 34
   },
+  "tunnelBores": 2,
+  "tunnelLengthM": 6670.143,
+  "tunnelProfile": "Estimated width, depth, clearance; source horizontal geometry and portal nodes",
   "region": {
     "id": "wuhan-three-towns-core",
     "name": "武汉·两江三镇核心区",
@@ -54,5 +57,5 @@
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "673f1d9c5800f304a1652aea090c84bf50efb41dbbc49066c0485647dcbaa314"
+  "sourceCitySha256": "5d5b67d35275a24ac5f9420d5c766bf71b7a448c5fdffea653341db3396a2c95"
 }

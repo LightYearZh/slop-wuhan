@@ -1,0 +1,77 @@
+{
+  "reports": [
+    {
+      "route": "wuhan-yangtze-hankou-to-wuchang",
+      "frames": 11258,
+      "index": 586,
+      "totalPoints": 587,
+      "minY": -28.000000000000004,
+      "maxYStep": 0.018231694912241636,
+      "maxHeightError": 0.15408741540286464,
+      "wetFrames": 7207,
+      "changes": [
+        {
+          "frame": 121,
+          "id": "wuhan-yangtze-hankou-to-wuchang",
+          "y": -0.00010685620555980569,
+          "index": 1
+        },
+        {
+          "frame": 11185,
+          "id": "ground",
+          "y": 0,
+          "index": 585
+        }
+      ],
+      "stuck": 0,
+      "position": {
+        "x": 2331.9844878818335,
+        "y": 0,
+        "z": 1373.7466215725624
+      },
+      "exitDistance": 2.7729721663589033,
+      "surfaceRoads": [
+        "osm-way-424860486-part-0",
+        "osm-way-131402807-part-0"
+      ]
+    },
+    {
+      "route": "wuhan-yangtze-wuchang-to-hankou",
+      "frames": 11221,
+      "index": 580,
+      "totalPoints": 581,
+      "minY": -28.000000000000004,
+      "maxYStep": 0.015636982444416248,
+      "maxHeightError": 0.15308299275156756,
+      "wetFrames": 7171,
+      "changes": [
+        {
+          "frame": 121,
+          "id": "wuhan-yangtze-wuchang-to-hankou",
+          "y": -0.0001095280974155668,
+          "index": 1
+        },
+        {
+          "frame": 11148,
+          "id": "ground",
+          "y": 0,
+          "index": 579
+        }
+      ],
+      "stuck": 0,
+      "position": {
+        "x": -344.1516876945294,
+        "y": 0,
+        "z": -509.77921819990286
+      },
+      "exitDistance": 2.960657462242322,
+      "surfaceRoads": [
+        "osm-way-1518975427-part-0",
+        "osm-way-177788429-part-0"
+      ]
+    }
+  ],
+  "errors": [],
+  "method": "Development browser, actual updateCar(1/60), automatic heading and throttle, normal collisions and water checks enabled; final variable-width portal geometry. No position stepping during traversal.",
+  "note": "maxHeightError is distance to sampled station height, not exact floor-contact error; triangle contact tested separately within 3 mm."
+}

@@ -110,7 +110,12 @@ def convert(city):
     for model in city.get('bridgeModels',[]):
         if any(t['name']==model['name'] for t in teleports):continue
         p=model['points'][0];teleports.append({'id':'bridge-'+model['sourceId'],'name':model['name'],'sub':'真实位置 · 桥面高度为估计','x':p[0],'z':p[2],'y':p[1]-2.12,'heading':0,'road':model['name']})
-    hills=city.get('hills');flat=lambda g:terrain_polys(g,hills)
+    tunnels=[{**t,'points':[[p[0],round(p[1]-2.12,3),p[2]] for p in t['points']]} for t in city.get('tunnels',[])]
+    for t in tunnels:
+        p,q=t['points'][:2];name=('汉口' if t['direction']=='hankou-to-wuchang' else '武昌')+'隧道入口'
+        teleports.append({'id':t['id'],'name':name,'sub':'武汉长江隧道 · 汽车通行','x':p[0],'z':p[2],'y':0,'heading':math.atan2(q[0]-p[0],q[2]-p[2]),'mode':'car','road':t['name']})
+        places.append([name,p[0],p[2],1])
+    hills=city.get('hills');cuts=polygons(city.get('rampCuts',[]));flat=lambda g:terrain_polys(g.difference(cuts),hills)
     land=polygons(city['land']);districts=[]
     # Town labels follow the actual connected land pieces separated by the two rivers.
     anchors=[('汉口',Point(-200,0)),('汉阳',Point(-2400,3200)),('武昌',Point(1700,4000))]
@@ -126,14 +131,15 @@ def convert(city):
          'grass':[],'forest':flat(polygons(city.get('forest',[]))),'pitch':[],'apron':[],'airfield':[],'runways':[],'parking':[],'plaza':[],
          **graph,**{k:v for k,v in details.items() if k!='detailRejected'},'hills':hills or {'nx':2,'nz':2,'x0':bounds[0],'z0':bounds[1],'res':5000,'tile':2,'tiles':[]},
          'buildingKinds':KINDS,'buildings':buildings,'buildingMeta':meta,'landmarks':{l['id']:l for l in city['landmarks']},'wuhanLandmarks':city['landmarks'],'bridgeModels':city.get('bridgeModels',[]),
-         'viaducts':[],'mrtStations':[],'stations':[],**sign_data,
+         'tunnels':tunnels,'rampCuts':city.get('rampCuts',[]),'viaducts':[],'mrtStations':[],'stations':[],**sign_data,
          'districts':districts,'places':places,
          'namedBuildings':[[b['name'],b['x'],b['z'],display_height(b)[0]] for b in city['buildings'] if b['name']],
-         'teleports':teleports,'placementData':{k:city[k] for k in ['bounds','land','water','roads','buildings','landmarks']}}
+         'teleports':teleports,'placementData':{k:city[k] for k in ['bounds','land','water','roads','buildings','landmarks','rampCuts']}}
     lat=city['origin'][1]*math.pi/180;e2=6.69437999014e-3;s=math.sin(lat);rad=math.pi/180
     geo['frame'].update(mLon=rad*6378137/math.sqrt(1-e2*s*s)*math.cos(lat),mLat=rad*6378137*(1-e2)/(1-e2*s*s)**1.5)
     report={'runtimeBase':'shwang1979/slop-taipei','ruleVersion':RULE,'sourceBuildings':len(city['buildings']),
             'renderedParts':len(meta),'roadLinks':len(links),'curvedRoadLinks':sum(len(l[8])>4 for l in links),'crossings':len(details['crossings']),'signals':len(details['signals']),'streetDetailRejected':details['detailRejected'],'heightSources':dict(heights),'signRecords':len(signs),'verticalSignCandidates':sum(m['verticalAllowed'] for m in sign_data['signMeta']),'signTextSources':dict(collections.Counter(m['textSource'] for m in sign_data['signMeta'])),'signRejected':sign_rejected,
+            'tunnelBores':len(tunnels),'tunnelLengthM':round(sum(t['length'] for t in tunnels),3),'tunnelProfile':'Estimated width, depth, clearance; source horizontal geometry and portal nodes',
             'region':city['region'],'hillTiles':len(geo['hills']['tiles']),'elevatedLinks':sum(bool(l[7]&2) for l in links),'terrainLinks':sum(bool(l[7]&8) for l in links),
             'limits':['Missing heights and 3D-GloBFP heights are estimates, not surveyed','No Taipei geography or landmarks imported',
                       'Only two masked ridges and three named crossings; deck engineering profiles estimated','Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas']}

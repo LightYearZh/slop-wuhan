@@ -217,7 +217,7 @@ function buildCityBlocks(scene) {
     if (!canopy) {
       colliders.push({
         minX: b.minX, maxX: b.maxX, minZ: b.minZ, maxZ: b.maxZ,
-        minY: b.base > 0 ? yBot : -Infinity, maxY: yTop, poly: outer, rings:b.rings, building: b
+        minY: yBot, maxY: yTop, poly: outer, rings:b.rings, building: b
       });
     }
 

@@ -176,6 +176,9 @@ class WuhanMapSystem {
         ctx.stroke();
       }
     }
+    // Underground crossings remain visible as dashed routes over the river.
+    ctx.save();ctx.setLineDash([6,5]);ctx.strokeStyle='#ebc279';ctx.lineWidth=Math.max(1.5,8*zoom);
+    for(const t of GEO.tunnels||[]){ctx.beginPath();t.points.forEach((p,i)=>(i?ctx.lineTo:ctx.moveTo).call(ctx,X(p[0]),Z(p[2])));ctx.stroke();}ctx.restore();
     // MRT viaducts
     ctx.strokeStyle = COLORS.mrt;
     ctx.lineWidth = Math.max(1.2, 3 * zoom);

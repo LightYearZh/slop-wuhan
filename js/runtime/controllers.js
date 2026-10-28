@@ -1,6 +1,6 @@
 import {circleFootprint} from './collision-footprint.js';
 import * as THREE from 'three/webgpu';
-import { BOUNDS, isTypingInField, groundHeightAt, deckHeightAt, WATER, TELEPORT_LOCATIONS } from './city-config.js';
+import { TUNNELS, BOUNDS, isTypingInField, groundHeightAt, deckHeightAt, WATER, TELEPORT_LOCATIONS } from './city-config.js';
 import { cityUniforms, createCarPaintMaterial, createContactShadowMaterial } from './tsl-materials.js';
 import {
   BODY_SPECS,
@@ -305,6 +305,7 @@ class ThirdPersonControllerManager {
 
   setMode(mode) {
     if (!this.entities[mode]) return;
+    if(this.activeMode==='car'&&this.entities.car.tunnelId&&this.entities.car.position.y< -1)return;
     this.activeMode = mode;
   }
 
@@ -314,6 +315,7 @@ class ThirdPersonControllerManager {
 
   teleportActiveTo(x, z, heading = Math.PI, savedAltitude = null) {
     const ent = this.getActiveEntity();
+    ent.tunnelId=null;
     this.resetInput();
     if (!Number.isFinite(heading)) heading = ent.heading;
     const heli = this.activeMode === 'helicopter';
@@ -377,7 +379,8 @@ class ThirdPersonControllerManager {
     const clampPoint = (px, pz) => {
       pz = Math.max(BOUNDS.minZ + 20 - margin, Math.min(BOUNDS.maxZ - 20 + margin, pz));
       px = Math.max(BOUNDS.minX + 20 - margin, Math.min(BOUNDS.maxX - 20 + margin, px));
-      if (!heli && WATER.contains(px, pz) && deckHeightAt(px,pz,(altitude??0)+1.2)<.6) return null;
+      if (!heli && WATER.contains(px, pz) && !(car&&altitude!==null&&TUNNELS.sample(px,pz,altitude)) && deckHeightAt(px,pz,(altitude??0)+1.2)<.6) return null;
+      if(!heli&&!car&&!TUNNELS.provider.canTraverse({x:px,z:pz,y:2.12,mode:this.activeMode==='person'?'person':'cyclist'}))return null;
       return { x: px, z: pz };
     };
     const clear = (p) => {
@@ -726,6 +729,7 @@ class ThirdPersonControllerManager {
   // Street, sidewalk (raised kerb) or hillside under (x, z); for anything but the helicopter also the viaduct & ramp
   // decks within a step of `currentY` (a car on a ramp climbs with it, one passing under the expressway stays down)
   getGroundHeight(x, z, mode = 'person', currentY = null) {
+    if(mode==='car'&&currentY!==null){const t=TUNNELS.sample(x,z,currentY,this.entities?.car?.tunnelId);if(t)return t.height;}
     const g = groundHeightAt(x, z);
     if (mode === 'helicopter') return g;
     const deck = deckHeightAt(x, z, (currentY ?? g) + 1.2);
@@ -877,6 +881,7 @@ class ThirdPersonControllerManager {
 
   // The rivers & ponds stop everything but the helicopter (and anything up on a bridge deck)
   keepOutOfWater(ent, prevX, prevZ) {
+    if(ent.tunnelId&&TUNNELS.sample(ent.position.x,ent.position.z,ent.position.y,ent.tunnelId))return;
     if (ent.position.y > 0.6 || !WATER.contains(ent.position.x, ent.position.z)) return;
     ent.position.x = prevX;
     ent.position.z = prevZ;
@@ -966,6 +971,7 @@ class ThirdPersonControllerManager {
     const prevZ = p.position.z;
     p.position.x += Math.sin(p.heading) * p.speed * dt;
     p.position.z += Math.cos(p.heading) * p.speed * dt;
+    if(!TUNNELS.provider.canTraverse({x:p.position.x,z:p.position.z,y:p.position.y+2.12,mode:'person'})){p.position.x=prevX;p.position.z=prevZ;}
     this.resolveHorizontalCollision(p.position, 0.48, p.position.y + 1.0);
     this.pushOutOfTraffic(p, PERSON_CIRCLES);
     this.keepOutOfWater(p, prevX, prevZ);
@@ -1019,8 +1025,10 @@ class ThirdPersonControllerManager {
     c.vx *= tireGripDamp;
     c.vz *= tireGripDamp;
 
+    TUNNELS.move(c);
     this.resolveHorizontalCollision(c.position, 1.35, c.position.y + 1.0, c);
     this.pushOutOfTraffic(c, CAR_CIRCLES);
+    TUNNELS.move(c);
     this.keepOutOfWater(c, prevX, prevZ);
     c.position.y = this.getGroundHeight(c.position.x, c.position.z, 'car', c.position.y);
 
@@ -1078,6 +1086,7 @@ class ThirdPersonControllerManager {
     const prevZ = b.position.z;
     b.position.x += Math.sin(b.heading) * b.speed * dt;
     b.position.z += Math.cos(b.heading) * b.speed * dt;
+    if(!TUNNELS.provider.canTraverse({x:b.position.x,z:b.position.z,y:b.position.y+2.12,mode:'cyclist'})){b.position.x=prevX;b.position.z=prevZ;}
     this.resolveHorizontalCollision(b.position, 0.6, b.position.y + 1.0, null, b);
     this.pushOutOfTraffic(b, SCOOTER_CIRCLES);
     this.keepOutOfWater(b, prevX, prevZ);
