@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Slop Wuhan — Phase 0</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Microsoft YaHei",sans-serif;color:#e6edf8}*{box-sizing:border-box}body{margin:0;background:#151e2b;overflow:hidden}canvas{display:block}
+#hud{position:absolute;top:16px;left:16px;background:#121b2dce;max-width:350px;padding:17px;border:1px solid #5b718744;border-radius:12px;backdrop-filter:blur(12px)}
+#hud h1{font-size:21px;margin:0 0 6px}#hud p{font-size:12px;color:#a7b7cd;line-height:1.7;margin:6px 0}
+#metrics{font-size:12px;line-height:1.7}#status{color:#86c7fd}#missing{display:none;color:#f6cb8f}
+#credit{position:absolute;bottom:14px;left:16px;font-size:11px;color:#dee7f4;background:#182335bf;padding:7px 10px;border-radius:6px}
+#instructions{position:absolute;top:18px;right:18px;font-size:12px;background:#172239c9;padding:10px;border-radius:9px;max-width:250px;line-height:1.9}
+button{background:#2d78c4;border:0;color:white;border-radius:7px;padding:7px 11px;cursor:pointer;margin-top:7px}button:hover{background:#3f90db}
+#crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:.65;font-size:21px;display:none}
+</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js"}}</script>
+</head><body>
+<div id="hud"><h1>武汉漫游 <span style="font-size:12px;opacity:.6">Phase 0</span></h1><p>汉口 · 江汉路—沿江大道 · 基于真实 OSM 数据的初始三维体量</p>
+<div id="status">正在读取城市数据…</div><div id="metrics"></div><div id="missing">尚未导入真实 OSM 数据。请执行 README 的 fetch_osm.py 与 convert_osm.py；程序不会自动生成虚构的武汉地图。</div>
+<button id="mode">切换为飞行视角（F）</button><p>建筑是简化体块；缺少真实高度时用 12m 估值。路桥高差、真实 DEM 和道路通行规则尚未重建。</p></div>
+<div id="instructions">单击画面：锁定鼠标<br>鼠标移动：环视<br>W A S D：移动　Shift：加速<br>F：步行 / 飞行<br>飞行时：Space 上升，C 下降<br>Esc：释放鼠标</div><div id="crosshair">+</div>
+<div id="credit">© OpenStreetMap contributors · ODbL 1.0 | Slop Wuhan independent geodata pilot</div>
+<script type="module" src="/web/main.js"></script></body></html>

@@ -1,0 +1,14 @@
+{
+  "name": "slop-wuhan-phase0",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Wuhan OSM to a browsable real-scale Three.js pilot; later integration into Slop runtime",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "python3 -m unittest discover -s tests -v"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  }
+}

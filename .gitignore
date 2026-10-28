@@ -1,0 +1,8 @@
+node_modules/
+data/*.pbf
+data/*.osm
+data/*overpass.json
+web/data/*.json
+__pycache__/
+.pytest_cache/
+.DS_Store
