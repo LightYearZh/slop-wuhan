@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu';
 import { GEO } from './wuhan-geodata.js';
-import { ROAD_LINKS, ROAD_NODES, CLS, LINK_FLAG, SIGNALS } from './city-config.js';
+import { ROAD_LINKS, ROAD_NODES, CLS, LINK_FLAG, SIGNALS,hillHeight,BRIDGE_SURFACES } from './city-config.js';
 import { createRoadPaintMaterial } from './tsl-materials.js';
 
 // js/road-paint.js
@@ -50,7 +50,9 @@ class PaintBuilder {
       if (i > 0) s += Math.hypot(p[0] - pts[i - 1][0], p[2] - pts[i - 1][2]);
       for (const sgn of [-1, 1]) {
         const o = off + sgn * hw;
-        c.pos.push(p[0] + rx * o, p[1] + LIFT, p[2] + rz * o);
+        const x=p[0]+rx*o,z=p[2]+rz*o;
+        const y=this.terrain?hillHeight(x,z):this.bridge?BRIDGE_SURFACES.heightAt(x,z)??p[1]:p[1];
+        c.pos.push(x, y + LIFT, z);
         c.col.push(col.r, col.g, col.b);
         c.paint.push(s, period, duty);
         c.side.push(rx * sgn * hw, rz * sgn * hw);
@@ -117,6 +119,7 @@ function buildRoadPaint(scene) {
     const s1 = l.len - junction(ROAD_NODES[l.b]);
     if (s1 - s0 < 3) continue;
     const pts = slice(l, s0, s1);
+    paint.terrain=Boolean(l.flags&LINK_FLAG.TERRAIN);paint.bridge=BRIDGE_SURFACES.roadIds.has(GEO.roadSourceIds[l.id]);
     const half = l.w / 2;
     if (l.oneway) {
       const lw = l.w / l.lanes;
@@ -148,6 +151,7 @@ function buildRoadPaint(scene) {
   }
 
   // Zebra crossings: bars 3 m long (along the road) every 0.8 m across it
+  paint.terrain=true;paint.bridge=false;
   for (const [x, z, ang, w] of GEO.crossings) {
     const ax = Math.cos(ang);
     const az = -Math.sin(ang); // across the road (perpendicular to its direction (sin, cos))
@@ -159,6 +163,7 @@ function buildRoadPaint(scene) {
   for (const sig of SIGNALS) {
     for (const [li, ni] of sig.approaches) {
       const l = ROAD_LINKS[li];
+      paint.terrain=Boolean(l.flags&LINK_FLAG.TERRAIN);paint.bridge=false;
       if (l.flags & (LINK_FLAG.ELEVATED | LINK_FLAG.NO_CARS) || l.cls > CLS.tertiary) continue;
       const atB = l.b === ni;
       // traffic towards the junction: one-way links only in their direction

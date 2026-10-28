@@ -1,7 +1,7 @@
 import * as THREE from 'three/webgpu';
 import { Fn, attribute, float, mix, step, smoothstep, fract, color, positionWorld } from 'three/tsl';
 import { GEO } from './wuhan-geodata.js';
-import { ROAD_LINKS, ROAD_NODES, LINK_FLAG, BOUNDS } from './city-config.js';
+import { ROAD_LINKS, ROAD_NODES, LINK_FLAG, BOUNDS,BRIDGE_SURFACES } from './city-config.js';
 import { createRoadSurfaceMaterial, cityUniforms } from './tsl-materials.js';
 
 // js/elevated.js
@@ -116,6 +116,7 @@ function buildRoadDecks(group, colliders) {
   const piers = [];
   for (const l of ROAD_LINKS) {
     if (!(l.flags & LINK_FLAG.ELEVATED)) continue;
+    if(BRIDGE_SURFACES.roadIds.has(GEO.roadSourceIds[l.id]))continue;
     const pts = resample(linkPoints(l), 10).map((p) => [p[0], Math.max(0, p[1]), p[2]]);
     if (pts.length < 2) continue;
     const hw = l.w / 2 + 0.6;
@@ -173,6 +174,34 @@ function buildRoadDecks(group, colliders) {
           minX: cx - 1.2, maxX: cx + 1.2, minZ: cz - 1.2, maxZ: cz + 1.2, minY: -Infinity, maxY: top,
           poly: new Float32Array([cx - hw2, cz - hw2, cx + hw2, cz - hw2, cx + hw2, cz + hw2, cx - hw2, cz + hw2])
         });
+      }
+    }
+  }
+  // Paired carriageways share one complete deck. Rails exist only on the two outer edges.
+  for(const surface of BRIDGE_SURFACES.surfaces){
+    const L=surface.left,R=surface.right;let travelled=0;
+    for(let i=1;i<L.length;i++){
+      const la=L[i-1],lb=L[i],ra=R[i-1],rb=R[i],p=surface.centres[i];
+      const top=get(tops,p[0],p[2]),side=get(sides,p[0],p[2]);
+      top.quad(...[la,lb,rb,ra].map(v=>[v[0],v[1]+.02,v[2]]));
+      side.quad(...[ra,rb,lb,la].map(v=>[v[0],v[1]-DECK,v[2]]));
+      const inner=(a,b)=>{const dx=b[0]-a[0],dz=b[2]-a[2],d=Math.hypot(dx,dz)||1;return [a[0]+dx/d*.35,a[1],a[2]+dz/d*.35];};
+      for(const [a,b,ai,bi]of [[la,lb,inner(la,ra),inner(lb,rb)],[ra,rb,inner(ra,la),inner(rb,lb)]]){
+        const wall=(...vertices)=>side.quad(...(a===ra?vertices.reverse():vertices));
+        wall([a[0],a[1]-DECK,a[2]],[b[0],b[1]-DECK,b[2]],[b[0],b[1]+BARRIER_H,b[2]],[a[0],a[1]+BARRIER_H,a[2]]);
+        wall([a[0],a[1]+BARRIER_H,a[2]],[b[0],b[1]+BARRIER_H,b[2]],[bi[0],bi[1]+BARRIER_H,bi[2]],[ai[0],ai[1]+BARRIER_H,ai[2]]);
+        wall([ai[0],ai[1],ai[2]],[ai[0],ai[1]+BARRIER_H,ai[2]],[bi[0],bi[1]+BARRIER_H,bi[2]],[bi[0],bi[1],bi[2]]);
+        const poly=[a[0],a[2],b[0],b[2],bi[0],bi[2],ai[0],ai[2]];
+        colliders.push({minX:Math.min(a[0],b[0],ai[0],bi[0]),maxX:Math.max(a[0],b[0],ai[0],bi[0]),
+          minZ:Math.min(a[2],b[2],ai[2],bi[2]),maxZ:Math.max(a[2],b[2],ai[2],bi[2]),
+          minY:Math.min(a[1],b[1])-.2,maxY:Math.max(a[1],b[1])+BARRIER_H,poly:new Float32Array(poly)});
+      }
+      const previous=travelled,q=surface.centres[i-1];travelled+=Math.hypot(p[0]-q[0],p[2]-q[2]);
+      const spacing=surface.name==='武汉长江大桥'?160:30;
+      if(p[1]>4.5&&Math.floor(previous/spacing)!==Math.floor(travelled/spacing)){
+        const h=p[1]-DECK;piers.push({x:p[0],z:p[2],h,yaw:Math.atan2(p[0]-q[0],p[2]-q[2]),w:Math.hypot(L[i][0]-R[i][0],L[i][2]-R[i][2])*.75});
+        colliders.push({minX:p[0]-1.2,maxX:p[0]+1.2,minZ:p[2]-1.2,maxZ:p[2]+1.2,minY:-Infinity,maxY:h,
+          poly:new Float32Array([p[0]-.9,p[2]-.9,p[0]+.9,p[2]-.9,p[0]+.9,p[2]+.9,p[0]-.9,p[2]+.9])});
       }
     }
   }

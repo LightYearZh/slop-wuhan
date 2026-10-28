@@ -212,41 +212,6 @@ function buildMountains(group) {
   return mesh;
 }
 
-// The forested hills inside the data box: a terrain grid over each heightfield tile with any height
-function buildHills(group) {
-  const H = GEO.hills;
-  const pos = [];
-  const idx = [];
-  const res = H.res;
-  for (const [ti, tj] of H.tiles) {
-    const base = pos.length / 3;
-    const n = H.tile + 1;
-    for (let j = 0; j < n; j++) {
-      for (let i = 0; i < n; i++) {
-        const x = H.x0 + (ti * H.tile + i) * res;
-        const z = H.z0 + (tj * H.tile + j) * res;
-        pos.push(x, hillHeight(x, z) - 0.06, z);
-      }
-    }
-    for (let j = 0; j < n - 1; j++) {
-      for (let i = 0; i < n - 1; i++) {
-        const a = base + j * n + i;
-        idx.push(a, a + n, a + 1, a + 1, a + n, a + n + 1);
-      }
-    }
-  }
-  const g = new THREE.BufferGeometry();
-  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-  g.setIndex(idx);
-  g.computeVertexNormals();
-  const mesh = new THREE.Mesh(g, createForestFloorMaterial());
-  mesh.name = 'Hills';
-  mesh.receiveShadow = true;
-  mesh.castShadow = true;
-  group.add(mesh);
-  return mesh;
-}
-
 function buildGround(scene) {
   const t0 = performance.now();
   const group = new THREE.Group();
@@ -289,7 +254,8 @@ function buildGround(scene) {
   for (const m of water) m.receiveShadow = false;
   edgeWalls(group, GEO.water, WATER_LEVEL - 0.6, 0.0, new THREE.MeshStandardNodeMaterial({ color: 0x8a877e, roughness: 0.9 }), 'Embankments', { inward: true });
 
-  if(GEO.hills.tiles.length) buildHills(group);
+  // Ground/lawn/forest polygons already follow the authoritative terrain triangles.
+  // Do not draw entire heightfield tiles: their flat margins would cover the river.
   buildMountains(group);
 
   console.info(`[ground] ${group.children.length} meshes in ${Math.round(performance.now() - t0)} ms`);

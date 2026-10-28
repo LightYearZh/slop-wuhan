@@ -1,9 +1,10 @@
 import test from 'node:test';
+import {ShapeUtils,Vector2} from 'three';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {GEO} from '../js/runtime/wuhan-geodata.js';
-import {BUILDINGS,ROAD_LINKS,ROAD_NODES,TELEPORT_LOCATIONS,WATER,hillHeight,deckHeightAt,linkPointAt} from '../js/runtime/city-config.js';
+import {BUILDINGS,ROAD_LINKS,ROAD_NODES,TELEPORT_LOCATIONS,WATER,hillHeight,deckHeightAt,linkPointAt,BRIDGE_SURFACES} from '../js/runtime/city-config.js';
 import {circleFootprint} from '../js/runtime/collision-footprint.js';
 import {roofRectangleFits,fitRoofShed} from '../js/runtime/roof-layout.js';
 const city=JSON.parse(fs.readFileSync(new URL('../public/data/city.json',import.meta.url)));
@@ -117,5 +118,32 @@ test('bridge decks retain actual shared node elevations and clear the mapped wat
   const p=linkPointAt(l,s);if(!WATER.contains(p.x,p.z))continue;
   assert.ok(p.y>.6,`${l.name} deck at ${s.toFixed(0)}m must clear water`);
   assert.ok(Math.abs(deckHeightAt(p.x,p.z)-p.y)<.5);
+ }
+});
+
+test('rendered terrain faces agree with contact height throughout the two hill regions',()=>{
+ let maximum=0,checked=0;
+ for(const key of ['ground','park','forest','carriageway','pedestrian','sidewalks'])for(const poly of GEO[key]){
+  const rings=poly.map(r=>{const points=[];for(let i=0;i<r.length;i+=2)points.push(new Vector2(r[i],r[i+1]));return points;});
+  const vertices=rings.flat(),triangles=ShapeUtils.triangulateShape(rings[0],rings.slice(1));
+  for(const triangle of triangles){
+   const p=triangle.map(i=>vertices[i]);const x=p.reduce((s,p)=>s+p.x,0)/3,z=p.reduce((s,p)=>s+p.y,0)/3;
+   const drawn=p.reduce((s,p)=>s+hillHeight(p.x,p.y),0)/3;
+   maximum=Math.max(maximum,Math.abs(drawn-hillHeight(x,z)));checked++;
+  }
+ }
+ assert.ok(checked>10000);assert.ok(maximum<.01,`visible/contact surface mismatch ${maximum}m`);
+});
+
+test('all mapped paired bridge decks support lateral movement across the entire span',()=>{
+ assert.ok(BRIDGE_SURFACES.surfaces.some(s=>s.name==='武汉长江大桥'));
+ for(const surface of BRIDGE_SURFACES.surfaces)for(let i=1;i<surface.left.length-1;i+=3){
+  const l=surface.left[i],r=surface.right[i];
+  for(let t=.05;t<1;t+=.05){
+   const p=l.map((v,k)=>v*(1-t)+r[k]*t),h=BRIDGE_SURFACES.heightAt(p[0],p[2]);
+   assert.notEqual(h,null,`${surface.name}: station ${i}, lateral ${t}`);
+   assert.ok(Math.abs(h-p[1])<.01);
+   assert.ok(deckHeightAt(p[0],p[2],h+1.2)>=h-.01);
+  }
  }
 });

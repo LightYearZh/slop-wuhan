@@ -52,10 +52,18 @@ def terrain_polys(geom,hills):
                hills['x0']+(i+1)*hills['tile']*hills['res'],hills['z0']+(j+1)*hills['tile']*hills['res']) for i,j,_ in hills['tiles']]
     mask=unary_union(tiles);out=flat_polys(geom.difference(mask));local=geom.intersection(mask)
     if local.is_empty:return out
-    w,s,e,n=local.bounds;size=50
-    for i in range(math.floor(w/size),math.ceil(e/size)):
-        for j in range(math.floor(s/size),math.ceil(n/size)):
-            out+=flat_polys(local.intersection(box(i*size,j*size,(i+1)*size,(j+1)*size)))
+    size=hills['res']
+    for tile in tiles:
+        piece=local.intersection(tile)
+        if piece.is_empty:continue
+        w,s,e,n=tile.bounds
+        for i in range(hills['tile']):
+            for j in range(hills['tile']):
+                x=w+i*size;z=s+j*size;cell=piece.intersection(box(x,z,x+size,z+size))
+                if cell.is_empty:continue
+                # Same diagonal and planes as sampleTerrain / sample_hill, clipped to real land/layer outlines.
+                for triangle in [Polygon([(x,z),(x+size,z),(x,z+size)]),Polygon([(x+size,z),(x+size,z+size),(x,z+size)])]:
+                    out+=flat_polys(cell.intersection(triangle))
     return out
 
 def encode_building(rings,h,base,kind):

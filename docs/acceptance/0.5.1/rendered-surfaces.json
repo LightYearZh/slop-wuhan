@@ -1,0 +1,15 @@
+{
+  "maximumTerrainDifferenceM": 0.030000000104308127,
+  "worst": {
+    "mesh": "Woods_-1,-1",
+    "x": -1948.1700032552083,
+    "z": -885.7966715494791,
+    "drawn": 0.030000000104308127,
+    "contact": 0
+  },
+  "landTrianglesCentredOnWaterM2": 0.017413221765309572,
+  "triangles": 396115,
+  "extraHillTileMesh": false,
+  "errors": [],
+  "sourceCitySha256": "673f1d9c5800f304a1652aea090c84bf50efb41dbbc49066c0485647dcbaa314"
+}

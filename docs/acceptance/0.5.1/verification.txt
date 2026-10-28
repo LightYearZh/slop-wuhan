@@ -1,0 +1,5 @@
+npm run verify: passed
+JavaScript: 67 passed, 0 failed
+Python: 22 passed
+Spatial audit: 0 ground road/building overlap; 0 centreline conflicts
+Production build: passed (existing initial bundle size warning remains)

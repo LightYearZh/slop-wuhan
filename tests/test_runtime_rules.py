@@ -22,6 +22,17 @@ class RuntimeRules(unittest.TestCase):
  def test_estimate_does_not_mutate_original_source(self):
   b=self.building();before=json.dumps(b,sort_keys=True);runtime.display_height(b)
   self.assertEqual(before,json.dumps(b,sort_keys=True))
+ def test_terrain_layer_is_cut_on_the_same_grid_and_diagonal_as_contact_sampling(self):
+  from shapely.geometry import box,Polygon
+  from shapely.ops import unary_union
+  h={'nx':3,'nz':3,'x0':0,'z0':0,'res':25,'tile':2,'tiles':[[0,0,'']]}
+  original=box(0,0,50,50).difference(box(15,15,35,35))
+  rows=runtime.terrain_polys(original,h);parts=[Polygon(list(zip(r[0][::2],r[0][1::2]))) for r in rows]
+  self.assertLess(unary_union(parts).symmetric_difference(original).area,.001)
+  for p in parts:
+   c=p.representative_point();i=int(c.x//25);j=int(c.y//25)
+   sums=[(x-i*25)+(z-j*25) for x,z in p.exterior.coords]
+   self.assertTrue(max(sums)<=25.001 or min(sums)>=24.999)
  def road(self,identifier,points,ids):
   return {'id':identifier,'name':'test','highway':'tertiary','width':6,'lanesTag':'2','oneway':False,'mode':'car','points':[[x,0,z] for x,z in points],'nodeIds':ids}
  def test_road_bends_are_geometry_not_extra_junctions(self):

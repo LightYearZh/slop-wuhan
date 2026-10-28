@@ -4,7 +4,7 @@
   "sourceBuildings": 23465,
   "renderedParts": 23467,
   "roadLinks": 9560,
-  "curvedRoadLinks": 4471,
+  "curvedRoadLinks": 4469,
   "crossings": 154,
   "signals": 102,
   "streetDetailRejected": {
@@ -47,12 +47,12 @@
   },
   "hillTiles": 26,
   "elevatedLinks": 32,
-  "terrainLinks": 657,
+  "terrainLinks": 653,
   "limits": [
     "Missing heights and 3D-GloBFP heights are estimates, not surveyed",
     "No Taipei geography or landmarks imported",
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "546734c8a435f20ab7198f07419334939c6cd365c5240ce1fcccec09975be88c"
+  "sourceCitySha256": "673f1d9c5800f304a1652aea090c84bf50efb41dbbc49066c0485647dcbaa314"
 }

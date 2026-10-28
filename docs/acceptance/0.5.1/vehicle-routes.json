@@ -1,0 +1,46 @@
+{
+  "results": [
+    {
+      "route": "main bridge alternating lanes",
+      "completed": true,
+      "lengthM": 2265.979483501036,
+      "travelledM": 2206.295459023068,
+      "steps": 5689,
+      "maxBelowTerrainM": 0,
+      "maxDropFromDeckM": 0,
+      "maxLateralM": 3.38658115340018
+    },
+    {
+      "route": "main bridge reverse alternating lanes",
+      "completed": true,
+      "lengthM": 2265.9794835010375,
+      "travelledM": 2206.3218792790904,
+      "steps": 5681,
+      "maxBelowTerrainM": 0,
+      "maxDropFromDeckM": 0,
+      "maxLateralM": 3.808747319524938
+    },
+    {
+      "route": "Guishan South Road uphill",
+      "completed": true,
+      "lengthM": 957.234742440314,
+      "travelledM": 897.2528555972764,
+      "steps": 2341,
+      "maxBelowTerrainM": 0,
+      "maxDropFromDeckM": 0,
+      "maxLateralM": 0.4657408445496898
+    },
+    {
+      "route": "Guishan South Road downhill",
+      "completed": true,
+      "lengthM": 957.2347424403138,
+      "travelledM": 897.2531061804948,
+      "steps": 2341,
+      "maxBelowTerrainM": 0,
+      "maxDropFromDeckM": 0,
+      "maxLateralM": 0.4419142201087502
+    }
+  ],
+  "errors": [],
+  "sourceCitySha256": "673f1d9c5800f304a1652aea090c84bf50efb41dbbc49066c0485647dcbaa314"
+}

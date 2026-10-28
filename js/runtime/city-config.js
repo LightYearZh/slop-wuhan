@@ -1,4 +1,6 @@
 import { GEO } from './wuhan-geodata.js';
+import {sampleTerrain} from './terrain-surface.js';
+import {createBridgeSurfaces} from './bridge-surfaces.js';
 
 // Wuhan data adapter for the Taipei runtime. Metres, x east, z south, street y=0.
 // Source: audited Hankou pilot with explicit display-height and semantic estimates.
@@ -126,14 +128,16 @@ function nearestLink(x, z, maxDist = 40, filter = null) {
 // Top of the highest viaduct / ramp deck under (x, z) that is at most `maxY` high (so a car on a ramp climbs with it
 // while one passing under the expressway stays on the street); 0 if none
 const _deckOut = { y: 0, link: null };
+const BRIDGE_SURFACES=createBridgeSurfaces(GEO.bridgeModels||[]);
 function deckHeightAt(x, z, maxY = Infinity) {
-  let top = 0;
+  let top = Math.max(0,BRIDGE_SURFACES.heightAt(x,z,maxY)??0);
   _deckOut.link = null;
   const list = segGrid.get(cellKey(Math.floor(x / SEG_CELL), Math.floor(z / SEG_CELL)));
   if (list) {
     for (let j = 0; j < list.length; j += 2) {
       const l = ROAD_LINKS[list[j]];
       if (!(l.flags & LINK_FLAG.ELEVATED)) continue;
+      if(BRIDGE_SURFACES.roadIds.has(GEO.roadSourceIds[l.id]))continue;
       const i = list[j + 1];
       const p = l.pts;
       const ax = p[i * 3 - 3], ay = p[i * 3 - 2], az = p[i * 3 - 1];
@@ -246,7 +250,7 @@ const WATER = new PolygonSet(GEO.water);
 const CARRIAGEWAY = new PolygonSet(GEO.carriageway);
 
 // ---------------------------------------------------------------------------------------------------------------------
-// Hills (象山 & the 四兽山, 福州山, 剑潭山 ...): sparse heightfield tiles, bilinear
+// Guishan / Sheshan: sparse source samples, interpolated on the rendered cell triangles.
 // ---------------------------------------------------------------------------------------------------------------------
 const HILLS = (() => {
   const H = GEO.hills;
@@ -265,26 +269,13 @@ const HILLS = (() => {
 })();
 
 function hillHeight(x, z) {
-  const H = HILLS;
-  const fx = (x - H.x0) / H.res;
-  const fz = (z - H.z0) / H.res;
-  const i = Math.floor(fx);
-  const j = Math.floor(fz);
-  if (i < 0 || j < 0 || i >= H.nx - 1 || j >= H.nz - 1) return 0;
-  const tx = fx - i;
-  const tz = fz - j;
-  const d = H.data;
-  const k = j * H.nx + i;
-  const a = d[k] + (d[k + 1] - d[k]) * tx;
-  const b = d[k + H.nx] + (d[k + H.nx + 1] - d[k + H.nx]) * tx;
-  return a + (b - a) * tz;
+  return sampleTerrain(HILLS,x,z);
 }
 
 // Ground the player stands on: hills, sidewalks (raised kerb), streets; viaduct decks via deckHeightAt
 function groundHeightAt(x, z) {
   const h = hillHeight(x, z);
-  if (h > 0.05) return h;
-  return SIDEWALKS.contains(x, z) ? SIDEWALK_HEIGHT : 0;
+  return h+(SIDEWALKS.contains(x, z) ? SIDEWALK_HEIGHT : 0);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -563,6 +554,7 @@ export {
   linkPointAt,
   nearestLink,
   deckHeightAt,
+  BRIDGE_SURFACES,
   PolygonSet,
   SIDEWALKS,
   WATER,

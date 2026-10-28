@@ -64,7 +64,7 @@ def hill_grid(path,water):
 
 def sample_hill(h,x,z):
     if not h:return 0
-    # Reconstruct once, then use the exact same bilinear grid as the runtime.
+    # Reconstruct once; use the same planar cell triangles as the rendered ground and runtime contact.
     if '_values' not in h:
         a=np.zeros((h['nz'],h['nx']),dtype=np.uint8)
         for ti,tj,encoded in h['tiles']:
@@ -74,7 +74,9 @@ def sample_hill(h,x,z):
     fx=(x-h['x0'])/h['res'];fz=(z-h['z0'])/h['res'];i=math.floor(fx);j=math.floor(fz)
     if i<0 or j<0 or i>=h['nx']-1 or j>=h['nz']-1:return 0
     tx=fx-i;tz=fz-j;a=h['_values']
-    return float((a[j,i]*(1-tx)+a[j,i+1]*tx)*(1-tz)+(a[j+1,i]*(1-tx)+a[j+1,i+1]*tx)*tz)
+    h00,h10,h01,h11=map(float,(a[j,i],a[j,i+1],a[j+1,i],a[j+1,i+1]))
+    if tx+tz<=1:return h00+(h10-h00)*tx+(h01-h00)*tz
+    return h11+(h01-h11)*(1-tx)+(h10-h11)*(1-tz)
 
 def landmark_from_building(item,kind,identifier,height,hills,source):
     # Use the largest mapped part; do not substitute a geocoded label for an existing footprint.
