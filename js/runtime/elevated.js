@@ -1,7 +1,8 @@
+import {barrierSpan} from './surface-barriers.js';
 import * as THREE from 'three/webgpu';
 import { Fn, attribute, float, mix, step, smoothstep, fract, color, positionWorld } from 'three/tsl';
 import { GEO } from './wuhan-geodata.js';
-import { ROAD_LINKS, ROAD_NODES, LINK_FLAG, BOUNDS,BRIDGE_SURFACES } from './city-config.js';
+import { ROAD_LINKS, ROAD_NODES, LINK_FLAG, BOUNDS,BRIDGE_SURFACES,hillHeight } from './city-config.js';
 import { createRoadSurfaceMaterial, cityUniforms } from './tsl-materials.js';
 
 // js/elevated.js
@@ -186,8 +187,12 @@ function buildRoadDecks(group, colliders) {
       top.quad(...[la,lb,rb,ra].map(v=>[v[0],v[1]+.02,v[2]]));
       side.quad(...[ra,rb,lb,la].map(v=>[v[0],v[1]-DECK,v[2]]));
       const inner=(a,b)=>{const dx=b[0]-a[0],dz=b[2]-a[2],d=Math.hypot(dx,dz)||1;return [a[0]+dx/d*.35,a[1],a[2]+dz/d*.35];};
-      for(const [a,b,ai,bi]of [[la,lb,inner(la,ra),inner(lb,rb)],[ra,rb,inner(ra,la),inner(rb,lb)]]){
-        const wall=(...vertices)=>side.quad(...(a===ra?vertices.reverse():vertices));
+      for(const [edgeA,edgeB,inA,inB]of [[la,lb,inner(la,ra),inner(lb,rb)],[ra,rb,inner(ra,la),inner(rb,lb)]]){
+        const span=barrierSpan(edgeA,edgeB,hillHeight(edgeA[0],edgeA[2]),hillHeight(edgeB[0],edgeB[2]));if(!span)continue;
+        const [a,b]=span,edgeLen=Math.hypot(edgeB[0]-edgeA[0],edgeB[2]-edgeA[2])||1;
+        const insetAt=p=>{const t=Math.hypot(p[0]-edgeA[0],p[2]-edgeA[2])/edgeLen;return inA.map((v,k)=>v+(inB[k]-v)*t);};
+        const ai=insetAt(a),bi=insetAt(b);
+        const wall=(...vertices)=>side.quad(...(edgeA===ra?vertices.reverse():vertices));
         wall([a[0],a[1]-DECK,a[2]],[b[0],b[1]-DECK,b[2]],[b[0],b[1]+BARRIER_H,b[2]],[a[0],a[1]+BARRIER_H,a[2]]);
         wall([a[0],a[1]+BARRIER_H,a[2]],[b[0],b[1]+BARRIER_H,b[2]],[bi[0],bi[1]+BARRIER_H,bi[2]],[ai[0],ai[1]+BARRIER_H,ai[2]]);
         wall([ai[0],ai[1],ai[2]],[ai[0],ai[1]+BARRIER_H,ai[2]],[bi[0],bi[1]+BARRIER_H,bi[2]],[bi[0],bi[1],bi[2]]);

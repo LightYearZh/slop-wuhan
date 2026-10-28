@@ -42,7 +42,7 @@ export function buildWuhanStreetscape(scene,data,placement,options={}){
     const lx=px-dx*4,lz=pz-dz*4;
     if(placement.reserve('heritage-lamp',lx,lz,.55)){add(new THREE.CylinderGeometry(.06,.12,5.5,7),'metal',lx,4.85,lz);
     add(new THREE.BoxGeometry(.55,.75,.55),'glass',lx,7.85,lz);add(new THREE.BoxGeometry(.75,.12,.75),'metal',lx,8.27,lz);}
-    if(placement.reserve('bench',px+dx*6,pz+dz*6,1.15))bench(px+dx*6,pz+dz*6,angle+Math.PI/2);
+    if(placement.reserve('bench',px+dx*6,pz+dz*6,1.15)){placement.sites.at(-1).yaw=angle+Math.PI/2;bench(px+dx*6,pz+dz*6,angle+Math.PI/2);}
    }
   }
  }

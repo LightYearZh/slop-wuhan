@@ -1,3 +1,4 @@
+import {tunnelHasSides} from './surface-barriers.js';
 // Reuse Shanghai's signed surface selection, vehicle clearance and camera rules.
 // The same strip vertices feed both the renderer and exact triangle contact.
 import {SurfaceProvider,constrainTunnelCamera} from '../core.js';
@@ -26,14 +27,14 @@ export function createTunnelSystem(routes=[],rampCuts=[]){
  function move(car){
   let s=sample(car.position.x,car.position.z,car.position.y,car.tunnelId);
   if(!s&&car.tunnelId){const n=provider.nearest(car.position.x,car.position.z,r=>r.id===car.tunnelId);
-   // Release only past a real portal; a side-wall is never an underground exit.
-   if(n&&n.height<-.1){s={road:n.road,surfaceId:n.road.id};}
+   // Shallow surface connections may be left sideways. Deeper walls retain the car.
+   if(n&&tunnelHasSides(n.height)){s={road:n.road,surfaceId:n.road.id};}
   }
   if(!s){car.tunnelId=null;return null;}
   const n=provider.nearest(car.position.x,car.position.z,r=>r.id===s.road.id),dx=n.b[0]-n.a[0],dz=n.b[2]-n.a[2];
   const widths=s.road.widths,width=widths?widths[n.segment]+(widths[n.segment+1]-widths[n.segment])*n.t:s.road.width;
   const limit=vehicleLateralLimit(car.heading,dx,dz,width);
-  if(n.distance>limit){const k=limit/n.distance;car.position.x=n.x+(car.position.x-n.x)*k;car.position.z=n.z+(car.position.z-n.z)*k;car.vx=car.vz=0;}
+  if(tunnelHasSides(n.height)&&n.distance>limit){const k=limit/n.distance;car.position.x=n.x+(car.position.x-n.x)*k;car.position.z=n.z+(car.position.z-n.z)*k;car.vx=car.vz=0;}
   const h=floorAt(car.position.x,car.position.z,s.road.id);
   if(h===null){car.tunnelId=null;return null;}
   car.tunnelId=s.road.id;car.position.y=h;return {...s,height:h};

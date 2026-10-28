@@ -1,0 +1,88 @@
+{
+  "results": [
+    {
+      "road": "wuhan-yangtze-hankou-to-wuchang",
+      "end": 0,
+      "side": -1,
+      "frames": 55,
+      "lateralDistance": 6.150466565224844,
+      "height": 0,
+      "offsetFromPortal": 0
+    },
+    {
+      "road": "wuhan-yangtze-hankou-to-wuchang",
+      "end": 0,
+      "side": 1,
+      "frames": 55,
+      "lateralDistance": 6.150466565224844,
+      "height": 0.15,
+      "offsetFromPortal": 0
+    },
+    {
+      "road": "wuhan-yangtze-hankou-to-wuchang",
+      "end": 584,
+      "side": -1,
+      "frames": 55,
+      "lateralDistance": 6.15046656522437,
+      "height": 0.15,
+      "offsetFromPortal": 0
+    },
+    {
+      "road": "wuhan-yangtze-hankou-to-wuchang",
+      "end": 584,
+      "side": 1,
+      "frames": 55,
+      "lateralDistance": 6.15046656522437,
+      "height": 0,
+      "offsetFromPortal": 0
+    },
+    {
+      "road": "wuhan-yangtze-wuchang-to-hankou",
+      "end": 0,
+      "side": -1,
+      "frames": 55,
+      "lateralDistance": 6.150466565224514,
+      "height": -0.0007970077805919352,
+      "offsetFromPortal": 0
+    },
+    {
+      "road": "wuhan-yangtze-wuchang-to-hankou",
+      "end": 0,
+      "side": 1,
+      "frames": 55,
+      "lateralDistance": 6.150466565224514,
+      "height": 0.15,
+      "offsetFromPortal": 0
+    },
+    {
+      "road": "wuhan-yangtze-wuchang-to-hankou",
+      "end": 578,
+      "side": -1,
+      "frames": 55,
+      "lateralDistance": 6.150466565225048,
+      "height": 0.15,
+      "offsetFromPortal": 0
+    },
+    {
+      "road": "wuhan-yangtze-wuchang-to-hankou",
+      "end": 578,
+      "side": 1,
+      "frames": 55,
+      "lateralDistance": 6.150466565225048,
+      "height": -0.0009488765344855352,
+      "offsetFromPortal": 0
+    }
+  ],
+  "errors": [],
+  "propKinds": [
+    "signal",
+    "planter-tree",
+    "tree",
+    "heritage-lamp",
+    "bench",
+    "bollard",
+    "lamp",
+    "parked-scooter"
+  ],
+  "method": "Browser actual updateCar(1/60); automatic heading/throttle; normal static collision, traffic and water checks retained."
+}

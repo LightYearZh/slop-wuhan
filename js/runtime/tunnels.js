@@ -1,3 +1,4 @@
+import {barrierSpan} from './surface-barriers.js';
 import * as THREE from 'three/webgpu';
 // Shanghai-style continuous road, retaining walls, covered bore and ceiling lamps.
 // Shared strip vertices are also the vehicle-contact triangles.
@@ -21,7 +22,7 @@ export function buildTunnels(scene,system){
    // Precisely the same diagonal as floorAt, including corners and slopes.
    floor.push(...a,...b,...c,...b,...d,...c);
    const top=p=>[p[0],p[1]+(p[1]>-6.4?Math.max(.5,.45-p[1]):road.clearance),p[2]];
-   quad(shell,a,c,top(c),top(a));quad(shell,b,d,top(d),top(b));
+   for(const [start,end]of [[a,c],[b,d]]){const span=barrierSpan(start,end,0,0,{underground:true});if(span){const [s,e]=span;quad(shell,s,e,top(e),top(s));}}
    if(Math.max(p[1],q[1])<=-6.4)quad(shell,top(a),top(b),top(d),top(c));
    if(i%3===0){const lerp=(x,y,t,dy=.025)=>[x[0]+(y[0]-x[0])*t,x[1]+(y[1]-x[1])*t+dy,x[2]+(y[2]-x[2])*t];quad(marks,lerp(a,b,.49),lerp(a,b,.51),lerp(c,d,.51),lerp(c,d,.49));}
    if(i%4===0&&p[1]<-7){for(const t of [.13,.87])lamps.push([a[0]+(b[0]-a[0])*t,p[1]+road.clearance-.09,a[2]+(b[2]-a[2])*t]);}

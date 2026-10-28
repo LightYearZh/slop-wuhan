@@ -1,3 +1,4 @@
+import {streetPropColliders} from './prop-colliders.js';
 import {SpatialPlacement} from '../spatial-placement.js';
 import {buildWuhanStreetscape} from '../wuhan-streetscape.js';
 import * as THREE from 'three/webgpu';
@@ -99,6 +100,7 @@ function treeSites() {
     const tz = z + rz * off;
     if (!SIDEWALKS.contains(tx, tz) || buildingAt(tx, tz, 0) || nearCrossing(tx, tz, 5) || buildingAt(tx + rx * 1.2, tz + rz * 1.2)) return;
     if(!placement.reserve('tree',tx,tz,.65))return;
+    placement.sites.at(-1).groundY=hillHeight(tx,tz)+SIDEWALK_HEIGHT;
     const sp = Math.floor(strHash(l.name || String(l.id)) * 3);
     sites.push({ x: tx, y: hillHeight(tx,tz)+SIDEWALK_HEIGHT, z: tz, species: sp, scale: 0.75 + rand() * 0.3, tier: 0 });
   }, { margin: 9 });
@@ -119,6 +121,7 @@ function treeSites() {
       for (let d = 5; d <= 22; d += 3.5) if (CARRIAGEWAY.contains(p.x + lx * (off + d), p.z + lz * (off + d))) other = true;
       if (!other) continue;
       if(!placement.reserve('tree',mx,mz,.65))continue;
+      placement.sites.at(-1).groundY=hillHeight(mx,mz)+.15;
       sites.push({ x: mx, y: hillHeight(mx,mz)+0.15, z: mz, species: 0, scale: 1.05 + rand() * 0.3, tier: 0 });
     }
   }
@@ -144,6 +147,7 @@ function treeSites() {
         if (!polyContains(poly, x, z)) continue;
         if (CARRIAGEWAY.contains(x, z) || SIDEWALKS.contains(x, z) || WATER.contains(x, z) || buildingAt(x, z, 1.5)) continue;
         if(!placement.reserve('tree',x,z,.65))continue;
+        placement.sites.at(-1).groundY=hillHeight(x,z);
         sites.push({ x, y: hillHeight(x, z), z, species: Math.floor(rand() * 3), scale: scaleRange[0] + rand() * (scaleRange[1] - scaleRange[0]), tier });
       }
     }
@@ -166,6 +170,7 @@ function buildLamps(group) {
     const pz = z + rz * off;
     if (buildingAt(px, pz, 0) || nearCrossing(px, pz, 3)) return;
     if(!placement.reserve('lamp',px,pz,.2))return;
+    placement.sites.at(-1).groundY=hillHeight(px,pz)+SIDEWALK_HEIGHT;
     sites.push({ x: px, z: pz, y: hillHeight(px,pz)+SIDEWALK_HEIGHT, yaw: Math.atan2(-rx, -rz) });
   }, { margin: 6 });
   // pole, arm & head in one mesh (one draw per chunk): `glow` marks the head, lit from below at night
@@ -511,7 +516,8 @@ function buildParkedScooters(group) {
       // facing out of the kerb (rear to the kerb) or into it, a little askew
       const fx = rear ? -rx : rx;
       const fz = rear ? -rz : rz;
-      list.push({ x: px, z: pz, yaw: Math.atan2(fx, fz) + (rand() - 0.5) * 0.25, tint: SCOOTER_PAINTS[Math.floor(rand() * SCOOTER_PAINTS.length)] });
+      const yaw=Math.atan2(fx, fz)+(rand()-.5)*.25;placement.sites.at(-1).yaw=yaw;
+      list.push({ x: px, z: pz, yaw, tint: SCOOTER_PAINTS[Math.floor(rand() * SCOOTER_PAINTS.length)] });
     }
   }, { margin: 10 });
   const geo = buildScooterLowGeometry().clone();
@@ -558,7 +564,7 @@ function buildStreetProps(scene, skip = new Set()) {
     trees,
     placement,
     stats:{trees:trees?placement.sites.filter(p=>p.kind==='tree'||p.kind==='planter-tree').length:0,focusTrees:focusTrees.length,lamps,signals:signals.count,signs,parked},
-    colliders: placement.sites.map(p=>{const r=({tree:.25,lamp:.18,signal:.18,'parked-scooter':.65}[p.kind]??p.radius);return {minX:p.x-r,maxX:p.x+r,minZ:p.z-r,maxZ:p.z+r,minY:0,maxY:({tree:8,lamp:9.2,signal:6.6,'parked-scooter':1.6,'planter-tree':8,'heritage-lamp':6.5,bench:1.3,bollard:.95}[p.kind]||2),poly:new Float32Array([p.x-r,p.z-r,p.x+r,p.z-r,p.x+r,p.z+r,p.x-r,p.z+r])}}),
+    colliders: placement.sites.flatMap(site=>streetPropColliders(site,{trees:!skip.has('trees')})),
     audioSignals: signals.audio,
     signalClock,
     update(dt, elapsed) {
