@@ -2,6 +2,8 @@
 from pathlib import Path
 import json, math, re, hashlib
 import osmium
+from city_profile import load_profile
+PROFILE=load_profile()
 from shapely import wkb, make_valid
 from shapely.ops import transform
 from shapely.geometry import box
@@ -10,8 +12,8 @@ from shapely.geometry import shape
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'data/source/citywide'
 DERIVED = ROOT / 'data/derived'
-ORIGIN = (114.293, 30.585)
-PILOT_WGS84 = box(114.2826,30.576,114.3034,30.594)
+ORIGIN = tuple(PROFILE['origin'])
+PILOT_WGS84 = box(*PROFILE['boundsWgs84'])
 rad = math.pi / 180
 e2 = 6.69437999014e-3
 s = math.sin(ORIGIN[1] * rad)
@@ -98,7 +100,7 @@ def main():
     h=Importer();h.apply_file(str(path),locations=True,idx='flex_mem')
     reader=osmium.io.Reader(str(path));timestamp=reader.header().get('osmosis_replication_timestamp');reader.close()
     meta={'provider':'Geofabrik / OpenStreetMap','url':'https://download.geofabrik.de/asia/china/hubei-latest.osm.pbf','sha256':digest,'timestamp':timestamp,'license':'ODbL 1.0'}
-    data={'source':meta,'importerSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
+    data={'source':meta,'profileBounds':PROFILE['boundsWgs84'],'importerSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
     DERIVED.mkdir(exist_ok=True)
     (DERIVED/'wuhan.json').write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')))
     print(json.dumps({'roads':len(h.roads),'buildings':len(h.buildings),'areas':len(h.areas),'skippedGeometries':h.skipped,'timestamp':timestamp},ensure_ascii=False),flush=True)

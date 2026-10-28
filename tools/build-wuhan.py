@@ -1,10 +1,12 @@
 """Adapt Shanghai Roam's importer and 500 m data contract to the Wuhan pilot."""
 from pathlib import Path
-import json, math, hashlib, runpy, collections, shutil, os, re
+import json, math, hashlib, runpy, collections, shutil, os, re, argparse
 from shapely.geometry import shape
 from shapely.ops import transform
 from shapely.strtree import STRtree
+from city_profile import load_profile
 from road_audit import audit_roads
+from spatial_rules import resolve_ground_layout
 from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union
 from shapely import make_valid
@@ -41,17 +43,20 @@ def road_width(r):
     return {'expy':12,'major':10,'minor':8,'local':6,'link':5}[r['class']],'class-estimate'
 
 def main():
+    parser=argparse.ArgumentParser();parser.add_argument('--profile',help='JSON area profile; defaults to config/wuhan-pilot.json')
+    args=parser.parse_args();profile=load_profile(args.profile);os.environ['WUHAN_PROFILE']=profile['_file']
     if not SOURCE.exists():raise SystemExit('Missing data/hubei-latest.osm.pbf; see README.md')
     digest=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
     importer_digest=hashlib.sha256((ROOT/'tools/import-citywide.py').read_bytes()).hexdigest()
-    if not CACHE.exists() or json.loads(CACHE.read_text()).get('importerSha256')!=importer_digest or json.loads(CACHE.read_text())['source']['sha256']!=digest:
+    if not CACHE.exists() or json.loads(CACHE.read_text()).get('importerSha256')!=importer_digest or json.loads(CACHE.read_text()).get('profileBounds')!=profile['boundsWgs84'] or json.loads(CACHE.read_text())['source']['sha256']!=digest:
         runpy.run_path(str(ROOT/'tools/import-citywide.py'),run_name='__main__')
     raw=json.loads(CACHE.read_text())
     rad=math.pi/180;s=math.sin(ORIGIN[1]*rad);e2=6.69437999014e-3
     sx=rad*6378137/math.sqrt(1-e2*s*s)*math.cos(ORIGIN[1]*rad)
     sz=rad*6378137*(1-e2)/(1-e2*s*s)**1.5
     def project(lon,lat,z=None):return ((lon-ORIGIN[0])*sx,-(lat-ORIGIN[1])*sz)
-    a=project(114.2826,30.594);b=project(114.3034,30.576)
+    west,south,east,north=profile['boundsWgs84']
+    a=project(west,north);b=project(east,south)
     bounds=[*a,*b];region=box(*bounds)
     water=unary_union([geometry(v['polygons']) for v in raw['areas'] if v['kind']=='water']).intersection(region).buffer(0)
     parks=unary_union([geometry(v['polygons']) for v in raw['areas'] if v['kind'] in ('park','green')]).intersection(region).difference(water).buffer(0)
@@ -76,7 +81,8 @@ def main():
     pedestrian=unary_union([line.buffer(r['width']/2,quad_segs=4) for line,r in zip(road_lines,roads) if r['mode']=='person']).intersection(region).difference(water).difference(asphalt)
     shoulders=unary_union([line.buffer(r['width']/2+2,quad_segs=3) for line,r in zip(road_lines,roads)]).intersection(region).difference(water)
     buildings=[];seen=set()
-    landmark_source=next(b for b in raw['buildings'] if b['name']=='江汉关大楼')
+    landmark_source=next((b for b in raw['buildings'] if b['name']=='江汉关大楼'),None)
+    if landmark_source is None:raise SystemExit('This profile must include the Jianghanguan pilot landmark; configure a separate landmark adapter for another area.')
     landmark_poly=geometry(landmark_source['polygons'])
     landmark_rr=landmark_poly.minimum_rotated_rectangle
     q=list(landmark_rr.exterior.coords);cx,cz=landmark_rr.centroid.x,landmark_rr.centroid.y
@@ -108,8 +114,11 @@ def main():
             add_building(item,poly,i,'OSM:footprint')
     osm_polys=[p for b in raw['buildings'] for p in parts(geometry(b['polygons']))]
     osm_tree=STRtree(osm_polys)
-    overture_path=ROOT/'data/source/overture-buildings.geojson'
+    overture_path=ROOT/profile['overtureExtract']
     if not overture_path.exists():raise SystemExit('Missing pinned Overture extract; see README')
+    extraction=json.loads(overture_path.with_suffix('.geojson.state').read_text())['bbox']
+    if not(extraction['xmin']<=west and extraction['ymin']<=south and extraction['xmax']>=east and extraction['ymax']>=north):
+        raise SystemExit('Overture extract does not cover the profile. Download the expanded bbox before building.')
     overture=json.loads(overture_path.read_text())
     for feature in overture['features']:
         props=feature['properties']
@@ -124,6 +133,8 @@ def main():
                   'heightSource':'Overture:height' if props.get('height') else 'Overture:floors' if props.get('num_floors') else 'visual-estimate',
                   'sourceDatasets':sorted(set(s.get('dataset') or s.get('resource','unknown') for s in props.get('sources',[])))}
             add_building(item,poly,i,'Overture:footprint')
+    roads,asphalt,pedestrian,shoulders,spatial_audit=resolve_ground_layout(roads,buildings,[landmark],region,water)
+    road_lines=[LineString([(p[0],p[2]) for p in r['points']]) for r in roads]
     places=[]
     for name in ['江汉路','沿江大道','中山大道','北京路','南京路','洞庭街']:
         candidates=[(r,line) for r,line in zip(roads,road_lines) if name in r['name']]
@@ -143,7 +154,7 @@ def main():
     _,walking_line=min(walking,key=lambda value:value[1].distance(museum_target))
     p=walking_line.interpolate(walking_line.project(museum_target))
     landmark['arrival']={'x':p.x,'z':p.y}
-    city={'schemaVersion':2,'origin':ORIGIN,'bounds':bounds,'region':{'id':'wuhan-hankou-pilot','name':'武汉·汉口试验区','boundsWgs84':[114.2826,30.576,114.3034,30.594]},
+    city={'schemaVersion':2,'origin':ORIGIN,'bounds':bounds,'region':{'id':profile['id'],'name':profile['name'],'boundsWgs84':profile['boundsWgs84']},
         'source':raw['source'],'water':polygons(water),'waterAreaM2':round(water.area),'parks':polygons(parks),
         'land':polygons(region.difference(water)),'asphalt':polygons(asphalt),'shoulders':polygons(shoulders),
         'roads':roads,'pedestrian':polygons(pedestrian),'tunnels':[],'rampCuts':[],'landmarks':[landmark],'buildings':buildings,'places':places,'controlPoints':[],'spawn':spawn}
@@ -153,6 +164,7 @@ def main():
     stage=ROOT/'public/data-wuhan-build';shutil.rmtree(stage,ignore_errors=True);(stage/'tiles').mkdir(parents=True)
     dump(stage/'city.json',city)
     dump(stage/'road-audit.json',road_audit)
+    dump(stage/'spatial-audit.json',spatial_audit)
     manifest={'schemaVersion':1,'sourceVersion':digest,'origin':ORIGIN,'bounds':bounds,'tileSizeM':500,'collisionHaloM':180,'attribution':'© OpenStreetMap contributors · ODbL 1.0','tiles':[],'routes':[]}
     for x in range(math.floor(bounds[0]/500),math.ceil(bounds[2]/500)):
         for z in range(math.floor(bounds[1]/500),math.ceil(bounds[3]/500)):
@@ -162,7 +174,7 @@ def main():
     dump(stage/'manifest.json',manifest);dump(stage/'metro.json',{'stations':[],'lines':[]})
     report={'source':raw['source'],'roads':len(roads),'buildings':len(buildings),'heightSources':dict(collections.Counter(b['heightSource'] for b in buildings)),
         'waterAreaM2':round(water.area),'waterPolygons':len(city['water']),'tiles':len(manifest['tiles']),'places':[p['name'] for p in places],
-        'buildingSources':dict(collections.Counter(b['source'] for b in buildings)),'supplement':city['supplement'],'landmarks':['江汉关博物馆'],'roadAudit':road_audit,'excluded':dict(excluded),'skippedSourceGeometries':raw['skippedGeometries'],
+        'buildingSources':dict(collections.Counter(b['source'] for b in buildings)),'supplement':city['supplement'],'landmarks':['江汉关博物馆'],'roadAudit':road_audit,'spatialAudit':spatial_audit,'excluded':dict(excluded),'skippedSourceGeometries':raw['skippedGeometries'],
         'limitations':['Flat ground, no DEM','Actual building footprints extruded; facade styles and missing heights are estimates','Jianghanguan is a photo-referenced simplified exterior, not surveyed detail','Bridge/tunnel/layer roads excluded pending elevation verification','Vehicle visuals inherited from Shanghai, not an authentic Wuhan fleet','No metro data or ride-hailing tasks yet']}
     dump(stage/'wuhan-audit.json',report)
     OUT.mkdir(parents=True,exist_ok=True)

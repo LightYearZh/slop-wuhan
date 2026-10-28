@@ -1,3 +1,4 @@
+import {SpatialPlacement} from './spatial-placement.js';
 import {createFootprintMeshes,footprintCollider} from './footprint-buildings.js';
 import {buildWuhanLandmarks} from './wuhan-landmarks.js';
 import {buildWuhanStreetscape} from './wuhan-streetscape.js';
@@ -38,9 +39,7 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
  const waterMat=createWaterMaterial();flat(scene,data.water,0,waterMat,'Huangpu and Suzhou water');
  flat(scene,data.asphalt,2.12,roadMat,'Shanghai roads');
  const lineGeo=[],rng=random(74821),treeSites=[],lampSites=[],pedSites=[];
- const plantingWorld=new CollisionWorld(),waterSurface=new SurfaceProvider([],data.water);
- plantingWorld.addTile('buildings',data.buildings.map(b=>({minX:b.x-b.w*.6,maxX:b.x+b.w*.6,minZ:b.z-b.d*.6,maxZ:b.z+b.d*.6,minY:0,maxY:1})));
- const noBuild=(x,z)=>!data.landmarks.some(l=>pointInPolygon(x,z,l.footprint))&&!waterSurface.isWater(x,z)&&!plantingWorld.query({minX:x,maxX:x,minZ:z,maxZ:z,minY:0,maxY:1}).length;
+ const placement=new SpatialPlacement(data);
  for(const road of streamed?[]:data.roads){
   for(let i=1;i<road.points.length;i++){
    const a=road.points[i-1],b=road.points[i],len=Math.hypot(b[0]-a[0],b[2]-a[2]);if(len<12)continue;
@@ -48,7 +47,9 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
    if(road.mode==='car'&&road.width>=5)for(let d=6;d<len-3;d+=14){const p=[a[0]+dx*d,2.14,a[2]+dz*d],q=[a[0]+dx*Math.min(d+5,len-2),2.14,a[2]+dz*Math.min(d+5,len-2)];if(data.rampCuts?.some(r=>pointInPolygon((p[0]+q[0])/2,(p[2]+q[2])/2,r)))continue;lineGeo.push(strip([p,q],.14));}
    if(road.width>10)for(let d=16;d<len;d+=42){
     const side=rng()<.5?-1:1,x=a[0]+dx*d+nx*(road.width/2+2.3)*side,z=a[2]+dz*d+nz*(road.width/2+2.3)*side;
-    if(noBuild(x,z)){const site={x,z,angle:Math.atan2(dx,dz)};lampSites.push(site);pedSites.push(site);if(rng()<.8)treeSites.push({x:x+nx*3,z:z+nz*3,y:2,scale:.7+rng()*.5,species:0,yaw:rng()*Math.PI*2});rng();}
+    if(placement.reserve('lamp',x,z,.55)){const site={x,z,angle:Math.atan2(dx,dz)};lampSites.push(site);pedSites.push(site);}
+    const tx=x+nx*side*3,tz=z+nz*side*3;
+    if(rng()<.8&&placement.reserve('tree',tx,tz,1.7))treeSites.push({x:tx,z:tz,y:2,scale:.7+rng()*.5,species:0,yaw:rng()*Math.PI*2});
    }
   }
  }
@@ -82,7 +83,7 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
   for(const p of [t.points[0],t.points.at(-1)]){const sign=makeSign('未开放隧道  →',0x155658);sign.position.set(p[0],7.6,p[2]);g.add(sign);}
  }
  await onProgress(2,'跨江隧道已构建');
- const landmarkSystem=buildWuhanLandmarks(scene,data.landmarks);buildWuhanStreetscape(scene,data,noBuild);await onProgress(3,'江汉关与江汉路街景已构建');
+ const landmarkSystem=buildWuhanLandmarks(scene,data.landmarks);buildWuhanStreetscape(scene,data,placement);await onProgress(3,'江汉关与江汉路街景已构建');
  const styles=[
   createCurtainWallMaterial({glassTint:0x24445b,frameTint:0x53616b,boxLocal:false,seed:2}),
   createPreWarBuildingMaterial({stoneColor:0xb8b6ab,trimColor:0x807d72,windowWidth:2.1,floorHeight:3.1,boxLocal:false,seed:8}),
@@ -147,7 +148,7 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
   crowd.begin();walkers.forEach((p,i)=>{if(!p.site)return;const distance=Math.hypot(p.site.x-camera.position.x,p.site.z-camera.position.z);if(distance>240)return;const d=Math.sin(time*.3+i)*4;const x=p.site.x+Math.sin(p.site.angle)*d,z=p.site.z+Math.cos(p.site.angle)*d;p.rig.update(1/60,x,z,p.site.angle,()=>2,null);crowd.add(p.rig,distance);});crowd.end();
  }
  await onProgress(6,'绿化与行人已准备');
- return {mountTile,loaded,overview,update,landmarkSystem,trees,walkers,streetTiles,metroSystem,get streetRevision(){return streetRevision;}};
+ return {placement,mountTile,loaded,overview,update,landmarkSystem,trees,walkers,streetTiles,metroSystem,get streetRevision(){return streetRevision;}};
 }
 
 function makeSign(text,bg){

@@ -3,7 +3,7 @@ import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {buildStrip} from './road-geometry.js';
 
 // Street furniture is illustrative dressing, not a surveyed street inventory.
-export function buildWuhanStreetscape(scene,data,noBuild){
+export function buildWuhanStreetscape(scene,data,placement){
  const focus=data.landmarks.find(l=>l.id==='jianghanguan');if(!focus)return;
  const buckets=new Map();
  const materials={stone:new THREE.MeshStandardNodeMaterial({color:0x8c8e83,roughness:.9}),paving:new THREE.MeshStandardNodeMaterial({color:0x847c6b,roughness:.95}),metal:new THREE.MeshStandardNodeMaterial({color:0x304241,roughness:.6,metalness:.35}),wood:new THREE.MeshStandardNodeMaterial({color:0x69513a,roughness:.88}),glass:new THREE.MeshStandardNodeMaterial({color:0xe9dab1,emissive:0x75623f,emissiveIntensity:.25,roughness:.5}),leaf:new THREE.MeshStandardNodeMaterial({color:0x506344,roughness:.95})};
@@ -31,13 +31,15 @@ export function buildWuhanStreetscape(scene,data,noBuild){
    const x=a[0]+dx*d,z=a[2]+dz*d;if(Math.hypot(x-focus.x,z-focus.z)>520)continue;
    for(const side of [-1,1]){
     const px=x+nx*side*(road.width/2+1.35),pz=z+nz*side*(road.width/2+1.35);
-    if(!noBuild(px,pz))continue;
+    if(placement.reserve('planter-tree',px,pz,2)){
     add(new THREE.BoxGeometry(2.8,.35,2.8),'stone',px,2.22,pz);
     add(new THREE.CylinderGeometry(.12,.2,3.7,7),'wood',px,4.02,pz);
     const crown=new THREE.IcosahedronGeometry(1.7,1);crown.scale(1,1.25,1);add(crown,'leaf',px,6.5,pz);
-    const lx=px-dx*4,lz=pz-dz*4;add(new THREE.CylinderGeometry(.06,.12,5.5,7),'metal',lx,4.85,lz);
-    add(new THREE.BoxGeometry(.55,.75,.55),'glass',lx,7.85,lz);add(new THREE.BoxGeometry(.75,.12,.75),'metal',lx,8.27,lz);
-    if(noBuild(px+dx*6,pz+dz*6))bench(px+dx*6,pz+dz*6,angle+Math.PI/2);
+    }
+    const lx=px-dx*4,lz=pz-dz*4;
+    if(placement.reserve('heritage-lamp',lx,lz,.55)){add(new THREE.CylinderGeometry(.06,.12,5.5,7),'metal',lx,4.85,lz);
+    add(new THREE.BoxGeometry(.55,.75,.55),'glass',lx,7.85,lz);add(new THREE.BoxGeometry(.75,.12,.75),'metal',lx,8.27,lz);}
+    if(placement.reserve('bench',px+dx*6,pz+dz*6,1.15))bench(px+dx*6,pz+dz*6,angle+Math.PI/2);
    }
   }
  }
@@ -45,7 +47,7 @@ export function buildWuhanStreetscape(scene,data,noBuild){
  for(const road of data.roads.filter(r=>r.name==='沿江大道'))for(let i=1;i<road.points.length;i++){
   const a=road.points[i-1],b=road.points[i],length=Math.hypot(b[0]-a[0],b[2]-a[2]),dx=(b[0]-a[0])/(length||1),dz=(b[2]-a[2])/(length||1);
   for(let d=2;d<length;d+=5){const x=a[0]+dx*d-dz*(road.width/2+1),z=a[2]+dz*d+dx*(road.width/2+1);
-   if(Math.hypot(x-focus.x,z-focus.z)>105||!noBuild(x,z))continue;
+   if(Math.hypot(x-focus.x,z-focus.z)>105||!placement.reserve('bollard',x,z,.2))continue;
    add(new THREE.CylinderGeometry(.13,.18,.85,8),'stone',x,2.5,z);
   }
  }

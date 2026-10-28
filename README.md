@@ -80,6 +80,21 @@ npm test
 npm run build
 ```
 
-当前 45 项测试包含多边形屋顶面积、内院碰撞、武汉数据来源与路网连通检查，以及上海的通用控制器、碰撞、加载、材质、地图导航测试以及武汉的数据与出发点检查。`tests/` 中保留的其他上海专用验收测试不属于武汉的默认测试集；原始上海发布工具仅作参考，武汉使用 `tools/build-wuhan.py`。
+当前 48 项 JavaScript 测试与 4 项 Python 空间测试包含多边形屋顶面积、内院碰撞、武汉数据来源与路网连通检查，以及上海的通用控制器、碰撞、加载、材质、地图导航测试以及武汉的数据与出发点检查。`tests/` 中保留的其他上海专用验收测试不属于武汉的默认测试集；原始上海发布工具仅作参考，武汉使用 `tools/build-wuhan.py`。
 
 代码保留上海项目和 mrdoob/Slop New York 的 MIT 声明，详见 [LICENSE](LICENSE)、[docs/upstream/SOURCES.md](docs/upstream/SOURCES.md) 与 `vendor/slop-newyork/`。地理数据库为 © OpenStreetMap contributors，采用 ODbL 1.0，见 [public/data/DATA-LICENSE.md](public/data/DATA-LICENSE.md)。
+
+## 自动化生成与空间检查 · 0.2.1
+
+数据、普通建筑和街具按规则批量生成，江汉关为专门制作的地标外观。完整流程、纽约与上海的实现差异以及扩区入口见 [生成流程说明](docs/GENERATION_PIPELINE.md)。
+
+新增统一空间规则，保留真实建筑、裁剪压楼的估算路面，暂时关闭并报告 3 处未经确认的穿楼地面段；街具避让所有相交道路、建筑、水面和其他街具。已生成地面路面与建筑相交面积为 0；这并不等于测绘级还原或所有交通关系已核实。
+
+区域配置集中在 `config/wuhan-pilot.json`；扩区时需要匹配范围的补充建筑资料。生成和检查命令：
+
+```sh
+npm run data:build
+npm run verify
+```
+
+`public/data/spatial-audit.json` 记录自动处理与待复核来源；运行时街具检查为 `window.wuhan.city.placement.audit()`。

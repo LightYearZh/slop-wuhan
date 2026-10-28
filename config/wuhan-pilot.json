@@ -1,0 +1,8 @@
+{
+  "id": "wuhan-hankou-pilot",
+  "name": "武汉·汉口试验区",
+  "boundsWgs84": [114.2826, 30.576, 114.3034, 30.594],
+  "origin": [114.293, 30.585],
+  "tileSizeM": 500,
+  "overtureExtract": "data/source/overture-buildings.geojson"
+}
