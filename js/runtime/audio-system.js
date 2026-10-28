@@ -490,7 +490,7 @@ class CityAudioSystem {
         }
       }
     }
-    Object.assign(this.windParams, { speed: Math.min(sources.motion, 50), altitude: position.y, traffic: sources.traffic, night: night ? 1 : 0, enclosure });
+    Object.assign(this.windParams, { mode:this.sources.controllers.activeMode, speed: Math.min(sources.motion, 50), altitude: position.y, traffic: sources.traffic, night: night ? 1 : 0, enclosure });
     this.wind.update(this.windParams, now);
   }
 

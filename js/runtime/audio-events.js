@@ -1,3 +1,4 @@
+import {motionWindExposure} from './driving-audio.js';
 import { setControlRate } from './audio-synthesis.js';
 
 const TAU = Math.PI * 2;
@@ -460,10 +461,10 @@ export function createWindVoice(ctx, resources, output) {
     gust.start(ctx.currentTime, i * resources.gusts.duration * 0.37);
   }
   return {
-    update({ speed = 0, altitude = 0, night = 0, traffic = 0, enclosure = 0 } = {}, now = ctx.currentTime) {
+    update({ speed = 0, altitude = 0, night = 0, traffic = 0, enclosure = 0, mode = 'person' } = {}, now = ctx.currentTime) {
       if (disposed) return;
       now = Math.max(ctx.currentTime, finite(now, ctx.currentTime));
-      const motion = clamp(Math.abs(finite(speed)) / 55);
+      const motion = clamp(Math.abs(finite(speed)) / 55)*motionWindExposure(mode);
       const exposure = Math.sqrt(clamp(altitude / 300));
       const quiet = 1 - clamp(Number(night)) * 0.3;
       const shelter = 1 - clamp(enclosure) * 0.65;

@@ -1,3 +1,4 @@
+import {dryRoadNoise} from './driving-audio.js';
 // Shared procedural audio and continuously running, mono vehicle voices. Spatial placement and overall mixing
 // belong to the caller; every source and processing node created by a voice is released by dispose().
 
@@ -319,8 +320,8 @@ export function createMotorVoice(context, resources, kind, output) {
     const mechanismGain = gain();
     mechanism.connect(mechanismFilter).connect(mechanismGain).connect(mix);
     const road = loop();
-    const roadHighpass = filter('highpass', 260, 0.5);
-    const roadLowpass = filter('lowpass', 3200, 0.5);
+    const roadHighpass = filter('highpass', 120, 0.5);
+    const roadLowpass = filter('lowpass', 1200, 0.5);
     const roadGain = gain();
     road.connect(roadHighpass).connect(roadLowpass).connect(roadGain).connect(mix);
     const exhaustRate = smoothParameter(exhaust.playbackRate, 0.035, 0.0005, true);
@@ -366,7 +367,7 @@ export function createMotorVoice(context, resources, kind, output) {
       const pitch = (0.97 + variation * 0.06) * doppler;
       const effort = Math.min(1, throttle + speed * 0.005);
       const torque = now < shiftUntil ? 0.52 : 1;
-      const rolling = Math.min(1.35, speed / 28);
+      const rolling = dryRoadNoise(speed,throttle,{bus,doppler});
       exhaustRate(rpm / sound.referenceRPM * pitch, now);
       highExhaustRate(rpm / sound.referenceRPM * pitch * bankRatio, now);
       // Same cycle count, starting phase and proportional rates keep the firings in step. Equal-power
@@ -380,9 +381,9 @@ export function createMotorVoice(context, resources, kind, output) {
       exhaustLevel(((bus ? 0.16 : suv ? 0.13 : 0.11) + effort * (bus ? 0.22 : 0.26)) * torque, now);
       mechanicalFrequency(((bus ? 1050 : 1250) + rpm * 0.12) * doppler, now);
       mechanicalLevel(((bus ? 0.10 : 0.03) + effort * (bus ? 0.15 : 0.085)) * torque, now);
-      // Tire contact is broadband and becomes the dominant sound of a car passing at speed off-throttle.
-      roadLevel(Math.pow(rolling, 1.25) * (bus ? 0.44 : 0.36) * (1 - throttle * 0.5), now);
-      roadFrequency((2200 + Math.min(1, rolling) * 2400) * doppler, now);
+      // A quiet, low dry-asphalt bed; lifting the throttle must not reveal a loud spray-like hiss.
+      roadLevel(rolling.gain, now);
+      roadFrequency(rolling.cutoff, now);
       noiseRate(doppler * (0.96 + variation * 0.08), now);
     };
   } else if (kind === 'helicopter') {

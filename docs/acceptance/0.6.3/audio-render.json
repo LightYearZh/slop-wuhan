@@ -1,0 +1,51 @@
+{
+  "reports": [
+    {
+      "speed": 0,
+      "load": 0,
+      "rms": 0.025862323167239274,
+      "peak": 0.09435232728719711,
+      "finite": true,
+      "road": {
+        "gain": 0,
+        "cutoff": 750
+      }
+    },
+    {
+      "speed": 10,
+      "load": 0.4,
+      "rms": 0.06829178847316299,
+      "peak": 0.16665415465831757,
+      "finite": true,
+      "road": {
+        "gain": 0.008757718457982403,
+        "cutoff": 1023.2142857142857
+      }
+    },
+    {
+      "speed": 20,
+      "load": 0,
+      "rms": 0.04227186822676574,
+      "peak": 0.12942074239253998,
+      "finite": true,
+      "road": {
+        "gain": 0.02953814615710207,
+        "cutoff": 1344.642857142857
+      }
+    },
+    {
+      "speed": 28,
+      "load": 0.6,
+      "rms": 0.09128448893860507,
+      "peak": 0.21023733913898468,
+      "finite": true,
+      "road": {
+        "gain": 0.04699400184571664,
+        "cutoff": 1601.7857142857142
+      }
+    }
+  ],
+  "carWindExposure": 0.18,
+  "errors": [],
+  "method": "Browser OfflineAudioContext, actual procedural sedan voice at rest, cruise, off-throttle and high speed. Checks output is finite and non-clipping; does not establish subjective sound quality."
+}
