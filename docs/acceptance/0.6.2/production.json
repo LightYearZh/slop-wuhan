@@ -1,0 +1,39 @@
+{
+  "results": [
+    {
+      "road": "沿江大道",
+      "position": {
+        "x": 106.1,
+        "y": 0,
+        "z": 323.61
+      },
+      "nearbyTrees": 34,
+      "missing": 0,
+      "drawnInstances": 2233
+    },
+    {
+      "road": "中山大道",
+      "position": {
+        "x": -968.335,
+        "y": 0,
+        "z": 613.605
+      },
+      "nearbyTrees": 44,
+      "missing": 0,
+      "drawnInstances": 3868
+    },
+    {
+      "road": "京汉大道",
+      "position": {
+        "x": -2663.465,
+        "y": 0,
+        "z": 554.685
+      },
+      "nearbyTrees": 41,
+      "missing": 0,
+      "drawnInstances": 4164
+    }
+  ],
+  "errors": [],
+  "method": "Production build at port 4187; same real-browser tree visibility regression on three roads."
+}

@@ -829,6 +829,9 @@ function hashPos(x, y, z) {
 function createTreeField(scene, sites) {
   const group = new THREE.Group();
   group.name = 'Trees';
+  // createTreeField owns its scene attachment, just like the other field builders.
+  // Collision sites must never outlive a detached visual group.
+  scene.add(group);
   const atlas = createLeafAtlas();
   const material = createTreeMaterial(atlas.texture);
 

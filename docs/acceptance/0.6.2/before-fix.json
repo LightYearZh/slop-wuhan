@@ -1,0 +1,6 @@
+{
+  "generatedTreeCount": 38890,
+  "sceneHasTreeGroup": false,
+  "errors": [],
+  "note": "The optional scene tree-group query returned undefined and was omitted by JSON; tree collision sites were still generated."
+}
