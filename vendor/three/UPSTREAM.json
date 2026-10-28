@@ -16,6 +16,8 @@
     "examples/jsm/tsl/display/boxBlur.js",
     "examples/jsm/tsl/utils/RNoise.js",
     "examples/jsm/tsl/utils/SpecularHelpers.js",
-    "examples/jsm/utils/BufferGeometryUtils.js"
+    "examples/jsm/utils/BufferGeometryUtils.js",
+    "examples/jsm/lighting/ClusteredLighting.js",
+    "examples/jsm/tsl/lighting/ClusteredLightsNode.js"
   ]
 }

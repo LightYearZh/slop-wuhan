@@ -1,6 +1,19 @@
 {
-  "repository": "https://github.com/YakirLove/ShangHai",
-  "revision": "5422e02e0b4f6982872deb12486625279f8395d2",
-  "preservedReference": "../reference-shanghai",
-  "previousPilotBranch": "archive/standalone-pilot"
+  "repository": "https://github.com/shwang1979/slop-taipei",
+  "revision": "1d70708fc92a088b779c8c0e22677adb64966a1b",
+  "preservedReference": "../reference-taipei",
+  "runtimeDirectory": "js/runtime",
+  "adaptations": [
+    "Wuhan data adapter",
+    "Simplified Chinese UI",
+    "Wuhan cameras, destinations and landmark",
+    "Audited spatial placement and courtyard collision"
+  ],
+  "previousRuntime": {
+    "repository": "https://github.com/YakirLove/ShangHai",
+    "revision": "5422e02e0b4f6982872deb12486625279f8395d2",
+    "preservedReference": "../reference-shanghai",
+    "previousPilotBranch": "archive/standalone-pilot",
+    "archiveBranch": "archive/shanghai-runtime-0.3.0"
+  }
 }

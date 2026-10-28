@@ -1,108 +1,59 @@
-# 武汉漫游 · Slop Wuhan
+# 武汉漫游 · Slop Wuhan 0.4.0
 
-本项目直接基于 [YakirLove/ShangHai](https://github.com/YakirLove/ShangHai) 改造，复用其 Three.js WebGPU/TSL、光照、建筑材质、角色、车辆、相机、碰撞、分块加载与中文地图系统。第一版覆盖汉口江汉路—沿江大道约 2 × 2 公里，使用真实武汉 OSM 数据。
+当前运行基础已切换为 [shwang1979/slop-taipei](https://github.com/shwang1979/slop-taipei)，复用其建筑与屋顶细节、街道、交通、角色、车辆、相机、地图、光照与音效系统。界面使用简体中文，地理内容使用武汉江汉路—沿江大道约 2×2 公里试验区。
 
-原上海参考仓库完整保存在 `../reference-shanghai/`，保持独立 Git 历史。采用的版本见 [docs/UPSTREAM.json](docs/UPSTREAM.json)。原来的独立 Phase 0 验证器保存在当前仓库的 `archive/standalone-pilot` 分支；主分支开发路线已改为上海项目的武汉改编，不再继续独立造引擎。
+台北参考仓库完整保存在 `../reference-taipei/`；上海参考仍保存在 `../reference-shanghai/`。上游版本见 [来源记录](docs/UPSTREAM.json)。上海运行版本保存在 `archive/shanghai-runtime-0.3.0` 分支，独立 Phase 0 保存在 `archive/standalone-pilot`。现有旧 `js/` 文件与测试暂时保留供数据工具和回退使用，当前网页入口是 `js/runtime/main.js`。
 
 ## 本地运行
 
-需要 Node.js 22.12+（本机为 24）。武汉生成数据已随项目保存，日常浏览无需下载原始 PBF。
+需要 Node.js 22.12+。地理数据已经随仓库保存，日常浏览无需下载 PBF。
 
 ```sh
 npm ci
 npm run dev
 ```
 
-打开 http://127.0.0.1:4799/ 。也可以运行 `npm start`。旧地址 `/web/` 已停用。
+打开 http://127.0.0.1:4799/ 。已有页面请刷新。
 
-- `1 / 2 / 3 / 4`：步行、驾驶、骑行、直升机。
-- `W / S`：前后移动；`A / D`：转向；`Shift`：加速；拖动鼠标：环视。
-- 飞行 `E / Q`：上升、下降；`V`：切换相机。
-- `M`：地图。地点菜单可到达江汉路、沿江大道、中山大道、北京路、南京路和洞庭街。
-- 右上角切换白天、黄昏、夜间或画质。
+- `WASD` 移动，`Shift` 加速，鼠标拖动环顾。
+- `1/2/3/4` 切换步行、汽车、踏板车、直升机；飞行时 `E/Space` 上升，`Q/C` 下降。
+- `M` 打开地图，可搜索江汉路、沿江大道、江汉关等地点；地图点击传送。
+- 顶部“传送”选择目的地；右下角相机菜单可选择江汉关、江汉路、江岸、汉口全景和空中环游。
+- 顶部切换黄昏、正午、蓝调、夜晚，`N` 切换声音，`H` 隐藏界面。
 
-## 真实数据与当前限制
+## 这版实际做了什么
 
-当前生成 **404 段道路、2,097 栋普通建筑体量、江汉关地标、4 片水域和 16 个 500m 建筑块**。普通建筑中 422 栋来自 OSM，1,675 栋来自去重后的 Overture Maps 补充轮廓，保持来源与原始 ID。OSM 快照为 2026-10-27 21:23:59 UTC；Overture 固定版本为 2026-10-21.0。
+武汉源层保留 404 段道路、2,097 栋普通建筑、江汉关地标和 4 片水域。422 栋建筑轮廓来自 OSM，1,675 栋来自去重后的 Overture。源层有空间审计，保留对象 ID、院落、已有高度与文献依据。江汉关沿用已有简化模型；平安大厦保留裙房、塔楼、顶部三个体量，转换到台北运行接口后共 2,099 条建筑分部记录。
 
-建筑采用原始多边形外环与内院生成，碰撞也跟随轮廓，不再用矩形包围盒替代整栋建筑。缺少高度的 **2,081 栋仍以 12m 估算**，另有 11 栋由 OSM 层数换算、3 栋读取 OSM 高度、2 栋补入文献总高或历史层数换算；补充轮廓并没有自动解决楼高问题。窗户、立面风格及屋顶材质是视觉表现，不是逐栋实景采集。
+缺失高度的 2,081 栋在源层仍保留 12m 占位与缺失标记；**显示层改为按用途、面积和固定种子估算层数**，真实高度始终优先。推断高度不是逐栋实景数据，详见 `public/data/runtime-audit.json` 与生成模块的 `buildingMeta`。没有为了丰富度更改真实轮廓或添加虚构建筑。
 
-江汉关使用 OSM `way/128400530` 平面定位，以公开实景参考制作约 45.85m 的简化外观，包含石材主楼、8 根正面廊柱、四面钟盘与钟楼。地图搜索“江汉关”可到达建筑外的道路落点。比例与细部有视觉估算，不是文物测绘模型。主楼高度来源与差异记录在 [街景任务说明](docs/STREETSCAPE_PLAN.md)。
+立面、窗格、空调、屋顶设备、店面等复用台北的程序规则；建筑用途、现有资料与高度参与样式选择。212 条沿墙招牌记录混合源建筑名称与通用业态文字，外观及安装位置不是实测店招。通用细节仍保留上游风格，后续需继续校准为汉口建筑语言。
 
-江汉路改为独立步行铺装，不绘制机动车道线；末段加入石带、树列、路灯、座椅等示意街具。街具数量与位置不是实测。道路优先读取 OSM width，或由 lanes × 3.25m 估算宽度，缺失时使用分类型估值。保留 OSM 节点 ID 的连通审计确认江汉路到沿江大道相连；全区仍包含裁剪边缘、孤立小径等多个连通分量，尚未逐处全部核查。
+街树、路灯及停车候选使用武汉的建筑／水域／全路网／步行中部／其他街具统一避让。地面碰撞保留院落，地标坐标与专用景点相机换成武汉。没有导入台北地形、101、纪念堂或台北店名。车辆为上游简化模型，修改了文字与部分密度，尚非真实武汉车队。
 
-地面仍平坦，未接 DEM；23 条桥梁、隧道或非地面层级源道路暂不开放。没有武汉地铁数据或网约车任务，驾驶也尚未实现完整交通规则。车辆造型沿用上海资源。
+## 数据重建与自动化
 
-完整统计、来源、SHA-256 和限制见 [public/data/wuhan-audit.json](public/data/wuhan-audit.json)。
+第一次在新机器生成需准备 Python 3.9+ 和湖北 PBF：
 
-## 重建武汉数据
-
-首次下载已完成，原始湖北文件放在 `data/hubei-latest.osm.pbf`（约 53MB，未提交 Git）。如果换机器或需要你手动下载：
-
-1. 打开 https://download.geofabrik.de/asia/china/hubei.html 。
-2. 下载 **hubei-latest.osm.pbf**，不是 Shapefile ZIP。
-3. 将文件放到项目 `data/` 目录，保持上述文件名。
-4. 运行以下命令；不需要你手动裁剪、坐标转换或使用 Osmium 命令行。
+1. 从 https://download.geofabrik.de/asia/china/hubei.html 下载 `hubei-latest.osm.pbf`。
+2. 放在项目 `data/hubei-latest.osm.pbf`。当前机器已有约 53MB 文件，不必重新下载。
+3. 执行：
 
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 npm run data:build
-npm test
-npm run build
-```
-
-Python 3.9+；Windows 可使用 `.venv/Scripts/python tools/build-wuhan.py`。生成器沿用上海的 OSM/pyosmium 提取逻辑，使用 Shapely 组装内外环、裁剪水域和道路，并输出上海运行系统的数据契约。`data/derived/wuhan.json` 缓存同时检查源文件与导入器哈希，修改导入器后会自动重建。
-
-Overture 的约 2MB 原始小范围提取及来源清单已随仓库提交，离线重建不需要再次联网。如需重新下载固定版本，使用 Python 3.12+ 单独建立下载环境：
-
-```sh
-python3 -m venv .data-venv
-.data-venv/bin/python -m pip install -r requirements-download.txt
-.data-venv/bin/overturemaps download --release=2026-10-21.0 \
-  --bbox=114.2826,30.576,114.3034,30.594 -f geojson --type=building \
-  -o data/source/overture-buildings.geojson
-npm run data:build
-```
-
-详情见 [data/source/overture-source.json](data/source/overture-source.json)。公开实景照片只在本地作为造型参考，不作为应用贴图或随代码分发。
-
-## 后续顺序
-
-1. 补可靠楼高与建筑用途，改善重点街段的首层商铺、立面样式和屋顶层次。
-2. 继续核查江岸、道路宽度和孤立路段，逐项恢复具有高程依据的桥隧。
-3. 逐步扩展武汉范围与地标；最后再参考 London Loop 加入接单、导航与任务。
-
-## 测试与许可
-
-```sh
-npm test
-npm run build
-```
-
-当前 50 项 JavaScript 测试与 10 项 Python 数据规则测试包含多边形屋顶面积、内院碰撞、武汉数据来源与路网连通检查，以及上海的通用控制器、碰撞、加载、材质、地图导航测试以及武汉的数据与出发点检查。`tests/` 中保留的其他上海专用验收测试不属于武汉的默认测试集；原始上海发布工具仅作参考，武汉使用 `tools/build-wuhan.py`。
-
-代码保留上海项目和 mrdoob/Slop New York 的 MIT 声明，详见 [LICENSE](LICENSE)、[docs/upstream/SOURCES.md](docs/upstream/SOURCES.md) 与 `vendor/slop-newyork/`。地理数据库为 © OpenStreetMap contributors，采用 ODbL 1.0，见 [public/data/DATA-LICENSE.md](public/data/DATA-LICENSE.md)。
-
-## 自动化生成与空间检查 · 0.2.1
-
-数据、普通建筑和街具按规则批量生成，江汉关为专门制作的地标外观。完整流程、纽约与上海的实现差异以及扩区入口见 [生成流程说明](docs/GENERATION_PIPELINE.md)。
-
-新增统一空间规则，保留真实建筑、裁剪压楼的估算路面，暂时关闭并报告 3 处未经确认的穿楼地面段；街具避让所有相交道路、建筑、水面和其他街具。已生成地面路面与建筑相交面积为 0；这并不等于测绘级还原或所有交通关系已核实。
-
-区域配置集中在 `config/wuhan-pilot.json`；扩区时需要匹配范围的补充建筑资料。生成和检查命令：
-
-```sh
-npm run data:build
 npm run verify
 ```
 
-`public/data/spatial-audit.json` 记录自动处理与待复核来源；运行时街具检查为 `window.wuhan.city.placement.audit()`。
+`tools/build-wuhan.py` 保留上海来源的 PBF 提取和武汉合并、空间审计流程，输出可追溯源层。`tools/build-runtime.py` 接着转换为台北运行接口，生成 `js/runtime/wuhan-geodata.js`，分离源高度与显示推断。仅调整外观／显示规则可运行 `npm run data:runtime`。
 
-## 建筑属性与自动临街表现 · 0.3.0
+固定版本 Overture 小范围提取已提交于 `data/source/overture-buildings.geojson`，不需要再次联网。来源快照：OSM 2026-10-27 21:23:59 UTC，Overture 2026-10-21.0。扩区入口仍是 `config/wuhan-pilot.json`，扩区前需要覆盖新范围的 Overture 文件，并验证新运行系统的性能。
 
-导入器进一步保留历史、年代、用途和楼内 POI。楼内 POI 与用地推断分别标记，按分类生成住宅、商业、公建、历史建筑等通用外观；210 栋建筑自动生成面向道路的首层细节，窗、门和招牌底板不代表逐店复原。
+## 验证与当前边界
 
-补充资料按 OSM ID 和名称双重匹配；佳丽广场（平安大厦）采用文献总高 251m，分为估算的裙楼/内缩塔身/顶部退台，璇宫饭店按文献记载的历史主体五层换算。两者已加入地点菜单，搜索“佳丽广场”可找到平安大厦。多数楼高依然未知，这次没有以随机高楼替代缺失数据。
+`npm run verify` 运行 54 项 JavaScript 测试、13 项 Python 测试、源层空间审计和生产构建。包括保留的通用回归测试与新增的台北运行契约、来源／推断高度、建筑分部、路网方向及院落碰撞检查。还需浏览器验收实际加载、地图、模式和视角；构建通过不能替代画面验证。
 
-详见 [建筑属性说明](docs/BUILDING_ATTRIBUTES.md) 和 `public/data/building-attributes-audit.json`；来源目录为 `data/source/building-evidence.json`。
+当前仍是平地试验区，没有 DEM、跨江桥隧、武汉地铁或网约车任务；23 条非地面层级源道路未开放。台北运行系统将本试验区整体加载后分块合批／裁剪，**旧版 500m 流式加载不是当前运行路径**，不宜直接扩大全市。下一步先校准汉口普通建筑、店招与可靠楼高，再扩区。
+
+代码保留 MIT 许可，来源见 [LICENSE](LICENSE)、[台北许可](docs/upstream/TAIPEI-LICENSE)、[运行系统迁移记录](docs/TAIPEI_RUNTIME_MIGRATION.md)。地理数据 © OpenStreetMap contributors、Overture Maps，见 [数据许可](public/data/DATA-LICENSE.md)。

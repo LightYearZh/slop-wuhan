@@ -67,3 +67,8 @@ OSM 建筑覆盖稀疏；284 栋高度估算，132 个矩形包围盒挤占道�
 - 本轮不扩大范围；2,081 栋高度仍为 12m 占位。详细来源、估算边界与生成器职责见 BUILDING_ATTRIBUTES.md。
 
 截图保存在 output/playwright/attributes-tower-final.png、attributes-street-final.png，作为本机验证产物保留，未提交源码。
+
+
+## 0.4.0 · 2026-10-28
+
+按用户决定切换台北运行基础。保存上海运行分支，新增武汉→台北数据契约转换，复用台北建筑／屋顶／街道／交通／地图／相机系统，统一简体中文，保留武汉轮廓、已有资料高度、分层平安大厦和江汉关。缺失高度改为明确标记的显示推断，源层不改写。迁移和验证边界见 [TAIPEI_RUNTIME_MIGRATION.md](TAIPEI_RUNTIME_MIGRATION.md)。

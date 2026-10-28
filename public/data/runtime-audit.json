@@ -1,0 +1,22 @@
+{
+  "runtimeBase": "shwang1979/slop-taipei",
+  "ruleVersion": "hankou-display-v1",
+  "sourceBuildings": 2097,
+  "renderedParts": 2099,
+  "roadLinks": 2111,
+  "heightSources": {
+    "visual-estimate:hankou-display-v1": 2081,
+    "reference:architectural-total": 1,
+    "OSM:levels": 11,
+    "OSM:height": 3,
+    "reference:storeys-derived": 1
+  },
+  "signRecords": 212,
+  "limits": [
+    "Missing heights are visual estimates, not surveyed",
+    "No Taipei geography or landmarks imported",
+    "Flat terrain; no bridges/tunnels/MRT",
+    "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
+  ],
+  "sourceCitySha256": "2e4c96e11d8233fe06291d38524416c14d21a97110d78b80dd04e4ffef0f6aae"
+}

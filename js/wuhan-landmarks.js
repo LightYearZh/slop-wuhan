@@ -90,7 +90,7 @@ export function buildWuhanLandmarks(scene,landmarks){
   const crown=new THREE.CylinderGeometry(1.6,6.1,2.4,4);crown.rotateY(Math.PI/4);add(crown,roof,0,41.8,3);
   box(2.4,.7,2.4,0,43.3,3,stone);cyl(.055,.065,2.15,0,44.55,3,dark,8);
   // Local sign is a model detail; no downloaded image is baked onto the building.
-  const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#bfbba9';ctx.fillRect(0,0,512,128);ctx.fillStyle='#3b433f';ctx.font='bold 76px serif';ctx.textAlign='center';ctx.fillText('江 漢 關',256,94);
+  const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#bfbba9';ctx.fillRect(0,0,512,128);ctx.fillStyle='#3b433f';ctx.font='bold 76px serif';ctx.textAlign='center';ctx.fillText('江 汉 关',256,94);
   const label=new THREE.Mesh(new THREE.PlaneGeometry(7.4,1.8),new THREE.MeshStandardNodeMaterial({map:new THREE.CanvasTexture(c),roughness:.8}));label.position.set(0,17.6,front+2.35);g.add(label);
   g.updateWorldMatrix(true,true);
   const inverse=g.matrixWorld.clone().invert();

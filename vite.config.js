@@ -1,8 +1,2 @@
 import {defineConfig} from 'vite';
-import fs from 'node:fs';import path from 'node:path';
-const root=process.cwd(),dataFiles=[['city','城市地理','city.json'],['manifest','城市块索引','manifest.json'],['metro','地铁站点','metro.json']];
-function startupManifest(){return {name:'shanghai-startup-manifest',configureServer(server){server.middlewares.use('/boot-manifest.json',(_req,res)=>{res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-cache');res.end(JSON.stringify({module:'./js/main.js',runtime:[],data:dataFiles.map(([key,label,file])=>({key,label,url:'./data/'+file,bytes:fs.statSync(path.join(root,'public/data',file)).size}))}));});},generateBundle(_options,bundle){
- const app=Object.values(bundle).find(f=>f.type==='chunk'&&f.facadeModuleId===path.join(root,'js/main.js'));if(!app)throw Error('Startup app entry is missing');const names=new Set();function include(name){if(names.has(name))return;names.add(name);for(const dependency of bundle[name]?.imports||[])include(dependency);}include(app.fileName);
- const runtime=[...names].map(name=>({url:'./'+name,bytes:Buffer.byteLength(bundle[name].code),label:'3D图形程序'}));this.emitFile({type:'asset',fileName:'boot-manifest.json',source:JSON.stringify({module:'./'+app.fileName,runtime,data:dataFiles.map(([key,label,file])=>({key,label,url:'./data/'+file,bytes:fs.statSync(path.join(root,'public/data',file)).size}))})});
- }};}
-export default defineConfig({base:'./',plugins:[startupManifest()],server:{host:'127.0.0.1',port:4799,strictPort:true},build:{target:'es2022',chunkSizeWarningLimit:2200,rollupOptions:{input:{index:path.join(root,'index.html'),app:path.join(root,'js/main.js')}}}});
+export default defineConfig({base:'./',server:{host:'127.0.0.1',port:4799,strictPort:true},build:{target:'es2022',chunkSizeWarningLimit:2500}});

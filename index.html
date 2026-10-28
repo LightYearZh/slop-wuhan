@@ -1,17 +1,284 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#142125"><title>武汉漫游 · 全区</title><link rel="icon" href="data:,"><link rel="stylesheet" href="/style.css"></head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Slop 武汉</title>
+  <link rel="icon" href="data:," />
+  <meta name="description" content="武汉漫游：江汉路、沿江大道与江汉关。真实城市轮廓与程序化街景。" />
+  <!-- three.js r186 (served by jsDelivr) -->
+  <!-- Fetch the city modules in parallel before stylesheets; the module graph controls evaluation order. -->
+  <link rel="modulepreload" href="./js/runtime/wuhan-geodata.js" />
+  <link rel="modulepreload" href="./js/runtime/city-config.js" />
+  <link rel="modulepreload" href="./js/runtime/tsl-materials.js" />
+  <link rel="modulepreload" href="./js/runtime/trees.js" />
+  <link rel="modulepreload" href="./js/runtime/actor-models.js" />
+  <link rel="modulepreload" href="./js/runtime/vehicle-lights.js" />
+  <link rel="modulepreload" href="./js/runtime/pedestrians.js" />
+  <link rel="modulepreload" href="./js/runtime/scooter-model.js" />
+  <link rel="modulepreload" href="./js/runtime/lighting.js" />
+  <link rel="modulepreload" href="./js/runtime/ground.js" />
+  <link rel="modulepreload" href="./js/runtime/buildings.js" />
+  <link rel="modulepreload" href="./js/runtime/road-paint.js" />
+  <link rel="modulepreload" href="./js/runtime/elevated.js" />
+  <link rel="modulepreload" href="./js/runtime/street-props.js" />
+  <link rel="modulepreload" href="./js/runtime/landmarks.js" />
+  <link rel="modulepreload" href="./js/runtime/garbage-truck.js" />
+  <link rel="modulepreload" href="./js/runtime/traffic.js" />
+  <link rel="modulepreload" href="./js/runtime/controllers.js" />
+  <link rel="modulepreload" href="./js/runtime/touch-controls.js" />
+  <link rel="modulepreload" href="./js/runtime/gamepad-controls.js" />
+  <link rel="modulepreload" href="./js/runtime/cameras.js" />
+  <link rel="modulepreload" href="./js/runtime/wuhan-map.js" />
+  <link rel="modulepreload" href="./js/runtime/scene-culling.js" />
+  <link rel="modulepreload" href="./js/runtime/post-processing.js" />
+  <link rel="modulepreload" href="./js/runtime/audio-synthesis.js" />
+  <link rel="modulepreload" href="./js/runtime/audio-events.js" />
+  <link rel="modulepreload" href="./js/runtime/audio-sources.js" />
+  <link rel="modulepreload" href="./js/runtime/audio-acoustics.js" />
+  <link rel="modulepreload" href="./js/runtime/audio-system.js" />
+  <link rel="modulepreload" href="./js/runtime/main.js" />
+  <script type="module" src="./js/runtime/main.js"></script>
+  <!-- Inter & Noto Sans SC (UI), Overpass (street-name plates) -->
+  <link rel="stylesheet" href="./css/taipei-runtime.css" />
+</head>
 <body>
- <main id="scene" aria-label="武汉三维漫游场景"></main>
- <div id="loading" role="status"><div class="loading-card"><div class="loading-mark">汉</div><h1>武汉漫游</h1><p id="loading-text">正在连接城市资源…</p><div class="loading-progress-title"><span id="loading-step">步骤 1 / 6</span><strong id="loading-percent">0%</strong></div><div id="loading-progress" class="loading-track" role="progressbar" aria-label="启动任务完成进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="loading-fill"></i></div><p id="loading-detail">即将读取程序与地图</p><div class="loading-meta"><span id="loading-count">正在准备…</span><span id="loading-elapsed">已用 0.0 秒</span></div><ol id="loading-stages"></ol><button id="loading-retry" hidden onclick="location.reload()">重新加载</button><small>按实际读取、场景任务与首帧就绪更新 · 汉口试验区</small></div></div>
- <header class="brand panel"><span class="brand-mark">汉</span><div><strong>武汉漫游</strong><span>汉口 · 江汉路—沿江大道 <b id="fps">—</b></span></div></header>
- <nav class="toolbar panel" aria-label="场景设置"><div class="time-buttons"><button data-time="golden" class="active">◒ 黄昏</button><button data-time="midday">☀ 白天</button><button data-time="midnight">☾ 夜间</button></div><span class="divider"></span><button id="places-button">⌖ 地点</button><button id="map-button">▱ 地图 <kbd>M</kbd></button><select id="quality" aria-label="画质"><option value="low">低画质</option><option value="medium" selected>中画质</option><option value="high">高画质</option></select><button id="hide-ui" aria-label="隐藏界面">◉</button></nav>
- <div id="places" class="panel popup" hidden></div>
- <aside class="map-corner"><div class="road-label" id="road-label">江汉路</div><button id="mini-map" class="panel" aria-label="打开武汉地图"><svg id="mini-svg" viewBox="-1800 -1500 4300 3500"></svg></button><span class="north">N ↑</span></aside>
- <div class="bottom-center"><div class="controls-hint" id="controls-hint"><kbd>W</kbd><kbd>S</kbd> 前进 / 后退　<kbd>A</kbd><kbd>D</kbd> 转向　<kbd>Shift</kbd> 加速　拖动环视</div><nav class="mode-dock panel" aria-label="漫游模式"><button data-mode="person">♙ 步行 <kbd>1</kbd></button><button data-mode="car" class="active">▰ 驾驶 <kbd>2</kbd></button><button data-mode="cyclist">♧ 骑行 <kbd>3</kbd></button><button data-mode="helicopter">⌘ 飞行 <kbd>4</kbd></button></nav></div>
- <aside class="speed-panel panel"><div id="mode-label">武汉出租车</div><div class="speed-line"><strong id="speed">0</strong><span id="speed-unit">km/h</span><small id="altitude"></small></div><div class="meter"><i id="speed-meter"></i></div><button id="camera-button">‹　<span id="camera-label">第三人称跟随</span>　› <kbd>V</kbd></button></aside>
- <div id="toast" class="panel" role="status" hidden></div>
- <footer class="attribution">© OpenStreetMap contributors · Overture Maps · <a href="https://opendatacommons.org/licenses/odbl/1-0/" target="_blank" rel="noreferrer">ODbL</a>　<span>城市印象 · 自由漫游</span></footer>
- <section id="map-modal" hidden aria-label="武汉地图"><div class="map-shell panel"><header><div><small>EXPLORE WUHAN</small><h2>选择一处，去看看</h2></div><input id="search" type="search" placeholder="在当前筛选中搜索站名、地标…" aria-label="搜索地标"><button id="map-fit" class="map-control">全区</button><button id="map-locate" class="map-control">当前位置</button><button id="close-map" aria-label="关闭地图">✕</button></header><div class="map-filters"><div class="map-types" role="group" aria-label="地点类型"><button data-map-type="landmark" aria-pressed="true">◆ 地标建筑</button><button data-map-type="metro" aria-pressed="false">M 地铁站</button><button data-map-type="place" aria-pressed="false">⌖ 城市地点</button><button data-map-type="all" aria-pressed="false">全部地点</button></div><label>行政区<select id="map-district" aria-label="行政区筛选"><option value="all">全部区域</option></select></label><label id="map-line-field" hidden>地铁线路<select id="map-line" aria-label="地铁线路筛选"><option value="all">全部线路</option></select></label><button id="map-reset">重置筛选</button></div><div class="map-body"><div id="map-viewport"><svg id="full-svg" viewBox="-1800 -1500 4300 3500" aria-label="可缩放地点地图"></svg><div class="map-legend">◆ 地标　<span>M 地铁</span>　<span>数字点可展开</span>　<span>平坦地形 · 楼高含估算</span></div><div class="map-zoom"><button id="map-zoom-in" aria-label="放大地图">＋</button><button id="map-zoom-out" aria-label="缩小地图">−</button><button id="map-fit-results" aria-label="适配筛选结果">⌖</button></div><span id="map-scale">视野 —</span></div><aside class="map-sidebar"><div id="map-selection" hidden><small>已选地点</small><h3 id="map-selected-name"></h3><p id="map-selected-meta"></p><div id="map-selected-lines"></div><div class="map-travel-actions"><button id="map-fly">⌘ 飞到这里</button><button id="map-go">按当前方式前往</button></div><p id="map-travel-status" role="status"></p></div><div class="map-results-heading"><strong id="map-result-count">12 个地点</strong><button id="map-show-results" hidden>返回全部结果</button></div><div id="search-results"></div></aside></div><footer>点击地点先查看详情 · 数字点展开后可从列表选择 · 滚轮/双击缩放，拖动平移 · 飞到这里将切换直升机抵达目的地上空</footer></div></section>
- <script type="module" src="/js/bootstrap.js" onerror="document.getElementById('loading-text').textContent='启动程序未能读取，请重试';document.getElementById('loading-retry').hidden=false"></script>
-</body></html>
+  <!-- Icon sprite (24 × 24 stroke icons, drawn in currentColor) -->
+  <svg class="icon-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="i-walk" viewBox="0 0 24 24"><circle cx="13" cy="4.4" r="2"/><path d="M12.3 8.2 10.8 13.8M10.8 13.8 9.2 17.2 7.2 20.5M10.8 13.8l2.4 3 1.6 3.8M12.3 8.6 9.6 10.2l-.8 2.6M12.3 8.6l2.1 2.4 2.4.8"/></symbol>
+      <symbol id="i-car" viewBox="0 0 24 24"><path d="M9.6 4.8V3.4a.6.6 0 0 1 .6-.6h3.6a.6.6 0 0 1 .6.6v1.4"/><path d="m5.2 10.5 1.4-4.1A2.2 2.2 0 0 1 8.7 4.8h6.6a2.2 2.2 0 0 1 2.1 1.6l1.4 4.1"/><rect x="3" y="10.5" width="18" height="6.5" rx="2"/><path d="M6 17v2.6M18 17v2.6M6.6 13.8h1.6M15.8 13.8h1.6"/></symbol>
+      <symbol id="i-scooter" viewBox="0 0 24 24"><circle cx="5.8" cy="17" r="2.6"/><circle cx="18.2" cy="17" r="2.6"/><path d="M8.4 17h6.6l1.6-6.2M16.6 10.8 15.2 5.2h2.6M3.6 13.6h6.6l1.2 3.4M9.4 10.4h3.8"/></symbol>
+      <symbol id="i-heli" viewBox="0 0 24 24"><path d="M3.5 4h15M11 4v3.2"/><path d="M6 12.2a5 5 0 0 1 5-5h1.6a4.4 4.4 0 0 1 4.4 4.4V15H8.8A2.8 2.8 0 0 1 6 12.2z"/><path d="M17 11h4.2M21.2 8.8v4.4M7 19h10.5M9.5 15v4M15 15v4"/></symbol>
+      <symbol id="i-golden" viewBox="0 0 24 24"><path d="M3 17.5h18M7 17.5a5 5 0 0 1 10 0M12 5v3M5.6 9.6l2 1.6M18.4 9.6l-2 1.6M7.5 21h9"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2.1M12 19.1v2.1M2.8 12h2.1M19.1 12h2.1M5.5 5.5 7 7M17 17l1.5 1.5M5.5 18.5 7 17M17 7l1.5-1.5"/></symbol>
+      <symbol id="i-twilight" viewBox="0 0 24 24"><path d="M3 15.5h18M7.5 19h9M8 15.5a4 4 0 0 1 8 0M17.5 4v3.2M15.9 5.6h3.2M7 7.4v1.8M6.1 8.3h1.8"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.6A7.8 7.8 0 0 1 9.4 4.5a7.8 7.8 0 1 0 10.1 10.1z"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21.2s-6.6-5.7-6.6-11.2a6.6 6.6 0 0 1 13.2 0c0 5.5-6.6 11.2-6.6 11.2z"/><circle cx="12" cy="10" r="2.4"/></symbol>
+      <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4.5 3.5 6.6v13l5.5-2.1 6 2.1 5.5-2.1v-13L15 6.6 9 4.5zM9 4.5v13M15 6.6v13"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3.5 3.5l17 17M10.6 5.6c.5-.1.9-.1 1.4-.1 6 0 9.5 6.5 9.5 6.5a16 16 0 0 1-2.4 3.2M6.6 6.6A15.6 15.6 0 0 0 2.5 12s3.5 6.5 9.5 6.5c1.6 0 3.1-.4 4.4-1.1M9.9 9.9a2.8 2.8 0 0 0 4.2 4.2"/></symbol>
+      <symbol id="i-sound" viewBox="0 0 24 24"><path d="m11 4-5 4H3v8h3l5 4V4ZM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></symbol>
+      <symbol id="i-sound-off" viewBox="0 0 24 24"><path d="m11 4-5 4H3v8h3l5 4V4ZM16 9l6 6M22 9l-6 6"/></symbol>
+      <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m7 9.5 5 5 5-5"/></symbol>
+      <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M14.5 6.5 9 12l5.5 5.5"/></symbol>
+      <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9.5 6.5 5.5 5.5-5.5 5.5"/></symbol>
+      <symbol id="i-camera" viewBox="0 0 24 24"><rect x="2.8" y="6.5" width="12.4" height="11" rx="2.4"/><path d="m15.2 10.4 6-3.4v10l-6-3.4"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5.5 12h13"/></symbol>
+      <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.4"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><path d="M12 2.5v3.1M12 18.4v3.1M2.5 12h3.1M18.4 12h3.1"/></symbol>
+      <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m20 20-4.6-4.6"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- Loading Screen -->
+  <div id="loading-overlay" role="status" aria-live="polite">
+    <div class="loader">
+      <span class="mta-bullet loader-bullet" aria-hidden="true">汉</span>
+      <div class="loader-title">Slop 武汉</div>
+      <div class="loader-track is-indeterminate" aria-hidden="true"><span id="loading-progress" class="loader-fill"></span></div>
+      <div id="loading-status">正在初始化 WebGPURenderer 与 TSL 着色器…</div>
+    </div>
+  </div>
+
+  <!-- 3D WebGPU Viewport Container -->
+  <main id="canvas-container" aria-label="Slop 武汉 3D 互动画面"></main>
+
+  <!-- Top-Left: Brand & Renderer Telemetry -->
+  <header class="hud hud-top-left">
+    <div class="panel brand">
+      <span class="mta-bullet" aria-hidden="true">汉</span>
+      <div class="brand-titles">
+        <div class="brand-heading">
+          <h1>Slop 武汉</h1>
+          <a class="repo-link" href="https://github.com/shwang1979/slop-taipei/" target="_blank" rel="noopener noreferrer" aria-label="基于 Slop 台北，原作 Slop New York（在新标签页打开）">基于 Slop 台北 <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="brand-subtitle">three.js · WebGPU · TSL · <span id="hud-fps" class="fps-ok">60</span> fps</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top-Right Toolbar: Time of Day, Teleport, Map & Clean View -->
+  <div class="hud hud-top-right">
+    <div id="hud-toolbar" class="panel toolbar">
+      <div class="time-switch" role="group" aria-label="天色与时间">
+        <button id="time-golden" class="time-btn active" data-time="golden" type="button" title="黄金时刻 17:30">
+          <svg class="icon" aria-hidden="true"><use href="#i-golden"/></svg><span class="seg-label">黄昏</span>
+        </button>
+        <button id="time-midday" class="time-btn" data-time="midday" type="button" title="晴朗正午 12:30">
+          <svg class="icon" aria-hidden="true"><use href="#i-sun"/></svg><span class="seg-label">正午</span>
+        </button>
+        <button id="time-twilight" class="time-btn" data-time="twilight" type="button" title="蓝调时刻 18:40">
+          <svg class="icon" aria-hidden="true"><use href="#i-twilight"/></svg><span class="seg-label">蓝调</span>
+        </button>
+        <button id="time-midnight" class="time-btn" data-time="midnight" type="button" title="夜晚 23:00">
+          <svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg><span class="seg-label">夜晚</span>
+        </button>
+      </div>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <button id="btn-teleport" class="tool-btn" type="button" popovertarget="teleport-popover" title="把目前的角色传送到…">
+        <svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg><span class="tool-label">传送</span><svg class="icon icon-sm" aria-hidden="true"><use href="#i-chevron-down"/></svg>
+      </button>
+      <button id="btn-open-map" class="tool-btn" type="button" title="武汉汉口街道地图 [M]">
+        <svg class="icon" aria-hidden="true"><use href="#i-map"/></svg><span class="tool-label">地图</span><kbd>M</kbd>
+      </button>
+      <span class="toolbar-divider" aria-hidden="true"></span>
+      <button id="btn-sound" class="tool-btn icon-only" type="button" title="静音 [N]" aria-label="静音" aria-pressed="true">
+        <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg>
+      </button>
+      <button id="btn-toggle-hud" class="tool-btn icon-only" type="button" title="纯净画面：隐藏介面 [H]" aria-label="隐藏介面" aria-pressed="false">
+        <svg class="icon icon-hide" aria-hidden="true"><use href="#i-eye"/></svg><svg class="icon icon-show" aria-hidden="true"><use href="#i-eye-off"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Teleport Destinations (native popover: light-dismiss & Esc; filled from TELEPORT_LOCATIONS by main.js) -->
+  <div id="teleport-popover" class="popover" popover data-side="below" data-anchor="hud-toolbar" aria-label="传送目前的角色">
+    <div class="pop-title">传送到</div>
+  </div>
+
+  <!-- Bottom-Left: Street-Name Signs & Live GPS Radar Minimap -->
+  <div class="hud hud-bottom-left">
+    <div id="hud-location" class="location" aria-live="off"></div>
+    <aside id="minimap-card" class="panel radar" aria-label="即时街道小地图" title="开启武汉汉口街道地图 [M]">
+      <canvas id="minimap-canvas"></canvas>
+      <span class="radar-north" aria-hidden="true">N</span>
+      <kbd class="radar-key">M</kbd>
+    </aside>
+  </div>
+
+  <!-- Bottom-Center: Third-Person Mode Switcher & Controls Guide -->
+  <footer class="hud hud-bottom-center">
+    <div id="hud-controls-hint" class="controls-hint"></div>
+    <nav id="mode-switch" class="panel mode-switch" aria-label="移动方式">
+      <span class="mode-indicator" aria-hidden="true"></span>
+      <button id="mode-person" class="mode-btn" data-mode="person" type="button" title="步行 [1]">
+        <svg class="icon" aria-hidden="true"><use href="#i-walk"/></svg><span class="mode-label">步行</span><kbd>1</kbd>
+      </button>
+      <button id="mode-car" class="mode-btn active" data-mode="car" type="button" title="开出租车 [2]">
+        <svg class="icon" aria-hidden="true"><use href="#i-car"/></svg><span class="mode-label">开车</span><kbd>2</kbd>
+      </button>
+      <button id="mode-scooter" class="mode-btn" data-mode="scooter" type="button" title="骑踏板车 [3]">
+        <svg class="icon" aria-hidden="true"><use href="#i-scooter"/></svg><span class="mode-label">踏板车</span><kbd>3</kbd>
+      </button>
+      <button id="mode-helicopter" class="mode-btn" data-mode="helicopter" type="button" title="直升机 [4]">
+        <svg class="icon" aria-hidden="true"><use href="#i-heli"/></svg><span class="mode-label">飞行</span><kbd>4</kbd>
+      </button>
+    </nav>
+  </footer>
+
+  <!-- Bottom-Right: Speed Cluster & Camera Switcher -->
+  <div class="hud hud-bottom-right">
+    <section id="hud-cluster" class="panel cluster" aria-label="速度与相机">
+      <div class="gauge">
+        <div class="gauge-top">
+          <span id="hud-active-mode" class="gauge-label">武汉漫游 · 出租车</span>
+          <span class="gauge-alt"><span class="gauge-alt-label">高度</span> <span id="hud-altitude">0</span> m</span>
+        </div>
+        <div class="gauge-speed"><span id="hud-speed">0</span><span class="gauge-unit">km/h</span></div>
+        <div class="gauge-meter" aria-hidden="true"><span id="hud-speed-meter"></span></div>
+      </div>
+      <div id="camera-switch" class="camera-switch">
+        <button id="cam-prev" class="icon-btn" type="button" title="上一个相机" aria-label="上一个相机">
+          <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"/></svg>
+        </button>
+        <button id="cam-menu-btn" class="camera-current" type="button" popovertarget="camera-popover" title="切换视角 [V 切换]">
+          <svg class="icon" aria-hidden="true"><use href="#i-camera"/></svg><span id="hud-active-camera">第三人称追踪</span><kbd>V</kbd>
+        </button>
+        <button id="cam-next" class="icon-btn" type="button" title="下一个相机 [V]" aria-label="下一个相机">
+          <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Touch input stays available in clean view; the map temporarily suspends it. -->
+  <section id="touch-controls" aria-label="触控操作" hidden>
+    <div class="touch-movement">
+      <div id="touch-stick" role="group" aria-label="移动摇杆：上下移动，左右转向">
+        <span class="touch-stick-axis" aria-hidden="true"></span>
+        <span id="touch-stick-knob" aria-hidden="true"></span>
+      </div>
+      <span class="touch-caption">移动与转向</span>
+    </div>
+    <p class="touch-look-hint">拖动环顾 · 双指缩放</p>
+    <div class="touch-actions" role="group" aria-label="按住执行动作">
+      <button class="touch-action" data-touch-action="up" type="button" aria-label="跳跃" aria-pressed="false" hidden>
+        <span aria-hidden="true">↑</span><span data-touch-label="up">跳跃</span>
+      </button>
+      <button class="touch-action" data-touch-action="down" type="button" aria-label="下降" aria-pressed="false" hidden>
+        <span aria-hidden="true">↓</span><span data-touch-label="down">下降</span>
+      </button>
+      <button class="touch-action touch-boost" data-touch-action="boost" type="button" aria-label="加速" aria-pressed="false">
+        <span aria-hidden="true">↟</span><span data-touch-label="boost">加速</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- All Cameras: 3 follow cameras, the Wuhan vantage points & the auto-director drone (filled by main.js) -->
+  <div id="camera-popover" class="popover" popover data-side="above" data-anchor="hud-cluster" data-align="hud-cluster" aria-label="相机">
+  </div>
+
+  <!-- Full-Screen Interactive Wuhan Street Map ([M]) -->
+  <section id="fullmap-modal" class="fullmap-modal hidden" role="dialog" aria-modal="true" aria-label="武汉汉口互动街道地图">
+    <div id="fullmap-canvas-wrap" class="fullmap-canvas-wrap">
+      <canvas id="fullmap-canvas"></canvas>
+    </div>
+
+    <div class="fullmap-header">
+      <div class="panel fullmap-title">
+        <span class="mta-bullet" aria-hidden="true">汉</span>
+        <div>
+          <h2>武汉汉口街道图</h2>
+          <p id="fullmap-player-info" class="fullmap-subtitle">汉口 · 沿江大道</p>
+        </div>
+      </div>
+      <label class="panel fullmap-search-wrap">
+        <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="fullmap-search" class="fullmap-search" type="text" placeholder="搜索路名与地标：江汉路、沿江大道、江汉关…" aria-label="搜索路名或地标" autocomplete="off" spellcheck="false" />
+      </label>
+      <button id="close-fullmap-btn" class="panel tool-btn fullmap-close" type="button" title="关闭地图 [M / Esc]">
+        <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg><span class="tool-label">关闭</span><kbd>Esc</kbd>
+      </button>
+    </div>
+
+    <div class="map-controls">
+      <div class="panel map-compass" title="正北方">
+        <svg viewBox="0 0 44 44" aria-hidden="true">
+          <g id="map-compass-needle">
+            <path d="M22 9.5 25.6 22h-7.2z" fill="#f05a4f"/>
+            <path d="M22 34.5 25.6 22h-7.2z" fill="rgba(255,255,255,0.72)"/>
+            <text x="22" y="8" text-anchor="middle">N</text>
+          </g>
+        </svg>
+      </div>
+      <div class="panel map-zoom">
+        <button id="map-zoom-in" class="icon-btn" type="button" title="放大" aria-label="放大"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></button>
+        <button id="map-zoom-out" class="icon-btn" type="button" title="缩小" aria-label="缩小"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg></button>
+      </div>
+      <div class="panel map-zoom">
+        <button id="map-center-player" class="icon-btn" type="button" title="回到你的位置" aria-label="回到你的位置"><svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg></button>
+        <button id="map-view-all" class="icon-btn" type="button" title="显示汉口试验区" aria-label="显示全部"><svg class="icon" aria-hidden="true"><use href="#i-fit"/></svg></button>
+      </div>
+    </div>
+
+    <div class="fullmap-footer">
+      <div class="panel fullmap-status">
+        <span id="fullmap-hover-info">点一下传送过去 · 拖动平移 · 滚轮缩放</span>
+      </div>
+    </div>
+
+    <div class="panel fullmap-legend">
+      <span class="legend-item"><span class="legend-swatch player-swatch"></span>你</span>
+      <span class="legend-item"><span class="legend-swatch landmark-swatch"></span>地标</span>
+      <span class="legend-item"><span class="legend-swatch gps-swatch"></span>地铁站</span>
+      <span class="legend-item"><span class="legend-swatch bridge-swatch"></span>高架 / 快速道路</span>
+      <span id="fullmap-counts" class="legend-counts"></span>
+    </div>
+  </section>
+
+<div class="data-credit">地理数据 © OpenStreetMap contributors · Overture Maps · 缺失楼高与通用外观为推断</div>
+</body>
+</html>
