@@ -1,3 +1,4 @@
+import {footprintPush} from './footprint-buildings.js';
 import * as THREE from 'three/webgpu';
 import {pass,mrt,output,normalView,positionView,metalness,roughness,vec2,vec3,smoothstep} from 'three/tsl';
 import {ssr} from 'three/addons/tsl/display/SSRNode.js';
@@ -37,7 +38,7 @@ async function init(){
  const rootRoad=surface.nearest(data.spawn.x,data.spawn.z,r=>r.mode==='car'&&!r.tunnel);
  if(!rootRoad)throw Error('武汉数据没有可用出发道路');
  const spawn={x:rootRoad.x,z:rootRoad.z,y:2.12};
- for(const [i,e]of Object.values(controllers.entities).entries()){e.position.set(spawn.x+i*4,2.12,spawn.z);e.heading=0;e.mesh.rotation.order='YXZ';}
+ for(const [i,e]of Object.values(controllers.entities).entries()){e.position.set(spawn.x+i*4,2.12,spawn.z);e.heading=data.spawn.heading||0;e.mesh.rotation.order='YXZ';}
  controllers.entities.car.position.set(spawn.x,2.12,spawn.z);controllers.entities.helicopter.position.y=110;
  startupTiles=new Set([...loader.tilesAt(spawn).map(t=>t.id),...(manifest.routes||[]).flatMap(r=>r.tiles)]);boot?.progress.complete('scene');boot?.progress.begin('tiles',startupTiles.size,'正在读取初始街区与跨江线路…');await nextPaint();await loader.ensureAt(spawn,'car');await Promise.all(data.tunnels.map(t=>loader.ensureRoute(t.id)));boot?.progress.complete('tiles');boot?.progress.begin('render',null,'正在准备光影材质与第一帧画面…');await nextPaint();
  const camera=cameras.camera;camera.near=.15;camera.far=16000;camera.updateProjectionMatrix();
@@ -59,7 +60,7 @@ async function init(){
    try{await loader.ensureAt(p,mode);}catch(e){if(revision!==arrivalRevision)return false;throw e;}
    if(revision!==arrivalRevision)return false;
    const b={minX:p.x-radius,maxX:p.x+radius,minY:p.y??2.12,maxY:(p.y??2.12)+2,minZ:p.z-radius,maxZ:p.z+radius};
-   const occupied=world.query(b).some(c=>{if(!c.obb)return true;const o=c.obb,dx=p.x-o.cx,dz=p.z-o.cz;return Math.abs(dx*o.cs-dz*o.sn)<o.hx+radius&&Math.abs(dx*o.sn+dz*o.cs)<o.hz+radius;});
+   const occupied=world.query(b).some(c=>{if(c.rings)return !!footprintPush(p.x,p.z,radius,c.rings);if(!c.obb)return true;const o=c.obb,dx=p.x-o.cx,dz=p.z-o.cz;return Math.abs(dx*o.cs-dz*o.sn)<o.hx+radius&&Math.abs(dx*o.sn+dz*o.cs)<o.hz+radius;});
    if(!occupied&&surface.canTraverse({...p,mode})&&(p.road?.bridge||!surface.isWater(p.x,p.z)))return p;
   }
   throw Error('附近暂无安全落点');
@@ -71,7 +72,7 @@ async function init(){
  const navigator=createDestinationNavigator({maxAltitude:HELICOPTER_MAX_ALTITUDE,nextRevision:()=>++arrivalRevision,isCurrent:r=>r===arrivalRevision,getState:()=>({mode:controllers.activeMode,position:controllers.getActiveEntity().position,inTunnel:!!controllers.getActiveEntity().surface?.tunnel}),prepare:(target,mode,revision)=>prepareLanding(target.x,target.z,mode,revision),arrive});
  async function teleport(x,z,heading=0,mode=controllers.activeMode){return navigator.travel({x,z},{mode,heading});}
  const baseDestinations=[...data.landmarks,...(data.places||[])],destinations=[...baseDestinations,...data.metroStations];
- async function gotoLandmark(id,{mode=controllers.activeMode}={}){const l=destinations.find(l=>l.id===id);if(!l)return false;try{const target=l.metro?metroArrivalTarget(l,mode):l;if(!await teleport(target.x,target.z,l.metro?l.entrance.heading+Math.PI:0,mode))return false;$('map-modal').hidden=true;$('places').hidden=true;$('search').blur();toast('已到达 '+l.name+(mode==='helicopter'?' 上空':l.metro?' 入口附近':' 附近'));return true;}catch(e){toast(e.message+'，请重试');return false;}}
+ async function gotoLandmark(id,{mode=controllers.activeMode}={}){const l=destinations.find(l=>l.id===id);if(!l)return false;try{const target=l.metro?metroArrivalTarget(l,mode):l.arrival?{...l,...l.arrival}:l;if(!await teleport(target.x,target.z,l.metro?l.entrance.heading+Math.PI:l.arrival?Math.atan2(l.x-target.x,l.z-target.z):0,mode))return false;$('map-modal').hidden=true;$('places').hidden=true;$('search').blur();toast('已到达 '+l.name+(mode==='helicopter'?' 上空':l.metro?' 入口附近':' 附近'));return true;}catch(e){toast(e.message+'，请重试');return false;}}
  async function setMode(mode){
   if(!controllers.entities[mode])return false;
   if(mode===controllers.activeMode){arrivalRevision++;return true;}
@@ -95,6 +96,8 @@ async function init(){
  addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);cameras.onResize(innerWidth,innerHeight);});
  const views=[
   {name:'汉口试验区俯瞰',position:[0,1500,1000],target:[0,0,0]},
+  {name:'江汉关钟楼近景',position:[data.landmarks[0].x+32,24,data.landmarks[0].z-67],target:[data.landmarks[0].x,24,data.landmarks[0].z]},
+  {name:'江汉路望江汉关',position:[-187.747,7,632.529],target:[data.landmarks[0].x,20,data.landmarks[0].z]},
   {name:'沿江大道出发点',position:[spawn.x-45,28,spawn.z+55],target:[spawn.x,5,spawn.z]},
  ];
  const app={data,manifest,renderer,scene,lighting,controllers,cameras,surface,world,loader,city,traffic,map,views,bootMarks,samples,errors,longTasks,teleport,gotoLandmark,setMode,setTime,

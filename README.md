@@ -23,11 +23,15 @@ npm run dev
 
 ## 真实数据与当前限制
 
-当前生成 383 段道路、290 栋 OSM 建筑体量、4 片水域、16 个 500m 建筑块。数据快照为 2026-10-27 21:23:59 UTC。原始轮廓、道路方向、对象 ID 和来源标签由上海 PBF 导入器读取；局部坐标原点为 WGS84 `[114.293, 30.585]`，1 单位为 1 米，x 向东、z 向南。
+当前生成 **404 段道路、2,097 栋普通建筑体量、江汉关地标、4 片水域和 16 个 500m 建筑块**。普通建筑中 422 栋来自 OSM，1,675 栋来自去重后的 Overture Maps 补充轮廓，保持来源与原始 ID。OSM 快照为 2026-10-27 21:23:59 UTC；Overture 固定版本为 2026-10-21.0。
 
-当前建筑数据稀疏，**284 栋楼高为 12m 估值，5 栋由层数换算，1 栋直接读取高度**。沿用上海运行时的旋转矩形建筑体量，不能当成精确建筑形状。132 个矩形包围盒会挤占道路的建筑被排除；不以虚构建筑掩盖数据空白。
+建筑采用原始多边形外环与内院生成，碰撞也跟随轮廓，不再用矩形包围盒替代整栋建筑。缺少高度的 **2,083 栋仍以 12m 估算**，其余 11 栋由 OSM 层数换算、3 栋读取 OSM 高度；补充轮廓并没有自动解决楼高问题。窗户、立面风格及屋顶材质是视觉表现，不是逐栋实景采集。
 
-地面平坦，未接 DEM；19 条桥梁、隧道或非地面层级道路暂不开放。长江水面来自 OSM 面几何与内环，不用直线代替岸线；有 5 个源几何在导入时跳过，需后续专项核查。没有手工地标、武汉地铁数据或网约车任务。车辆造型沿用上海资源，尚未还原武汉实际车型与涂装。
+江汉关使用 OSM `way/128400530` 平面定位，以公开实景参考制作约 45.85m 的简化外观，包含石材主楼、8 根正面廊柱、四面钟盘与钟楼。地图搜索“江汉关”可到达建筑外的道路落点。比例与细部有视觉估算，不是文物测绘模型。主楼高度来源与差异记录在 [街景任务说明](docs/STREETSCAPE_PLAN.md)。
+
+江汉路改为独立步行铺装，不绘制机动车道线；末段加入石带、树列、路灯、座椅等示意街具。街具数量与位置不是实测。道路优先读取 OSM width，或由 lanes × 3.25m 估算宽度，缺失时使用分类型估值。保留 OSM 节点 ID 的连通审计确认江汉路到沿江大道相连；全区仍包含裁剪边缘、孤立小径等多个连通分量，尚未逐处全部核查。
+
+地面仍平坦，未接 DEM；23 条桥梁、隧道或非地面层级源道路暂不开放。没有武汉地铁数据或网约车任务，驾驶也尚未实现完整交通规则。车辆造型沿用上海资源。
 
 完整统计、来源、SHA-256 和限制见 [public/data/wuhan-audit.json](public/data/wuhan-audit.json)。
 
@@ -48,12 +52,25 @@ npm test
 npm run build
 ```
 
-Python 3.9+；Windows 可使用 `.venv/Scripts/python tools/build-wuhan.py`。生成器沿用上海的 OSM/pyosmium 提取逻辑，使用 Shapely 组装内外环、裁剪水域和道路，并输出上海运行系统的数据契约。`data/derived/wuhan.json` 是按源文件哈希检查的缓存，调试导入逻辑后可删除它重新生成。
+Python 3.9+；Windows 可使用 `.venv/Scripts/python tools/build-wuhan.py`。生成器沿用上海的 OSM/pyosmium 提取逻辑，使用 Shapely 组装内外环、裁剪水域和道路，并输出上海运行系统的数据契约。`data/derived/wuhan.json` 缓存同时检查源文件与导入器哈希，修改导入器后会自动重建。
+
+Overture 的约 2MB 原始小范围提取及来源清单已随仓库提交，离线重建不需要再次联网。如需重新下载固定版本，使用 Python 3.12+ 单独建立下载环境：
+
+```sh
+python3 -m venv .data-venv
+.data-venv/bin/python -m pip install -r requirements-download.txt
+.data-venv/bin/overturemaps download --release=2026-10-21.0 \
+  --bbox=114.2826,30.576,114.3034,30.594 -f geojson --type=building \
+  -o data/source/overture-buildings.geojson
+npm run data:build
+```
+
+详情见 [data/source/overture-source.json](data/source/overture-source.json)。公开实景照片只在本地作为造型参考，不作为应用贴图或随代码分发。
 
 ## 后续顺序
 
-1. 核查武汉江岸、道路宽度、缺失建筑与来源几何；改善沿江空间与出发视角。
-2. 在原系统内改善建筑轮廓、补可靠建筑数据，逐项检查桥隧高差。
+1. 补可靠楼高与建筑用途，改善重点街段的首层商铺、立面样式和屋顶层次。
+2. 继续核查江岸、道路宽度和孤立路段，逐项恢复具有高程依据的桥隧。
 3. 逐步扩展武汉范围与地标；最后再参考 London Loop 加入接单、导航与任务。
 
 ## 测试与许可
@@ -63,6 +80,6 @@ npm test
 npm run build
 ```
 
-当前测试包含上海的通用控制器、碰撞、加载、材质、地图导航测试以及武汉的数据与出发点检查。`tests/` 中保留的其他上海专用验收测试不属于武汉的默认测试集；原始上海发布工具仅作参考，武汉使用 `tools/build-wuhan.py`。
+当前 45 项测试包含多边形屋顶面积、内院碰撞、武汉数据来源与路网连通检查，以及上海的通用控制器、碰撞、加载、材质、地图导航测试以及武汉的数据与出发点检查。`tests/` 中保留的其他上海专用验收测试不属于武汉的默认测试集；原始上海发布工具仅作参考，武汉使用 `tools/build-wuhan.py`。
 
 代码保留上海项目和 mrdoob/Slop New York 的 MIT 声明，详见 [LICENSE](LICENSE)、[docs/upstream/SOURCES.md](docs/upstream/SOURCES.md) 与 `vendor/slop-newyork/`。地理数据库为 © OpenStreetMap contributors，采用 ODbL 1.0，见 [public/data/DATA-LICENSE.md](public/data/DATA-LICENSE.md)。

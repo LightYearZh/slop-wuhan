@@ -9,3 +9,6 @@ data/*.pbf
 data/*.osm
 data/*overpass.json
 data/derived/
+
+.data-venv/
+data/reference/

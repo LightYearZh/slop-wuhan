@@ -18,7 +18,7 @@ s = math.sin(ORIGIN[1] * rad)
 SX = rad * 6378137 / math.sqrt(1 - e2 * s*s) * math.cos(ORIGIN[1] * rad)
 SZ = rad * 6378137 * (1-e2) / (1-e2*s*s)**1.5
 DISTRICTS = set()
-CLASSES = {'motorway':'expy','trunk':'major','primary':'major','secondary':'minor','tertiary':'local','residential':'local','unclassified':'local','living_street':'local','service':'local','pedestrian':'pedestrian','footway':'pedestrian'}
+CLASSES = {'motorway':'expy','trunk':'major','primary':'major','secondary':'minor','tertiary':'local','residential':'local','unclassified':'local','living_street':'local','service':'local','pedestrian':'pedestrian','footway':'pedestrian','path':'pedestrian','steps':'pedestrian','cycleway':'pedestrian'}
 for kind in ['motorway','trunk','primary','secondary','tertiary']:
     CLASSES[kind+'_link'] = 'link'
 
@@ -58,7 +58,7 @@ class Importer(osmium.SimpleHandler):
         except ValueError:layer=0
         self.roads.append({'id':'osm-way-'+str(w.id),'name':name,'class':CLASSES[kind],
             'points':[[round(x,2),2.12,round(z,2)] for x,z in pts],
-            'nodeIds':[str(n.ref) for n in w.nodes], 'highway':kind,'oneway':w.tags.get('oneway') in ('yes','1','-1'),
+            'nodeIds':[str(n.ref) for n in w.nodes], 'highway':kind,'widthTag':w.tags.get('width'),'lanesTag':w.tags.get('lanes'),'surfaceTag':w.tags.get('surface'),'footTag':w.tags.get('foot'),'oneway':w.tags.get('oneway') in ('yes','1','-1'),
             'reverse':w.tags.get('oneway')=='-1','bridge':bridge,'tunnel':tunnel,'layer':layer,
             'mode':'person' if CLASSES[kind]=='pedestrian' else 'car',
             'directionSource':'OSM:oneway','levelSource':'OSM:bridge/tunnel/layer'})
@@ -89,7 +89,7 @@ class Importer(osmium.SimpleHandler):
             try:height=float(number.group()) if number else float(t.get('building:levels','0'))*3.2
             except ValueError:height=0
             source='OSM:height' if number else 'OSM:levels' if height else 'visual-estimate'
-            self.buildings.append({'id':('osm-building-way-' if a.from_way() else 'osm-building-relation-')+str(a.orig_id()),'polygons':polygons(geom.simplify(.3,preserve_topology=True)),'h':height,'heightSource':source,'name':name})
+            self.buildings.append({'id':('osm-building-way-' if a.from_way() else 'osm-building-relation-')+str(a.orig_id()),'polygons':polygons(geom.simplify(.3,preserve_topology=True)),'h':height,'heightSource':source,'name':name,'use':t.get('building','yes')})
 
 def main():
     path=ROOT/'data/hubei-latest.osm.pbf'
@@ -98,7 +98,7 @@ def main():
     h=Importer();h.apply_file(str(path),locations=True,idx='flex_mem')
     reader=osmium.io.Reader(str(path));timestamp=reader.header().get('osmosis_replication_timestamp');reader.close()
     meta={'provider':'Geofabrik / OpenStreetMap','url':'https://download.geofabrik.de/asia/china/hubei-latest.osm.pbf','sha256':digest,'timestamp':timestamp,'license':'ODbL 1.0'}
-    data={'source':meta,'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
+    data={'source':meta,'importerSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'roads':h.roads,'buildings':h.buildings,'areas':h.areas,'skippedGeometries':h.skipped}
     DERIVED.mkdir(exist_ok=True)
     (DERIVED/'wuhan.json').write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')))
     print(json.dumps({'roads':len(h.roads),'buildings':len(h.buildings),'areas':len(h.areas),'skippedGeometries':h.skipped,'timestamp':timestamp},ensure_ascii=False),flush=True)

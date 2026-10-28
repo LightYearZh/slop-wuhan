@@ -1,0 +1,17 @@
+{
+  "provider": "Overture Maps Foundation",
+  "release": "2026-10-21.0",
+  "retrievedAt": "2026-10-28T07:46:35.514512+00:00",
+  "bboxWsen": [
+    114.2826,
+    30.576,
+    114.3034,
+    30.594
+  ],
+  "file": "overture-buildings.geojson",
+  "sha256": "b9c8001de18c8d43d68bcf5655fbe6e12953ab32d7f14d2bba95d1c486c511d2",
+  "features": 2253,
+  "license": "ODbL 1.0",
+  "documentation": "https://docs.overturemaps.org/guides/buildings/",
+  "command": "overturemaps download --release=2026-10-21.0 --bbox=114.2826,30.576,114.3034,30.594 -f geojson --type=building -o data/source/overture-buildings.geojson"
+}

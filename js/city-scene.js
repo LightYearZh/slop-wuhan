@@ -1,3 +1,6 @@
+import {createFootprintMeshes,footprintCollider} from './footprint-buildings.js';
+import {buildWuhanLandmarks} from './wuhan-landmarks.js';
+import {buildWuhanStreetscape} from './wuhan-streetscape.js';
 import {buildStrip as strip} from './road-geometry.js';
 import * as THREE from 'three/webgpu';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
@@ -6,7 +9,6 @@ import {createTreeField} from './trees.js';
 import {BODY_SPECS,buildCarGeometry,buildSteerableWheelGeo,createLoftedCarMaterial} from './actor-models.js';
 import {PersonCrowd,PersonRig} from './pedestrians.js';
 import {pointInPolygon,closestOnSegment,CollisionWorld,SurfaceProvider} from './core.js';
-import {buildLandmarks} from './shanghai-landmarks.js';
 import {disposeTileGeometry} from './resources.js';
 import {nearbySites} from './nearby-sites.js';
 import {buildTileStreets} from './tile-streets.js';
@@ -32,17 +34,18 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
  flat(scene,data.land,2,new THREE.MeshStandardNodeMaterial({color:0xa39c86,roughness:.9}),'Shanghai land');
  flat(scene,data.parks,2.06,new THREE.MeshStandardNodeMaterial({color:0x536447,roughness:.95}),'Parks');
  flat(scene,data.shoulders,2.08,sidewalk,'Pavements');
+ flat(scene,data.pedestrian||[],2.125,new THREE.MeshStandardNodeMaterial({color:0xb7ad99,roughness:.95}),'Pedestrian streets');
  const waterMat=createWaterMaterial();flat(scene,data.water,0,waterMat,'Huangpu and Suzhou water');
  flat(scene,data.asphalt,2.12,roadMat,'Shanghai roads');
  const lineGeo=[],rng=random(74821),treeSites=[],lampSites=[],pedSites=[];
  const plantingWorld=new CollisionWorld(),waterSurface=new SurfaceProvider([],data.water);
  plantingWorld.addTile('buildings',data.buildings.map(b=>({minX:b.x-b.w*.6,maxX:b.x+b.w*.6,minZ:b.z-b.d*.6,maxZ:b.z+b.d*.6,minY:0,maxY:1})));
- const noBuild=(x,z)=>!waterSurface.isWater(x,z)&&!plantingWorld.query({minX:x,maxX:x,minZ:z,maxZ:z,minY:0,maxY:1}).length;
+ const noBuild=(x,z)=>!data.landmarks.some(l=>pointInPolygon(x,z,l.footprint))&&!waterSurface.isWater(x,z)&&!plantingWorld.query({minX:x,maxX:x,minZ:z,maxZ:z,minY:0,maxY:1}).length;
  for(const road of streamed?[]:data.roads){
   for(let i=1;i<road.points.length;i++){
    const a=road.points[i-1],b=road.points[i],len=Math.hypot(b[0]-a[0],b[2]-a[2]);if(len<12)continue;
    const dx=(b[0]-a[0])/len,dz=(b[2]-a[2])/len,nx=-dz,nz=dx;
-   for(let d=6;d<len-3;d+=14){const p=[a[0]+dx*d,2.14,a[2]+dz*d],q=[a[0]+dx*Math.min(d+5,len-2),2.14,a[2]+dz*Math.min(d+5,len-2)];if(data.rampCuts?.some(r=>pointInPolygon((p[0]+q[0])/2,(p[2]+q[2])/2,r)))continue;lineGeo.push(strip([p,q],.14));}
+   if(road.mode==='car'&&road.width>=5)for(let d=6;d<len-3;d+=14){const p=[a[0]+dx*d,2.14,a[2]+dz*d],q=[a[0]+dx*Math.min(d+5,len-2),2.14,a[2]+dz*Math.min(d+5,len-2)];if(data.rampCuts?.some(r=>pointInPolygon((p[0]+q[0])/2,(p[2]+q[2])/2,r)))continue;lineGeo.push(strip([p,q],.14));}
    if(road.width>10)for(let d=16;d<len;d+=42){
     const side=rng()<.5?-1:1,x=a[0]+dx*d+nx*(road.width/2+2.3)*side,z=a[2]+dz*d+nz*(road.width/2+2.3)*side;
     if(noBuild(x,z)){const site={x,z,angle:Math.atan2(dx,dz)};lampSites.push(site);pedSites.push(site);if(rng()<.8)treeSites.push({x:x+nx*3,z:z+nz*3,y:2,scale:.7+rng()*.5,species:0,yaw:rng()*Math.PI*2});rng();}
@@ -79,27 +82,27 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
   for(const p of [t.points[0],t.points.at(-1)]){const sign=makeSign('未开放隧道  →',0x155658);sign.position.set(p[0],7.6,p[2]);g.add(sign);}
  }
  await onProgress(2,'跨江隧道已构建');
- const landmarkSystem=buildLandmarks(scene,data.landmarks);await onProgress(3,'武汉地标已构建');
+ const landmarkSystem=buildWuhanLandmarks(scene,data.landmarks);buildWuhanStreetscape(scene,data,noBuild);await onProgress(3,'江汉关与江汉路街景已构建');
  const styles=[
-  createCurtainWallMaterial({glassTint:0x24445b,frameTint:0x53616b,boxLocal:true,seed:2}),
-  createPreWarBuildingMaterial({stoneColor:0xb8b6ab,trimColor:0x807d72,windowWidth:2.1,floorHeight:3.1,boxLocal:true,seed:8}),
-  createPreWarBuildingMaterial({stoneColor:0xc1ae89,trimColor:0x86775f,windowWidth:2.5,floorHeight:3.8,boxLocal:true,seed:10}),
-  createPreWarBuildingMaterial({stoneColor:0x9f8170,trimColor:0xd0baa1,windowWidth:1.9,floorHeight:3.3,boxLocal:true,seed:14}),
-  createCurtainWallMaterial({glassTint:0x354d54,frameTint:0x8a8c87,windowWidth:2.3,floorHeight:3.4,boxLocal:true,seed:19})
+  createCurtainWallMaterial({glassTint:0x24445b,frameTint:0x53616b,boxLocal:false,seed:2}),
+  createPreWarBuildingMaterial({stoneColor:0xb8b6ab,trimColor:0x807d72,windowWidth:2.1,floorHeight:3.1,boxLocal:false,seed:8}),
+  createPreWarBuildingMaterial({stoneColor:0xc1ae89,trimColor:0x86775f,windowWidth:2.5,floorHeight:3.8,boxLocal:false,seed:10}),
+  createPreWarBuildingMaterial({stoneColor:0x9f8170,trimColor:0xd0baa1,windowWidth:1.9,floorHeight:3.3,boxLocal:false,seed:14}),
+  createCurtainWallMaterial({glassTint:0x354d54,frameTint:0x8a8c87,windowWidth:2.3,floorHeight:3.4,boxLocal:false,seed:19})
  ];
+ const footprintRoof=new THREE.MeshStandardNodeMaterial({color:0x777b79,roughness:.88});
  const overview=new Map(),loaded=new Map();
  const overviewSize=streamed?1000:500,grouped=new Map();for(const b of data.buildings){const key=Math.floor(b.x/overviewSize)+'_'+Math.floor(b.z/overviewSize);if(!grouped.has(key))grouped.set(key,[]);grouped.get(key).push(b);}
- const distantMat=createCurtainWallMaterial({glassTint:0x51636c,frameTint:0x66747a,windowWidth:2.6,boxLocal:true,seed:22});
+ const distantMat=createCurtainWallMaterial({glassTint:0x51636c,frameTint:0x66747a,windowWidth:2.6,boxLocal:false,seed:22});
  let overviewMesh=null;const overviewMatrices=new Map();
  if(streamed&&data.buildings.length){
   overviewMesh=createFacadeBoxes(distantMat,data.buildings.map(b=>({...b,y:2+b.h/2})));overviewMesh.castShadow=false;overviewMesh.frustumCulled=false;scene.add(overviewMesh);
   data.buildings.forEach((b,i)=>{const id=Math.floor(b.x/overviewSize)+'_'+Math.floor(b.z/overviewSize);if(!overview.has(id))overview.set(id,[]);overview.get(id).push(i);const m=new THREE.Matrix4();overviewMesh.getMatrixAt(i,m);overviewMatrices.set(i,m);});
- }else for(const [id,bs]of grouped){const mesh=createFacadeBoxes(distantMat,bs.map(b=>({...b,y:2+b.h/2})));mesh.castShadow=false;scene.add(mesh);overview.set(id,mesh);}
+ }else for(const [id,bs]of grouped){const mesh=createFootprintMeshes(bs,distantMat,footprintRoof);scene.add(mesh);overview.set(id,mesh);}
  function showOverview(id,show){const entry=overview.get(id);if(!entry)return;if(!streamed){entry.visible=show;return;}for(const i of entry)overviewMesh.setMatrixAt(i,show?overviewMatrices.get(i):new THREE.Matrix4().makeScale(0,0,0));overviewMesh.instanceMatrix.needsUpdate=true;}
  await onProgress(4,'城市远景楼群已构建');
  const streetMaterials={road:roadMat,paint:new THREE.MeshStandardNodeMaterial({color:0xdad7b9,roughness:.8}),rail:new THREE.MeshStandardNodeMaterial({color:0xadb9b3,roughness:.7}),pole:new THREE.MeshStandardNodeMaterial({color:0x364640,roughness:.6}),bulb:new THREE.MeshStandardNodeMaterial({color:0xd4d5bd,emissive:0xffc66d,emissiveIntensity:.1}),poleGeo:new THREE.CylinderGeometry(.09,.14,7,6),bulbGeo:new THREE.SphereGeometry(.28,6,4),land:new THREE.MeshStandardNodeMaterial({color:0xa39c86,roughness:.9}),park:new THREE.MeshStandardNodeMaterial({color:0x536447,roughness:.95}),farm:new THREE.MeshStandardNodeMaterial({color:0x8a9460,roughness:1})};
  const streetTiles=new Map();let streetRevision=0;
- const roofMat=new THREE.MeshStandardNodeMaterial({color:0x8b8f8b,roughness:.7});
  const metroSystem=createMetroSystem(data.metroStations||[]);
  function mountTile(tile,meta){
   const group=new THREE.Group();group.name='tile:'+meta.id;const colliders=[];
@@ -109,17 +112,15 @@ export async function createCityScene(scene,data,collisionWorld,surfaceProvider=
   }
   for(let i=0;i<styles.length;i++){
    const bs=tile.buildings.filter(b=>b.style===i).map(b=>({...b,y:2+b.h/2}));if(!bs.length)continue;
-   const mesh=createFacadeBoxes(styles[i],bs);mesh.castShadow=true;mesh.receiveShadow=true;group.add(mesh);
+   const mesh=createFootprintMeshes(bs,styles[i],footprintRoof);group.add(mesh);
   }
-  const roofs=tile.buildings.filter(b=>b.h>24).map(b=>({...b,w:b.w*.38,d:b.d*.35,h:1.8,y:2+b.h+.9}));
-  if(roofs.length)group.add(createFacadeBoxes(roofMat,roofs));
-  for(const b of tile.buildings){const cs=Math.cos(b.ry),sn=Math.sin(b.ry),ex=Math.abs(cs)*b.w/2+Math.abs(sn)*b.d/2,ez=Math.abs(sn)*b.w/2+Math.abs(cs)*b.d/2;colliders.push({id:b.id,minX:b.x-ex,maxX:b.x+ex,minY:2,maxY:2+b.h,minZ:b.z-ez,maxZ:b.z+ez,obb:{cx:b.x,cz:b.z,cs,sn,hx:b.w/2,hz:b.d/2}});}
+  for(const b of tile.buildings)colliders.push(footprintCollider(b));
   const metro=metroSystem.mountTile(group,meta.id);colliders.push(...metro.colliders);if(streamed)surfaceProvider?.setTileRoads(meta,[...tile.roads,...metro.floorRoads]);
   scene.add(group);showOverview(meta.id,false);loaded.set(meta.id,group);collisionWorld.addTile(meta.id,colliders);
   return {dispose(){scene.remove(group);disposeTileGeometry(group);metro.dispose();showOverview(meta.id,true);loaded.delete(meta.id);collisionWorld.removeTile(meta.id);streetTiles.get(meta.id)?.dispose?.();streetTiles.delete(meta.id);surfaceProvider?.removeTileWater(meta.id);surfaceProvider?.removeTileRoads(meta.id);streetRevision++;}};
  }
  // Landmark collision volumes remain present even when neighbouring detail tiles are unloaded.
- collisionWorld.addTile('landmarks',landmarkSystem.groups.flatMap((g,i)=>{g.updateMatrixWorld(true);return (g.userData.collisionParts||[g]).map((part,j)=>{const b=new THREE.Box3().setFromObject(part);return {id:data.landmarks[i].id+':'+j,minX:b.min.x,maxX:b.max.x,minZ:b.min.z,maxZ:b.max.z,minY:2,maxY:b.max.y};});}));
+ collisionWorld.addTile('landmarks',data.landmarks.map(l=>footprintCollider({id:l.id,rings:l.footprint,h:l.height})));
  await onProgress(5,'地铁入口与分层碰撞已准备');
  const trees=createTreeField(scene,treeSites.filter(p=>p.x>data.bounds[0]&&p.x<data.bounds[2]&&p.z>data.bounds[1]&&p.z<data.bounds[3]),streamed?{capacity:640}:{});
  const poles=new THREE.InstancedMesh(new THREE.CylinderGeometry(.09,.14,7,8),new THREE.MeshStandardNodeMaterial({color:0x364640,roughness:.6}),lampSites.length);

@@ -1,3 +1,4 @@
+import {footprintPush} from './footprint-buildings.js';
 import * as THREE from 'three/webgpu';
 import {
   ISLAND_BOUNDS,
@@ -311,6 +312,7 @@ class ThirdPersonControllerManager {
       for (const c of this.nearColliders(p.x, p.z, reach)) {
         if (y > c.maxY + 1.5) continue;
         if (p.x + extX <= c.minX || p.x - extX >= c.maxX || p.z + extZ <= c.minZ || p.z - extZ >= c.maxZ) continue;
+        if(c.rings&&!footprintPush(p.x,p.z,car?Math.hypot(CAR_HALF_W,CAR_HALF_L)+.1:radius+.1,c.rings))continue;
         if (c.obb) {
           const o = c.obb, dx = p.x - o.cx, dz = p.z - o.cz;
           const ls = sinH * o.cs - cosH * o.sn, lc = sinH * o.sn + cosH * o.cs;
@@ -815,7 +817,11 @@ class ThirdPersonControllerManager {
       ) {
         let nx = 0;
         let nz = 0;
-        if (c.obb) {
+        if(c.rings){
+          const push=footprintPush(pos.x,pos.z,carEntity?Math.hypot(CAR_HALF_W,CAR_HALF_L):radius,c.rings);
+          if(!push)continue;
+          pos.x=push.x;pos.z=push.z;nx=push.nx;nz=push.nz;
+        } else if (c.obb) {
           // Oriented box (buildings along a non-grid street; min/max are its world bounds): push out in its own frame
           const o = c.obb;
           const dx = pos.x - o.cx;
