@@ -1,10 +1,10 @@
 import * as THREE from 'three/webgpu';
 import {createFootprintGeometry} from '../footprint-buildings.js';
-import {modelBuilder} from './landmark-craft.js';
+import {modelBuilder,craftTexture} from './landmark-craft.js';
 
 // Small reusable vocabulary, bound to reviewed OSM identities by the data pipeline.
 // No district-wide "European" randomizer; modern banks deliberately omit classical ornament.
-const CLASSICAL = new Set(['taiwan-bank','hsbc-bank','citibank','corner-cupola','classical-commercial']);
+const CLASSICAL = new Set(['taiwan-bank','hsbc-bank','citibank','corner-cupola','classical-commercial','brick-commercial']);
 const COLONNADE = new Set(['taiwan-bank','hsbc-bank','citibank','corner-cupola']);
 
 function masonryTexture(){
@@ -27,6 +27,7 @@ function masonryTexture(){
 let materials;
 export function heritageMaterials(){
   if(!materials)materials={
+    brick:new THREE.MeshStandardNodeMaterial({color:0xffffff,map:craftTexture('brick'),roughness:.94}),
     stone:new THREE.MeshStandardNodeMaterial({color:0xe6e0d1,map:masonryTexture(),roughness:.9}),
     trim:new THREE.MeshStandardNodeMaterial({color:0xbab6a8,roughness:.86}),
     pale:new THREE.MeshStandardNodeMaterial({color:0xd4cfc0,roughness:.9}),
@@ -71,6 +72,8 @@ function planarUV(g){
 
 export function buildHeritageBuilding(root,b,m=heritageMaterials()){
   const p=b.heritageProfile;if(!p)return null;
+  const stoneBase=m.stone;
+  if(p.template==='brick-commercial')m={...m,stone:m.brick};
   const builder=modelBuilder(root),H=b.h,y0=b.ground,edges=facadeEdges(b.rings[0]);
   const eligible=edges.filter(e=>e.L>10);
   const face=eligible.sort((a,c)=>(c.nx*p.frontHint[0]+c.nz*p.frontHint[1])*Math.sqrt(c.L)-(a.nx*p.frontHint[0]+a.nz*p.frontHint[1])*Math.sqrt(a.L))[0];
@@ -89,6 +92,9 @@ export function buildHeritageBuilding(root,b,m=heritageMaterials()){
     prism(b.rings,0,baseH,m.stone);
     const inset=recessRing(b.rings[0],face,setback);prism([inset,...b.rings.slice(1)],baseH,bodyH-atticH,m.stone);
     prism(b.rings,bodyH-atticH,bodyH,m.stone);
+  }else if(p.template==='brick-commercial'){
+    prism(b.rings,0,baseH,stoneBase);
+    prism(b.rings,baseH,bodyH,m.stone);
   }else prism(b.rings,0,bodyH,m.stone);
 
   // Every trim follows a real edge. Only 0.38m of shallow relief projects outside the footprint.

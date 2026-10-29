@@ -1,0 +1,218 @@
+
+> slop-wuhan@0.8.3 verify
+> npm test && npm run test:data && npm run audit:data && npm run build
+
+
+> slop-wuhan@0.8.3 test
+> node --test tests/core.test.mjs tests/controllers.test.mjs tests/resources.test.mjs tests/material.test.mjs tests/loading-progress.test.mjs tests/vehicle-road.test.mjs tests/map-navigation.test.mjs tests/map-view.test.mjs tests/wuhan.test.mjs tests/footprint.test.mjs tests/spatial-placement.test.mjs tests/taipei-runtime.test.mjs tests/surfaces.test.mjs tests/tunnels.test.mjs tests/ground-connections.test.mjs tests/driving-audio.test.mjs tests/core-destinations.test.mjs tests/heritage.test.mjs tests/passages.test.mjs tests/travel-state.test.mjs
+
+✔ helicopter descent stops above Shanghai land and cancels its downward velocity (0.600333ms)
+✔ taxi collision contains its mirrors and bumper rather than only its narrow chassis (0.24575ms)
+✔ movement honours the expanded Shanghai bounds on both banks instead of clamping to the old release (0.084708ms)
+✔ helicopter can climb above Shanghai Tower and stops upward velocity at the new ceiling (6.409625ms)
+✔ a high helicopter keeps its altitude when teleported to another location (0.698125ms)
+✔ ten curated places cover the three towns and keep residential calibration targets out (0.507083ms)
+✔ Yellow Crane model has curved projecting roof massing, finite geometry and the documented 51.4m total (132.040959ms)
+✔ Red House uses the mapped concave footprint and an explicitly estimated 18m exterior (3.515791ms)
+✔ WGS84 projection preserves east/north orientation and metre scale (3.564709ms)
+✔ surface sampling keeps a car underground while a pedestrian stays on the street above (0.926084ms)
+✔ collision query filters both horizontal extent and height and unregisters tiles (0.372959ms)
+✔ tile loader retries failures and ignores stale late mounts after disposal (1.217542ms)
+✔ road graph separates levels and respects one-way and walking-only paths (0.447792ms)
+✔ readiness gate blocks an unmounted cell and rejects positions outside the declared region (0.490375ms)
+✔ a pending explicit arrival survives background prefetch at the old position (0.699083ms)
+✔ landing and movement readiness include neighbouring owners of buildings spanning a tile boundary (0.618584ms)
+✔ underground follow camera remains below the ceiling without clamping to world zero (1.738875ms)
+✔ underground camera stays inside the actual bore when the vehicle is already near a wall (0.440542ms)
+✔ road surface triangles face upward for either travel direction (60.823958ms)
+✔ citywide readiness and prefetch do not scan the complete tile catalog (35.836167ms)
+✔ streamed road and water surfaces enter and leave with their owning tile (0.329125ms)
+✔ walking and cycling follow a raised bridge while staying above a separate tunnel (0.115417ms)
+✔ municipal mask blocks unmodelled neighbouring provinces without blocking island water (0.147542ms)
+✔ car arrivals exclude walking-only paths while pedestrians can use them (0.142917ms)
+✔ non-car modes stop before open tunnel ramps without blocking an upper street over a deep bore (0.110625ms)
+✔ dry tires are silent at rest and creeping, then increase smoothly with speed (0.520375ms)
+✔ dry road noise is subdued and lower in frequency; releasing throttle cannot double the hiss (0.561917ms)
+✔ closed-car motion wind is reduced without changing walking, scooter or helicopter wind (0.086166ms)
+✔ concave building geometry preserves the L shape rather than closing its missing corner (4.72125ms)
+✔ a real courtyard remains open for rendering and walking (2.71175ms)
+✔ tower parts keep the low podium open above its roof instead of colliding as a full-height slab (1.175375ms)
+✔ all four ground portals allow a car to leave either side without invisible confinement (38.664208ms)
+✔ walls start at the same separation threshold on screen and in contact; raised terrain is considered (1.491791ms)
+✔ furniture reservation space remains drivable; actual pole and planter still block (0.960541ms)
+✔ the actual taxi collision routine clears a lamp when the body clears its visible pole (603.928583ms)
+✔ reviewed heritage identities survive source conversion and have separate street arrivals (1.762625ms)
+✔ a colonnade recess moves inward rather than adding a slab across the pavement (0.203459ms)
+✔ all heritage models preserve mapped extents and finite geometry within a bounded detail budget (517.996ms)
+✔ startup percentage advances with completed work, never with elapsed time, and waits for a usable frame (1.085291ms)
+✔ a startup failure stays incomplete and preserves a useful error for retry (1.515958ms)
+✔ stream progress counts decoded bytes against a pinned size even when the wire Content-Length is compressed (28.902167ms)
+✔ unknown-length streams are counted without an invented percentage and truncated pinned assets fail (2.376542ms)
+✔ fly-to prepares the destination before changing modes and preserves a high flight altitude (1.641333ms)
+✔ late or failed destinations cannot overwrite a newer arrival or strand the player in another mode (1.420208ms)
+✔ flying out of a road tunnel is rejected and an explicit cancellation invalidates an in-flight request (0.450334ms)
+✔ a car that enters a tunnel while a flight destination loads remains underground in car mode (0.337542ms)
+✔ full-city map zoom preserves the pointer location and supports street-scale views (1.440291ms)
+✔ map can fit filtered results to a wide panel and zoom to a station entrance without letterbox drift (0.144875ms)
+✔ fitting a single search result preserves neighbourhood context while manual zoom can still inspect the entrance (0.086333ms)
+✔ map can pan to islands and recenter on a remote player without leaving city bounds (0.097541ms)
+✔ Shanghai water material constructs its physical waves and light graph without unresolved TSL functions (57.571875ms)
+✔ both mapped carriageways survive under Tiemen Gate and a taxi fits in both directions (21.302125ms)
+✔ the two foot arches and the Jianghan Gate path stay open while actual gate walls still collide (5.408667ms)
+✔ visible Tiemen arch holes match the collider passage and have solid vaults above (30.210042ms)
+✔ all gate and canopy volumes carry explicit vertical clearance and preserve surveyed source rings (4.565708ms)
+✔ unloading an instanced tile releases its instance buffers and geometry but preserves shared materials (5.311209ms)
+✔ unloading a regular tile mesh notifies WebGPU render objects before disposing geometry (1.009583ms)
+✔ a lamp beside its owner road still rejects the intersecting road at a junction (0.566916ms)
+✔ complete prop footprint avoids buildings, water, boundaries and nearby props (0.914375ms)
+✔ broad pedestrian streets retain a clear middle corridor while allowing edge furniture (0.257084ms)
+✔ saddle terrain uses the rendered triangle planes rather than a bilinear patch (1.033333ms)
+✔ two opposite bridge carriageways become one supported deck, including their central gap (9.492ms)
+✔ surface contact follows the actual quad triangles through bends and height changes (1.474458ms)
+✔ separate distant bridge alignments cannot be merged merely because their names match (0.100209ms)
+✔ Taipei runtime is the active entry and includes only Wuhan geography (21.530333ms)
+✔ source heights survive display estimates and documented tower parts remain separate (23.071458ms)
+✔ runtime road graph preserves original topology and excludes cars from pedestrian streets (3.570625ms)
+✔ migrated collision retains open courtyards and produces finite corrective depth (0.26425ms)
+✔ roof detail fits inside the real roof rather than touching its bounding-box edge (0.247875ms)
+✔ roof equipment rejects courtyards and concave notches even when all four corners fit (0.092125ms)
+✔ real OSM signal nodes and POI signs reach the runtime with provenance (0.152708ms)
+✔ expanded core preserves metre scale, the pilot and the four mapped landmarks (0.10125ms)
+✔ hill sampling, landmark foundations and building foundations share a single heightfield (1.540834ms)
+✔ remote-sensing heights preserve source identity, thresholds, age and uncertainty (9.093166ms)
+✔ bridge decks retain actual shared node elevations and clear the mapped water (2.460667ms)
+✔ rendered terrain faces agree with contact height throughout the two hill regions (476.620209ms)
+✔ all mapped paired bridge decks support lateral movement across the entire span (10.811416ms)
+✔ Wuhan skyline keeps real tower footprints, low podiums and explicit height evidence (0.829709ms)
+✔ Hankou skyline restores documented residential cluster without raising nearby low wings (0.682833ms)
+✔ shipping center retains corroborated 330m total but separates low podium and a narrowing crown (0.296875ms)
+✔ ordinary destination visits preserve every travel mode; only explicit valid overrides change it (0.610042ms)
+✔ flight arrivals retain controller altitude instead of being forced onto a ground entrance (0.186083ms)
+✔ two full source-connected bores stay within bounds and have surface connections at both portals (0.733292ms)
+✔ surface traffic never snaps to a buried tunnel; tunnel vehicles retain signed contact in either direction (118.83275ms)
+✔ vehicle corners stay inside the bore and camera stays below the roof (1.338875ms)
+✔ contact equals rendered floor triangles through bends and grades (65.493292ms)
+✔ runtime water barrier permits a supported underground car but still rejects a surface car on the river (501.26225ms)
+✔ tunnel wall clearance contains the entire taxi for straight and sideways headings (1.315459ms)
+✔ a 10m bore gives the taxi one extra metre on each side without letting its corners cross a wall (2.377417ms)
+✔ Wuhan source, origin and pilot roads replace Shanghai geography (5.725375ms)
+✔ arrival point sits on a drivable road on land and has a collision tile (13.60925ms)
+✔ every building is in exactly one loadable tile with matching bytes and hash (194.258417ms)
+✔ street upgrade restores footprints, adds source buildings and keeps Jianghan route connected (3.556708ms)
+✔ building classification keeps source, contextual inference and visual estimates separate (7.142625ms)
+ℹ tests 94
+ℹ suites 0
+ℹ pass 94
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2924.647792
+
+> slop-wuhan@0.8.3 test:data
+> .venv/bin/python -m unittest discover -s tests -p 'test_*rules.py' -v
+
+test_documented_part_height_can_correct_mapped_floor_count_without_raising_the_whole_podium (test_building_parts_rules.BuildingPartsRules) ... ok
+test_existing_documented_massing_is_preserved (test_building_parts_rules.BuildingPartsRules) ... ok
+test_real_part_shape_and_vertical_offset_replace_podium_only_representation (test_building_parts_rules.BuildingPartsRules) ... ok
+test_small_source_mismatch_is_clipped_to_parent_footprint (test_building_parts_rules.BuildingPartsRules) ... ok
+test_unmatched_and_invalid_parts_do_not_invent_new_buildings (test_building_parts_rules.BuildingPartsRules) ... ok
+test_a_nearby_shop_outside_the_footprint_is_not_attached (test_building_rules.BuildingRulesTests) ... ok
+test_contained_poi_and_context_inference_have_distinct_provenance (test_building_rules.BuildingRulesTests) ... ok
+test_documented_total_creates_estimated_setbacks_not_a_full_height_slab (test_building_rules.BuildingRulesTests) ... ok
+test_height_units_and_malformed_values_do_not_silently_change_scale (test_building_rules.BuildingRulesTests) ... ok
+test_reference_id_and_name_must_both_match (test_building_rules.BuildingRulesTests) ... ok
+test_source_height_is_preserved_and_missing_height_stays_explicit (test_building_rules.BuildingRulesTests) ... ok
+test_building_destination_uses_source_position_and_a_separate_road_arrival (test_core_destinations_rules.DestinationRules) ... ok
+test_height_flags_are_candidates_and_cannot_modify_the_source (test_core_destinations_rules.DestinationRules) ... ok
+test_ambiguous_candidates_cannot_silently_win (test_core_rules.CoreRulesTests) ... ok
+test_boundary_never_presents_a_severed_crossing_as_complete (test_core_rules.CoreRulesTests) ... ok
+test_crossing_keeps_connected_bridge_approaches_and_source_direction (test_core_rules.CoreRulesTests) ... ok
+test_height_requires_matching_footprint_not_just_nearest_centroid (test_core_rules.CoreRulesTests) ... ok
+test_identity_and_source_height_are_not_guessed_from_nearby_location (test_heritage_rules.HeritageRules) ... ok
+test_photo_estimate_keeps_original_and_is_never_labeled_measured (test_heritage_rules.HeritageRules) ... ok
+test_street_arrival_avoids_footprint_even_when_nearest_road_intersects_it (test_heritage_rules.HeritageRules) ... ok
+test_restored_road_is_continuous_under_opening_but_not_through_a_pier (test_passage_rules.PassageRules) ... ok
+test_roof_posts_avoid_the_mapped_walkway (test_passage_rules.PassageRules) ... ok
+test_three_real_openings_keep_side_walls_and_upper_arch_solids (test_passage_rules.PassageRules) ... ok
+test_underground_routes_are_not_promoted_by_name_or_tunnel_tag_alone (test_passage_rules.PassageRules) ... ok
+test_original_source_height_and_estimated_geometry_remain_distinct (test_reviewed_massing_rules.ReviewedMassingRules) ... ok
+test_short_axis_ridge_narrows_along_the_long_face (test_reviewed_massing_rules.ReviewedMassingRules) ... ok
+test_tall_body_uses_member_footprint_and_crown_colliders_match_stepped_extrusions (test_reviewed_massing_rules.ReviewedMassingRules) ... ok
+test_unrelated_member_cannot_be_assigned_to_this_building (test_reviewed_massing_rules.ReviewedMassingRules) ... ok
+test_crossings_and_signals_require_actual_source_records (test_runtime_rules.RuntimeRules) ... ok
+test_estimate_does_not_mutate_original_source (test_runtime_rules.RuntimeRules) ... ok
+test_height_estimates_are_repeatable_and_cannot_override_source (test_runtime_rules.RuntimeRules) ... ok
+test_nearby_unshared_nodes_are_not_connected (test_runtime_rules.RuntimeRules) ... ok
+test_poi_signs_keep_business_category_and_auditable_association (test_runtime_rules.RuntimeRules) ... ok
+test_polygon_conversion_keeps_courtyard_and_winding (test_runtime_rules.RuntimeRules) ... ok
+test_road_bends_are_geometry_not_extra_junctions (test_runtime_rules.RuntimeRules) ... ok
+test_terrain_layer_is_cut_on_the_same_grid_and_diagonal_as_contact_sampling (test_runtime_rules.RuntimeRules) ... ok
+test_courtyard_lane_remains_open (test_spatial_rules.SpatialRulesTests) ... ok
+test_estimated_road_width_trims_paint_without_deleting_a_building (test_spatial_rules.SpatialRulesTests) ... ok
+test_tagged_upper_and_lower_roads_are_not_silently_flattened (test_spatial_rules.SpatialRulesTests) ... ok
+test_unverified_passage_is_closed_without_destroying_the_source_building (test_spatial_rules.SpatialRulesTests) ... ok
+
+----------------------------------------------------------------------
+Ran 40 tests in 0.040s
+
+OK
+
+> slop-wuhan@0.8.3 audit:data
+> .venv/bin/python tools/audit-spatial.py
+
+{
+  "roads": 4078,
+  "buildingAndLandmarkFootprints": 23467,
+  "roadBuildingOverlapM2": 0.0,
+  "centrelineConflicts": 0,
+  "status": "passed"
+}
+
+> slop-wuhan@0.8.3 build
+> vite build
+
+vite v8.3.5 building client environment for production...
+transforming...
+✓ 74 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/assets/landmarks-Nu2u4Q7q.js              0.94 kB
+dist/assets/vehicle-lights-DFiDX8ZX.js         1.35 kB
+dist/assets/post-processing-DEgWDjIB.js        3.97 kB
+dist/assets/audio-acoustics-CwjHJ-5R.js        4.15 kB
+dist/assets/gamepad-controls-C5paOnaz.js       6.26 kB
+dist/assets/garbage-truck-ikz6vUGv.js          6.43 kB
+dist/assets/touch-controls-sVoQk-R5.js         7.22 kB
+dist/assets/road-paint-Dx5DT9bO.js             8.45 kB
+dist/assets/audio-sources-gB3Ynf0i.js          9.45 kB
+dist/assets/scooter-model-Dz-NCR8e.js         10.14 kB
+dist/assets/ground-C_PhJWMf.js                11.18 kB
+dist/assets/lighting-D0jDNLxX.js              11.99 kB
+dist/assets/scene-culling-BW7rZVes.js         14.23 kB
+dist/assets/cameras-Ds1OULJP.js               15.93 kB
+dist/assets/buildings-CCDc_U0m.js             18.51 kB
+dist/index.html                               19.58 kB │ gzip:     6.01 kB
+dist/assets/audio-events-A0QxFyYq.js          22.59 kB
+dist/assets/elevated-eOLTb6YN.js              23.54 kB
+dist/assets/city-config-BEkbgWEn.js           23.96 kB
+dist/assets/audio-system-fFbTNDNr.js          24.43 kB
+dist/assets/wuhan-map-j9oBiHe-.js             27.41 kB
+dist/assets/audio-synthesis-DkseLVa1.js       27.49 kB
+dist/assets/street-props-C-Zltysm.js          28.08 kB
+dist/assets/traffic-CAiE6l-j.js               34.37 kB
+dist/assets/main-ujts--Er.js                  36.73 kB
+dist/assets/trees-C7l9lGyW.js                 42.88 kB
+dist/assets/controllers-D6nCshMg.js           47.66 kB
+dist/assets/pedestrians-CVotKOJz.js           62.15 kB
+dist/assets/actor-models-flxH_QUH.js          85.22 kB
+dist/assets/tsl-materials-Bv5zXCUe.js        162.14 kB
+dist/assets/index--PT9eNIh.css                25.69 kB │ gzip:     6.27 kB
+dist/assets/index-Ce_KLvnX.js             49,613.76 kB │ gzip: 8,410.53 kB
+
+✓ built in 2.57s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 2500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

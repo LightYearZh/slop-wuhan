@@ -1,0 +1,23 @@
+id,name,template,heightM,heightSource,newIn083,reference
+osm-building-way-128400520-0,台湾银行汉口分行旧址,taiwan-bank,23,visual-reference:photo-envelope,False,https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml
+osm-building-way-128400523-0,四明银行汉口分行旧址,restrained-deco,31,visual-reference:photo-envelope,False,https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml
+osm-building-way-767972188-0,汉口汇丰银行大楼旧址,hsbc-bank,24,visual-reference:photo-envelope,False,https://www.whcbs.com/Upload/BookReadFile/202004/8bcbb02411c04eb6b90f150e861056bb.pdf
+osm-building-way-767972189-0,汉口花旗银行大楼旧址,citibank,29.5,reference:architectural-total,False,https://www.whcbs.com/Upload/BookReadFile/202004/8bcbb02411c04eb6b90f150e861056bb.pdf
+osm-building-way-767972190-0,日清洋行汉口分行旧址,corner-cupola,32,visual-reference:photo-envelope,False,https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml
+osm-building-way-767972191-0,巴诺夫公馆（小巴公）,brick-commercial,12,visual-estimate,True,https://www.wuhan.gov.cn/sy/whyw/202205/t20220525_1976737.shtml
+osm-building-way-770782892-0,美国领事馆旧址,brick-commercial,12.8,OSM:levels,True,https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter086.html
+osm-building-way-789936193-0,交通银行大楼,classical-commercial,12,visual-estimate,True,https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter015.html
+osm-building-way-789936213-0,武汉市少儿图书馆,classical-commercial,12,visual-estimate,True,https://www.dxh.gov.cn/YXLKG_16692/wszl/202305/P020250508258021618616.pdf
+osm-building-way-981847959-0,日信洋行旧址,classical-commercial,16.0,OSM:levels,False,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+osm-building-way-981847960-0,TSUTAYA Book Sote （永利银行旧址）,modern-bank,12,visual-estimate,False,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+osm-building-way-1091893007-0,汉口华俄道胜银行旧址,classical-commercial,12,visual-estimate,True,https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter010.html
+osm-building-way-1091893008-0,汉口新泰大楼旧址,classical-commercial,31.0,OSM:height,True,https://www.digitalwuhan.net/UploadFileNew/20200812054000551.pdf
+osm-building-way-1092815752-0,汉口景明大楼旧址,modern-bank,22.4,OSM:levels,True,https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter045.html
+osm-building-way-1094546679-0,汉口横滨正金银行大楼,classical-commercial,12,visual-estimate,False,https://www.whzx.gov.cn/zxzl/wsl/whwszl/202405/P020240507544829602192.pdf
+osm-building-way-1095192364-0,俄国领事馆旧址,classical-commercial,12,visual-estimate,True,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699332.shtml
+osm-building-way-1289238581-0,中国实业银行大楼旧址,modern-bank,12,visual-estimate,False,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+osm-building-way-1289238583-0,中国银行,classical-commercial,12,visual-estimate,False,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+osm-building-way-1314323878-0,巴诺夫公馆（大巴公）,brick-commercial,12,visual-estimate,True,https://www.wuhan.gov.cn/sy/whyw/202205/t20220525_1976737.shtml
+osm-building-way-1314771285-0,璇宫饭店（中心百货）,restrained-deco,28.4,reference:architectural-total,True,https://design.citic/portal/article/index/id/2629/cid/27.html
+osm-building-way-1314771294-0,浙江兴业银行大楼,classical-commercial,12,visual-estimate,False,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+osm-building-way-1323368292-0,上海银行汉口分行旧址,classical-commercial,12,visual-estimate,False,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml

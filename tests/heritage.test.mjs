@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three/webgpu';
@@ -7,8 +8,10 @@ import {buildHeritageBuilding,facadeEdges,recessRing} from '../js/runtime/hankou
 
 test('reviewed heritage identities survive source conversion and have separate street arrivals',()=>{
   const buildings=BUILDINGS.filter(b=>b.heritageProfile);
-  assert.equal(buildings.length,12);assert.equal(GEO.heritageSites.length,12);
-  assert.equal(new Set(buildings.map(b=>b.sourceId)).size,12);
+  const count=JSON.parse(readFileSync(new URL('../config/hankou-heritage.json',import.meta.url))).buildings.length;
+  assert.ok(count>=22);
+  assert.equal(buildings.length,count);assert.equal(GEO.heritageSites.length,count);
+  assert.equal(new Set(buildings.map(b=>b.sourceId)).size,count);
   for(const s of GEO.heritageSites){
     assert.ok(TAIPEI_LANDMARKS.find(l=>l.id===s.id));
     assert.equal(TELEPORT_LOCATIONS[s.id].mode,'person');
@@ -37,5 +40,5 @@ test('all heritage models preserve mapped extents and finite geometry within a b
     if(['modern-bank','restrained-deco'].includes(b.heritageProfile.template))assert.equal(root.userData.heritage.columns,0);
     if(['taiwan-bank','citibank','hsbc-bank'].includes(b.heritageProfile.template))assert.ok(root.userData.heritage.setbackM>1);
   }
-  assert.ok(total<1500000);
+  assert.ok(total<2300000);
 });

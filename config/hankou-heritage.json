@@ -213,6 +213,142 @@
       ],
       "source": "https://www.whzx.gov.cn/zxzl/wsl/whwszl/202405/P020240507544829602192.pdf",
       "detailConfidence": "typology-reference;ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-789936193",
+      "expectedName": "交通银行大楼",
+      "label": "交通银行旧址",
+      "template": "classical-commercial",
+      "floors": 4,
+      "frontHint": [
+        -0.7,
+        0.71
+      ],
+      "source": "https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter015.html",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-789936213",
+      "expectedName": "武汉市少儿图书馆",
+      "label": "汉口商业银行旧址（少儿图书馆）",
+      "template": "classical-commercial",
+      "floors": 4,
+      "frontHint": [
+        0.7,
+        -0.71
+      ],
+      "source": "https://www.dxh.gov.cn/YXLKG_16692/wszl/202305/P020250508258021618616.pdf",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-1314771285",
+      "expectedName": "璇宫饭店（中心百货）",
+      "label": "璇宫饭店旧址",
+      "template": "restrained-deco",
+      "floors": 6,
+      "frontHint": [
+        0.7,
+        -0.71
+      ],
+      "source": "https://design.citic/portal/article/index/id/2629/cid/27.html",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated",
+      "heightCorrection": {
+        "heightM": 28.4,
+        "documented": true,
+        "source": "https://design.citic/portal/article/index/id/2629/cid/27.html",
+        "meaning": "Architect renovation project records six-storey main building height; roof ornament remains approximate"
+      }
+    },
+    {
+      "osmId": "osm-building-way-1091893007",
+      "expectedName": "汉口华俄道胜银行旧址",
+      "label": "华俄道胜银行旧址",
+      "template": "classical-commercial",
+      "floors": 4,
+      "frontHint": [
+        0.9,
+        0.44
+      ],
+      "source": "https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter010.html",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-1091893008",
+      "expectedName": "汉口新泰大楼旧址",
+      "label": "新泰大楼旧址",
+      "template": "classical-commercial",
+      "floors": 6,
+      "frontHint": [
+        0.9,
+        0.44
+      ],
+      "source": "https://www.digitalwuhan.net/UploadFileNew/20200812054000551.pdf",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-1092815752",
+      "expectedName": "汉口景明大楼旧址",
+      "label": "景明大楼旧址",
+      "template": "modern-bank",
+      "floors": 6,
+      "frontHint": [
+        0.7,
+        -0.71
+      ],
+      "source": "https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter045.html",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-767972191",
+      "expectedName": "巴诺夫公馆（小巴公）",
+      "label": "小巴公房子",
+      "template": "brick-commercial",
+      "floors": 4,
+      "frontHint": [
+        0.7,
+        -0.71
+      ],
+      "source": "https://www.wuhan.gov.cn/sy/whyw/202205/t20220525_1976737.shtml",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-1314323878",
+      "expectedName": "巴诺夫公馆（大巴公）",
+      "label": "大巴公房子",
+      "template": "brick-commercial",
+      "floors": 4,
+      "frontHint": [
+        0.7,
+        -0.71
+      ],
+      "source": "https://www.wuhan.gov.cn/sy/whyw/202205/t20220525_1976737.shtml",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-770782892",
+      "expectedName": "美国领事馆旧址",
+      "label": "美国领事馆旧址",
+      "template": "brick-commercial",
+      "floors": 3,
+      "frontHint": [
+        0.9,
+        0.44
+      ],
+      "source": "https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter086.html",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+    },
+    {
+      "osmId": "osm-building-way-1095192364",
+      "expectedName": "俄国领事馆旧址",
+      "label": "俄国领事馆旧址",
+      "template": "classical-commercial",
+      "floors": 4,
+      "frontHint": [
+        0.9,
+        0.44
+      ],
+      "source": "https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699332.shtml",
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
     }
   ]
 }

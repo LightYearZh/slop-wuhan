@@ -16,11 +16,11 @@
     "3D-GloBFP:model-estimate": 20124,
     "OSM:levels": 474,
     "OSM:parts-max": 32,
-    "reference:architectural-total": 15,
+    "reference:architectural-total": 16,
     "visual-reference:photo-envelope": 6,
     "visual-reference:open-building-envelope": 19,
     "reference:published-approximate": 1,
-    "reference:storeys-derived": 7,
+    "reference:storeys-derived": 6,
     "Overture:floors": 3
   },
   "signRecords": 673,
@@ -62,5 +62,5 @@
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "e746c585704241ba122c0a294ab8a6619d9b9119973797aa172fc5cb9c4db5b5"
+  "sourceCitySha256": "9830e8030d60e6e05142ef9c552d8da86570bc66735dbdd42152823f65b455d9"
 }

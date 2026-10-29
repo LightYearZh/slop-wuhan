@@ -760,6 +760,9 @@ body.hud-minimized .icon-show {
   justify-content: center;
   gap: 6px 16px;
   max-width: 600px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--glass-strong);
   font-size: 12px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.88);
@@ -793,25 +796,6 @@ body.hud-minimized .icon-show {
   padding: 5px;
 }
 
-/* The taxi-yellow pill glides to the selected mode (positioned by main.js) */
-.mode-indicator {
-  position: absolute;
-  z-index: 0;
-  top: 5px;
-  bottom: 5px;
-  left: 0;
-  width: var(--ind-w, 0px);
-  transform: translateX(var(--ind-x, 0px));
-  border-radius: 12px;
-  background: var(--taxi);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(0, 0, 0, 0.12), 0 4px 12px -4px rgba(0, 0, 0, 0.5);
-  transition: transform 0.45s var(--ease-out), width 0.45s var(--ease-out);
-}
-
-.mode-switch.no-anim .mode-indicator {
-  transition: none;
-}
-
 .mode-btn {
   position: relative;
   z-index: 1;
@@ -836,7 +820,8 @@ body.hud-minimized .icon-show {
 .mode-btn.active,
 .mode-btn.active:hover {
   color: var(--taxi-ink);
-  background: transparent;
+  background: var(--taxi);
+  transition: color .25s ease;
 }
 
 .mode-btn .icon {
@@ -1267,19 +1252,23 @@ body.is-boosting #hud-speed-meter {
 }
 
 @media (max-width: 1240px) {
-  .controls-hint { display: none; }
+  .controls-hint { max-width: min(600px,calc(100vw - 600px)); gap: 4px 10px; }
   .mode-btn kbd { display: none; }
 }
 
 @media (max-width: 1080px) {
-  .mode-label,
   .tool-label,
   .tool-btn kbd { display: none; }
   .mode-btn { padding: 0 12px; }
   .tool-btn:not(.icon-only):not(.fullmap-close) { gap: 4px; padding: 0 9px; }
 }
 
+.return-follow{width:calc(100% - 8px);min-height:32px;margin:4px;border-radius:8px;padding:7px 9px;color:var(--text);background:var(--hover);font-size:12px;white-space:nowrap;}
+.return-follow[hidden]{display:none;}
+
 @media (max-width: 820px) {
+  .hud-bottom-right { bottom: calc(var(--edge) + 180px); }
+  .controls-hint { max-width: calc(100vw - 28px); }
   :root { --edge: 12px; }
   .hud-top-left { top: calc(max(var(--edge), env(safe-area-inset-top)) + 62px); }
   .brand > .mta-bullet,
@@ -1300,7 +1289,8 @@ body.is-boosting #hud-speed-meter {
   .time-btn.active .seg-label { display: none; }
   .time-btn.active { padding: 0 9px; gap: 0; }
   .radar { display: none; }
-  .hud-bottom-right { bottom: calc(var(--edge) + 64px); }
+  .hud-bottom-right { bottom: calc(var(--edge) + 180px); }
+  .hud-bottom-left { bottom: calc(var(--edge) + 276px); }
   .gauge { display: none; }
   .camera-switch { border-top: 0; }
 }

@@ -17,6 +17,7 @@ import { ThirdPersonControllerManager } from './controllers.js';
 import { TouchControls } from './touch-controls.js';
 import { GamepadControls } from './gamepad-controls.js';
 import { CameraSystem, CAMERA_PRESETS } from './cameras.js';
+import {TRAVEL_MODES,travelMode,travelAltitude} from './travel-state.js';
 import { LightingSystem } from './lighting.js';
 import { WuhanMapSystem } from './wuhan-map.js';
 import { setupSceneCulling, updateSceneCulling } from './scene-culling.js';
@@ -215,12 +216,10 @@ async function initApp() {
   const renderPipeline = new THREE.RenderPipeline(renderer, colorGrade.outputNode);
 
   // 6. Wire UI Controls (Strictly using safe DOM APIs: textContent, classList, addEventListener)
-  const MODES = ['person', 'car', 'scooter', 'helicopter'];
-  const modeButtons = document.querySelectorAll('[data-mode]');
+  const MODES = TRAVEL_MODES;
+  const modeButtons = document.querySelectorAll('.mode-btn[data-mode]');
   const timeButtons = document.querySelectorAll('[data-time]');
   const hudToggleBtn = document.getElementById('btn-toggle-hud');
-  const modeSwitch = document.getElementById('mode-switch');
-  touchControls.onAvailabilityChange = placeModeIndicator;
 
   // Teleport destinations & the camera list come from city-config.js & cameras.js
   const teleportPopover = document.getElementById('teleport-popover');
@@ -313,14 +312,6 @@ async function initApp() {
     elControlsHint.replaceChildren(...items);
   }
 
-  // The taxi-yellow pill under the selected mode glides from button to button
-  function placeModeIndicator() {
-    const active = modeSwitch ? modeSwitch.querySelector('.mode-btn.active') : null;
-    if (!active) return;
-    modeSwitch.style.setProperty('--ind-x', `${active.offsetLeft}px`);
-    modeSwitch.style.setProperty('--ind-w', `${active.offsetWidth}px`);
-  }
-
   function selectMode(mode) {
     controllerManager.setMode(mode);
     mode=controllerManager.activeMode;
@@ -328,9 +319,9 @@ async function initApp() {
     gamepadControls.reset();
     modeButtons.forEach((btn) => {
       btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+      btn.setAttribute('aria-pressed',String(btn.getAttribute('data-mode')===mode));
     });
     document.body.dataset.mode = mode;
-    placeModeIndicator();
     const ent = controllerManager.getActiveEntity();
     if (elMode) elMode.textContent = ent.label;
     renderControlHints(mode);
@@ -349,6 +340,8 @@ async function initApp() {
     });
     const preset = cameraSystem.getActivePreset();
     if (elCamera) elCamera.textContent = preset.name;
+    const returnFollow=document.getElementById('btn-return-follow');
+    if(returnFollow)returnFollow.hidden=preset.category==='follow';
   }
 
   // Steps through CAMERA_PRESETS (V / Shift+V, and the arrows either side of the camera name)
@@ -474,7 +467,7 @@ async function initApp() {
   }
 
   function teleportTo(x, z, heading = Math.PI, y = null) {
-    const destination = controllerManager.teleportActiveTo(x, z, heading,y);
+    const destination = controllerManager.teleportActiveTo(x, z, heading,travelAltitude(controllerManager.activeMode,y));
     touchControls.reset();
     gamepadControls.reset();
     cameraSystem.resetForTeleport();
@@ -486,6 +479,12 @@ async function initApp() {
     };
     return destination;
   }
+  function visitDestination(destination,explicitMode=null){
+    selectMode(travelMode(controllerManager.activeMode,explicitMode));
+    const a=destination.arrival||destination;
+    return teleportTo(a.x,a.z,a.heading??destination.heading??0,a.y??null);
+  }
+  document.getElementById('btn-return-follow')?.addEventListener('click',()=>selectCamera('chase',true));
 
   const mapSystem = new WuhanMapSystem({
     controllerManager,
@@ -501,13 +500,13 @@ async function initApp() {
       }
     },
     onTeleport: teleportTo,
-    onVisit:d=>{selectMode(d.mode||'person');const a=d.arrival;teleportTo(a.x,a.z,a.heading||0,a.y??null);}
+    onVisit:d=>visitDestination(d)
   });
 
   teleportButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const loc = TELEPORT_LOCATIONS[btn.getAttribute('data-teleport')];
-      if (loc) {if(loc.mode)selectMode(loc.mode);teleportTo(loc.x, loc.z, loc.heading,loc.y??null);}
+      if (loc) visitDestination(loc);
       closePopovers();
     });
   });
@@ -565,7 +564,6 @@ async function initApp() {
   window.addEventListener('resize', () => {
     cameraSystem.onResize(window.innerWidth, window.innerHeight);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    placeModeIndicator();
     if (mapSystem.isFullMapOpen) {
       mapSystem.resizeFullCanvas();
       mapSystem.renderFullMap();
@@ -575,16 +573,17 @@ async function initApp() {
   // Initialize the UI and chase camera around the restored player, or the default taxi on a first visit.
   // ?mode=, ?camera= & ?time= (and ?at=<teleport id>) pick the start (handy for sharing a view)
   const params = new URLSearchParams(location.search);
+  // A new visit opens a playable interface; screenshot-only HUD state is not a launch preference.
+  document.body.classList.remove('hud-minimized');
+  hudToggleBtn?.setAttribute('aria-pressed','false');
   if (params.get('at') && TELEPORT_LOCATIONS[params.get('at')]) {
     const loc = TELEPORT_LOCATIONS[params.get('at')];
-    controllerManager.setMode(MODES.includes(params.get('mode')) ? params.get('mode') : loc.mode||controllerManager.activeMode);
-    controllerManager.teleportActiveTo(loc.x, loc.z, loc.heading,loc.y??null);
+    controllerManager.setMode(travelMode(controllerManager.activeMode,params.get('mode')));
+    controllerManager.teleportActiveTo(loc.x, loc.z, loc.heading,travelAltitude(controllerManager.activeMode,loc.y));
   }
   selectMode(MODES.includes(params.get('mode')) ? params.get('mode') : controllerManager.activeMode);
   selectCamera(CAMERA_PRESETS.some((p) => p.id === params.get('camera')) ? params.get('camera') : 'chase', true);
   selectTime(['golden', 'midday', 'twilight', 'midnight'].includes(params.get('time')) ? params.get('time') : 'golden');
-  // the web fonts change the buttons' widths once they arrive
-  if (document.fonts) document.fonts.ready.then(placeModeIndicator);
   markInit('ui');
 
   // The loading screen stays up while the shaders compile (precompileShaders() & the warm-up frame, see the loop) and
@@ -670,7 +669,7 @@ async function initApp() {
   window.wuhan={ready:false,base:'slop-taipei',data:GEO,scene,renderer,controllers:controllerManager,cameraSystem,map:mapSystem,
     placement:streetProps.placement,stats:{...streetProps.stats,buildings:cityBlocks.stats},setMode:mode=>selectMode(mode),
     setView:id=>selectCamera(typeof id==='number'?CAMERA_PRESETS[id].id:id,true),
-    gotoLandmark:(id,{mode=null}={})=>{const l=TELEPORT_LOCATIONS[id]||GEO.landmarks[id];if(!l)return false;selectMode(mode||l.mode||'person');teleportTo(l.x,l.z,l.heading||0,l.y??null);return true},
+    gotoLandmark:(id,{mode=null}={})=>{const l=TELEPORT_LOCATIONS[id]||GEO.landmarks[id];if(!l)return false;visitDestination(l,mode);return true},
     metrics:()=>({errors:runtimeErrors,frames:frameTimes.slice(-180),render:renderer.info.render,base:'slop-taipei'})};
   await precompileShaders();
   markInit('compile');

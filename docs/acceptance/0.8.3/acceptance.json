@@ -1,0 +1,89 @@
+{
+  "version": "0.8.3",
+  "baseline": "ef583d9",
+  "sourceCitySha256": "9830e8030d60e6e05142ef9c552d8da86570bc66735dbdd42152823f65b455d9",
+  "heritageBuildings": 22,
+  "newBindings": 10,
+  "sourceFootprintsUnchanged": true,
+  "unchanged": {
+    "bounds": true,
+    "origin": true,
+    "roads": true,
+    "water": true,
+    "hills": true,
+    "tunnels": true,
+    "bridgeModels": true,
+    "landmarks": true,
+    "coreDestinations": true
+  },
+  "automatedVerification": {
+    "javascriptTests": 94,
+    "pythonTests": 40,
+    "roadBuildingOverlapM2": 0,
+    "centrelineConflicts": 0,
+    "productionBuild": "passed"
+  },
+  "limits": [
+    "Identity-bound type references, not measured facade reconstructions",
+    "Special roofs, exact window positions and unidentified historic buildings remain incomplete",
+    "Only Xuangong height changed in this batch: architect project total 28.4m"
+  ],
+  "browserVerification": {
+    "origin": "http://127.0.0.1:4187",
+    "teleportMatrix": {
+      "modes": [
+        "person",
+        "car",
+        "scooter",
+        "helicopter"
+      ],
+      "entryPoints": [
+        "teleport popover",
+        "core destination map button",
+        "gotoLandmark API"
+      ],
+      "allPreserved": true,
+      "helicopterAltitudeBeforeM": 160,
+      "helicopterAltitudeAfterM": 160,
+      "explicitApiOverride": "passed"
+    },
+    "urls": {
+      "explicitModes": [
+        "person",
+        "car",
+        "scooter",
+        "helicopter"
+      ],
+      "invalidModePreservesRestored": "passed",
+      "atOnlyPreservesScooter": "passed",
+      "reloadClearsHiddenHud": "passed"
+    },
+    "correctedUiWidths": [
+      1200,
+      1000,
+      390
+    ],
+    "selectedBackground": "rgb(255, 194, 26)",
+    "hintsUncovered": true,
+    "returnToFollow": "passed",
+    "visibleNewModels": [
+      "大巴公房子",
+      "璇宫饭店"
+    ],
+    "runtimeErrors": [],
+    "handoff": {
+      "url": "http://127.0.0.1:4187/",
+      "mode": "car",
+      "camera": "chase",
+      "hudHidden": false,
+      "testCameraOverrideRemoved": true
+    },
+    "screenshots": [
+      "travel-final-1200.png",
+      "travel-final-1000.png",
+      "travel-final-390.png",
+      "heritage-new-bagong.png",
+      "heritage-new-xuangong.png"
+    ]
+  }
+}

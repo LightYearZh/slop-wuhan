@@ -152,7 +152,6 @@
   <footer class="hud hud-bottom-center">
     <div id="hud-controls-hint" class="controls-hint"></div>
     <nav id="mode-switch" class="panel mode-switch" aria-label="移动方式">
-      <span class="mode-indicator" aria-hidden="true"></span>
       <button id="mode-person" class="mode-btn" data-mode="person" type="button" title="步行 [1]">
         <svg class="icon" aria-hidden="true"><use href="#i-walk"/></svg><span class="mode-label">步行</span><kbd>1</kbd>
       </button>
@@ -171,6 +170,7 @@
   <!-- Bottom-Right: Speed Cluster & Camera Switcher -->
   <div class="hud hud-bottom-right">
     <section id="hud-cluster" class="panel cluster" aria-label="速度与相机">
+        <button id="btn-return-follow" class="return-follow" type="button" hidden title="回到当前角色的跟随视角">返回角色</button>
       <div class="gauge">
         <div class="gauge-top">
           <span id="hud-active-mode" class="gauge-label">武汉漫游 · 出租车</span>
