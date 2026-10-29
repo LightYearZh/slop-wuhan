@@ -94,6 +94,14 @@ class BuildingEnricher:
                 'use':tags.get('building:use') or tags.get('building','unknown'),'historic':(category=='historic'),
                 'startDate':tags.get('start_date'),'pois':[{'id':p['id'],'name':p['tags'].get('name',''),'shop':p['tags'].get('shop'),'amenity':p['tags'].get('amenity'),'tourism':p['tags'].get('tourism')} for p in pois]}
         if reference and reference.get('facadeProfile'):result['facadeProfile']=reference['facadeProfile']
+        if reference:
+            result['heightBeforeReference']={'h':item.get('h',0),'heightSource':item.get('heightSource','visual-estimate')}
+            if reference.get('identityEvidence'):result['heightEvidence']['identityEvidence']=reference['identityEvidence']
+        if reference and reference.get('massingMembers'):
+            from reviewed_massing import reviewed_massing
+            result['massingParts']=reviewed_massing(poly,reference)
+            result['massingSource']='visual-estimate:reviewed-osm-members-and-crown'
+            result['massingReference']=reference['source']
         result['frontages']=self.frontages(poly,category,pois)
         if reference and reference.get('massingRecipe'):
             from shapely import make_valid

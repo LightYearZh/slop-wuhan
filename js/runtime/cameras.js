@@ -19,6 +19,8 @@ const CAMERA_PRESETS = [
   {id:'hankou-skyline',name:'汉口滨江天际线',short:'汉口滨江',category:'scenic',fov:50},
   {id:'qingchuan-skyline',name:'南岸嘴与晴川饭店',short:'南岸嘴',category:'scenic',fov:50},
   {id:'jiyuqiao-skyline',name:'积玉桥滨江楼群',short:'积玉桥',category:'scenic',fov:50},
+  {id:'shipping-skyline',name:'长江航运中心与世纪江尚',short:'汉口高层',category:'scenic',fov:50},
+  {id:'century-skyline',name:'世纪江尚住宅楼群',short:'世纪江尚',category:'scenic',fov:50},
   {id:'overview',name:'两江三镇全景',short:'全景',category:'scenic',fov:50},
   {id:'drone',name:'汉口空中环游',short:'环游',category:'scenic',fov:50}
 ];
@@ -32,6 +34,8 @@ const WUHAN_VIEWS = {
  'hankou-skyline':{position:[-600,160,2350],target:[-1400,55,1300]},
  'qingchuan-skyline':{position:[-500,170,2400],target:[-1250,45,2800]},
  'jiyuqiao-skyline':{position:[-200,240,2600],target:[1050,70,1850]},
+ 'shipping-skyline':{position:[300,230,1450],target:[-320,145,1100]},
+ 'century-skyline':{position:[400,270,700],target:[-330,90,800]},
  overview:{position:[2700,2200,6100],target:[-650,0,2300]}
 };
 

@@ -70,6 +70,7 @@ class GeoBuilder {
 function styleOf(b) {
   const r = b.seed;
   if(b.facadeProfile==='qingchuan-hotel')return BUILDING_STYLE.hotel;
+  if(b.facadeProfile==='hankou-riverfront-residential')return BUILDING_STYLE.hankouTower;
   if(b.facadeProfile==='riverfront-office')return BUILDING_STYLE.glass;
   if(b.facadeProfile==='riverfront-residential'||b.category==='residential'&&b.h>=60)return BUILDING_STYLE.residentialTower;
   if(b.category==='historic') return BUILDING_STYLE.civic;

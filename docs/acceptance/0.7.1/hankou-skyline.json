@@ -1,0 +1,149 @@
+{
+  "version": "0.7.1",
+  "baseline": "4b395ac",
+  "sourceCitySha256": "6ecf0a23f799fbdcfcc5edee0fea129a1a13188fa2cc70582f3f1a52275d6997",
+  "unchangedGeography": {
+    "roads": true,
+    "water": true,
+    "land": true,
+    "hills": true,
+    "tunnels": true,
+    "rampCuts": true,
+    "bridgeModels": true,
+    "landmarks": true,
+    "spawn": true
+  },
+  "changedBuildings": [
+    {
+      "id": "osm-building-way-1013447170-0",
+      "name": "武汉恒隆广场办公楼",
+      "before": 12,
+      "after": 320.7,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-relation-14117454-0",
+      "name": "武汉长江航运中心",
+      "before": 330.0,
+      "after": 330,
+      "parts": 11
+    },
+    {
+      "id": "osm-building-way-1094972949-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-way-1094972950-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-way-1094972951-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-way-1094972953-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-way-1094972954-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-way-1094972958-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-way-1094972959-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-way-1094972960-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    },
+    {
+      "id": "osm-building-way-1094972961-0",
+      "name": "",
+      "before": 12,
+      "after": 174,
+      "parts": 0
+    }
+  ],
+  "heightMatchingExamples": [
+    {
+      "osmWay": "1094972949",
+      "bestIoU": 0.207,
+      "candidateHeightM": 23.283,
+      "matched": false
+    },
+    {
+      "osmWay": "1094972959",
+      "bestIoU": 0.352,
+      "candidateHeightM": 17.03,
+      "matched": false
+    },
+    {
+      "osmWay": "1013447170",
+      "bestIoU": 0.166,
+      "candidateHeightM": 25.668,
+      "centroidDistanceM": 38.5,
+      "matched": false
+    }
+  ],
+  "massingLimits": [
+    "OSM relation member role assignment reviewed from aerial, not source building:part tags",
+    "22.5m podium, 294m body split and nine-step gabled crown are visual estimates",
+    "Century group heights documented; per-numbered-tower identity unverified"
+  ],
+  "tests": {
+    "javascriptPassed": 82,
+    "pythonPassed": 31,
+    "build": "passed",
+    "roadBuildingOverlapM2": 0,
+    "centrelineConflicts": 0
+  },
+  "browser": {
+    "productionPort": 4187,
+    "runtimeErrors": [],
+    "lighting": "midday",
+    "fov": 50,
+    "newPresets": [
+      "shipping-skyline",
+      "century-skyline"
+    ],
+    "clusterPresetActualPosition": [
+      400,
+      270,
+      700
+    ],
+    "comparisonViews": [
+      "shipping",
+      "century",
+      "hankou"
+    ],
+    "screenshot": "output/playwright/hankou-cluster-overview.png"
+  }
+}

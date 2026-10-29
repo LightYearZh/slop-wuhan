@@ -2916,7 +2916,7 @@ function createCarFlareMaterial() {
  * shed: factories, warehouses, garages: corrugated steel siding, high windows
  * temple: red walls under a curved tile roof (the roof itself is modelled in buildings.js)
  */
-const BUILDING_STYLE = { walkup: 0, midrise: 1, glass: 2, civic: 3, shed: 4, temple: 5, residentialTower:6, hotel:7 };
+const BUILDING_STYLE = { walkup: 0, midrise: 1, glass: 2, civic: 3, shed: 4, temple: 5, residentialTower:6, hotel:7, hankouTower:8 };
 
 // Tile & paint palettes (ceramic 二丁挂 tiles: beige, sand, salmon, brown, grey; painted concrete; steel siding)
 const TILE_PALETTE = [0xd6c8ae, 0xc8b49a, 0xe2dacb, 0xb7a796, 0xc48e78, 0xa47a62, 0x929ba1, 0xd8c39c, 0xe9e5dc, 0x9a6b56, 0xb9b3a6, 0xcfb9a8];
@@ -2955,7 +2955,8 @@ function createWuhanBuildingMaterial() {
   const seed = fract(vB);
   const isStyle = (s) => step(abs(style.sub(s)), 0.25);
   const walkup = isStyle(BUILDING_STYLE.walkup);
-  const modernTower = isStyle(BUILDING_STYLE.residentialTower);
+  const hankouTower = isStyle(BUILDING_STYLE.hankouTower);
+  const modernTower = max(isStyle(BUILDING_STYLE.residentialTower),hankouTower);
   const hotel = isStyle(BUILDING_STYLE.hotel);
   const modern = max(modernTower,hotel);
   const midrise = isStyle(BUILDING_STYLE.midrise).add(modern);
@@ -3039,7 +3040,8 @@ function createWuhanBuildingMaterial() {
     mix(pickFromPalette(STEEL_PALETTE, r1), color(0xb03a2a), temple),
     max(shed, temple)
   ).toVar();
-  const cWall=mix(mix(cWallBase,mix(color(0xd9cdbb),color(0xebe7df),r2),modernTower),color(0xe3dfd4),hotel).toVar();
+  const towerTint=mix(mix(color(0xd9cdbb),color(0xebe7df),r2),mix(color(0xb6a285),color(0xc6b69c),r2),hankouTower);
+  const cWall=mix(mix(cWallBase,towerTint,modernTower),color(0xe3dfd4),hotel).toVar();
   const cGlass = pickFromPalette(GLASS_PALETTE, r3);
 
   mat.aoNode = canyonSkyAONode();

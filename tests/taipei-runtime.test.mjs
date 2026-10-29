@@ -172,3 +172,28 @@ test('Wuhan skyline keeps real tower footprints, low podiums and explicit height
  assert.equal(city.buildingPartsAudit.parents_restored,33);
  assert.equal(city.buildingPartsAudit.rendered_parts,60);
 });
+
+
+test('Hankou skyline restores documented residential cluster without raising nearby low wings',()=>{
+ const ids=['1094972949','1094972950','1094972951','1094972953','1094972954','1094972958','1094972959','1094972960','1094972961'];
+ for(const id of ids){
+  const b=BUILDINGS.find(b=>b.sourceId===`osm-building-way-${id}-0`);
+  assert.ok(b);assert.equal(b.h,174);assert.equal(b.sourceHeightType,'reference:architectural-total');
+  assert.equal(b.facadeProfile,'hankou-riverfront-residential');
+ }
+ for(const id of ['1094972955','1094972956'])assert.ok(city.buildings.find(b=>b.id===`osm-building-way-${id}-0`).h<30);
+ const office=BUILDINGS.find(b=>b.sourceId==='osm-building-way-1013447170-0');
+ assert.equal(office.h,320.7);assert.equal(office.facadeProfile,'riverfront-office');
+ assert.ok(GEO.teleports.filter(p=>p.id.startsWith('building-')).every(p=>p.name));
+});
+
+test('shipping center retains corroborated 330m total but separates low podium and a narrowing crown',()=>{
+ const parts=BUILDINGS.filter(b=>b.sourceId==='osm-building-relation-14117454-0');
+ assert.equal(Math.max(...parts.map(b=>b.h)),330);
+ const podium=parts.find(b=>b.role==='podium');assert.equal(podium.h,22.5);
+ const body=parts.find(b=>b.role==='tower');assert.equal(body.h,294);assert.equal(body.base,22.5);
+ assert.ok(body.area<podium.area*.8);
+ const crowns=parts.filter(b=>b.role==='crown').sort((a,b)=>a.base-b.base);assert.equal(crowns.length,9);
+ assert.ok(crowns.every((b,i)=>!i||b.area<crowns[i-1].area));
+ for(const part of [...crowns,body]){assert.equal(part.partSourceId,'osm-way-943192870');assert.ok(part.partHeightSource.startsWith('visual-estimate:'));}
+});

@@ -102,6 +102,7 @@ def convert(city):
     places=[[p['name'],p['x'],p['z'],1] for p in city['places']]
     teleports=[{'id':'jianghanguan','name':'江汉关博物馆','sub':'沿江大道 · 钟楼','x':spawn['x'],'z':spawn['z'],'heading':spawn['heading'],'road':'沿江大道'}]
     for p in city['places']:
+        if not p.get('name'):continue  # Height-only references are not unnamed destinations.
         if p['name'] in ('江汉路','中山大道','沿江大道') or p.get('arrival'):
             arrival=p.get('arrival',p)
             teleports.append({'id':p['id'],'name':p['name'],'sub':'汉口核心区','x':arrival['x'],'z':arrival['z'],'heading':spawn['heading'],'road':p.get('road','')})
