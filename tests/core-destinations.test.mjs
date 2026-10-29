@@ -1,3 +1,4 @@
+import {orderedCoreDestinations,teleportMenuDestinations} from '../js/runtime/destination-order.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three/webgpu';
@@ -43,4 +44,25 @@ test('Han River crossings gain a red arch and a steel truss above their traversa
   let vertices=0;group.traverse(o=>{if(o.isMesh){const p=o.geometry.getAttribute('position');vertices+=p.count;assert.ok(Array.from(p.array).every(Number.isFinite));}});
   assert.ok(vertices>1000,name);
  }
+});
+
+test('representative destinations retain landmark priority and leave historic sites available separately',()=>{
+  const before=GEO.coreDestinations.map(d=>d.id);
+  const ordered=orderedCoreDestinations([...GEO.coreDestinations].reverse());
+  assert.deepEqual(ordered.map(d=>d.id),['yellow-crane','yangtze-bridge','jianghanguan','jianghan-road','qingchuange','guishan-tower','red-house','greenland-center','shipping-center','heartland-66']);
+  assert.deepEqual(GEO.coreDestinations.map(d=>d.id),before);
+  assert.ok(ordered.every(d=>!d.id.startsWith('heritage-')));
+  for(const site of GEO.heritageSites)assert.ok(TELEPORT_LOCATIONS[site.id],'historic destination remains usable: '+site.name);
+});
+
+test('teleport menu prioritizes landmarks without capping places or listing bank aliases',()=>{
+ const menu=teleportMenuDestinations(GEO.coreDestinations,TELEPORT_LOCATIONS);
+ assert.deepEqual(menu.slice(0,3).map(d=>d.id),['yellow-crane','yangtze-bridge','jianghanguan']);
+ assert.ok(menu.length>10);assert.equal(new Set(menu.map(d=>d.id)).size,menu.length);
+ assert.ok(!menu.some(d=>/银行/.test(d.name)));
+ for(const name of ['江汉桥','晴川桥','铁门关','江汉门','汉口隧道入口','武昌隧道入口','大巴公房子'])assert.ok(menu.some(d=>d.name===name),name);
+ assert.equal(menu.filter(d=>d.name==='武汉长江大桥').length,1);
+ const added=teleportMenuDestinations(GEO.coreDestinations,{...TELEPORT_LOCATIONS,'future-place':{id:'future-place',name:'新增代表地点'}});
+ assert.equal(added.length,menu.length+1);
+ assert.ok(added.some(d=>d.id==='future-place'));
 });

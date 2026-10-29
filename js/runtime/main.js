@@ -1,3 +1,4 @@
+import {teleportMenuDestinations} from './destination-order.js';
 import {buildTunnels} from './tunnels.js';
 import {GEO} from './wuhan-geodata.js';
 import * as THREE from 'three/webgpu';
@@ -223,7 +224,7 @@ async function initApp() {
 
   // Teleport destinations & the camera list come from city-config.js & cameras.js
   const teleportPopover = document.getElementById('teleport-popover');
-  for (const loc of Object.values(TELEPORT_LOCATIONS)) {
+  for (const loc of teleportMenuDestinations(GEO.coreDestinations||[],TELEPORT_LOCATIONS)) {
     const btn = document.createElement('button');
     btn.className = 'pop-item tp-btn';
     btn.type = 'button';
@@ -233,7 +234,7 @@ async function initApp() {
     name.textContent = loc.name;
     const sub = document.createElement('span');
     sub.className = 'pop-sub';
-    sub.textContent = loc.sub;
+    sub.textContent = loc.sub || [loc.district,loc.category].filter(Boolean).join(' · ') || loc.road || '';
     btn.append(name, sub);
     teleportPopover.appendChild(btn);
   }
