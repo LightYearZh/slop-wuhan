@@ -1,0 +1,12 @@
+{"schemaVersion":1,"destinations":[
+{"id":"jianghanguan","name":"江汉关博物馆","landmarkId":"jianghanguan","category":"历史建筑","district":"汉口","summary":"钟楼与近代汉口江岸","source":"https://3g.wuhan.gov.cn/sy/kwh/202401/t20240122_2347703.shtml"},
+{"id":"jianghan-road","name":"江汉路步行街","placeName":"江汉路","category":"城市街区","district":"汉口","summary":"历史商街与沿江大道","source":"OpenStreetMap:江汉路"},
+{"id":"shipping-center","name":"长江航运中心","buildingId":"osm-building-relation-14117454-0","category":"城市高楼","district":"汉口","summary":"两江交汇处的航运地标","source":"https://www.skyscrapercenter.com/building/wuhan-yangtze-river-shipping-center/12461"},
+{"id":"heartland-66","name":"武汉恒隆广场","buildingId":"osm-building-way-1013447170-0","category":"商务地标","district":"汉口","summary":"商业中心与办公塔楼","source":"https://www.hanglung.com/en-us/properties/mainland-properties/wuhan/heartland-66"},
+{"id":"qingchuange","name":"晴川阁","landmarkId":"qingchuange","category":"历史建筑","district":"汉阳","summary":"龟山东麓的临江楼阁","source":"https://www.hanyang.gov.cn/mlhy/fjms/202509/t20250923_2651436.shtml"},
+{"id":"guishan-tower","name":"龟山电视塔","landmarkId":"guishan-tower","category":"城市地标","district":"汉阳","summary":"龟山之巅的电视塔","source":"https://www.wuhan.gov.cn/zjwh/whly/202602/t20260215_2730613.shtml"},
+{"id":"yangtze-bridge","name":"武汉长江大桥","bridgeName":"武汉长江大桥","category":"桥梁地标","district":"汉阳—武昌","summary":"跨越长江的公铁两用桥","source":"OpenStreetMap:武汉长江大桥"},
+{"id":"yellow-crane","name":"黄鹤楼","landmarkId":"yellow-crane","category":"历史建筑","district":"武昌","summary":"蛇山上的五层重檐名楼","source":"https://wlt.hubei.gov.cn/bmdt/ztzl/lszt/hszjbjc/xwbd_hs/202109/t20210927_3783772.shtml"},
+{"id":"red-house","name":"红楼 · 武昌起义军政府旧址","landmarkId":"red-house","category":"历史建筑","district":"武昌","summary":"辛亥首义的历史见证","aliases":["红楼","辛亥革命武昌起义纪念馆"],"source":"https://www.wuchang.gov.cn/zjwc/wcly/you/zmjd/202005/t20200507_1241528.html"},
+{"id":"greenland-center","name":"武汉绿地中心","buildingId":"osm-building-way-533413541-0","category":"城市高楼","district":"武昌","summary":"滨江超高层与三叶形轮廓","source":"https://www.skyscrapercenter.com/city/wuhan"}
+]}

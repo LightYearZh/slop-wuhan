@@ -1,0 +1,13 @@
+0.8.0 verification
+
+Full data rebuild completed; canonical/runtime source hash matches acceptance.json.
+npm run verify: passed (85 JavaScript tests, 33 Python tests; 118 total).
+Spatial audit: road/building overlaps 0; road centreline conflicts 0.
+Production build: passed; existing large bundle warning remains.
+Production browser: all 10 destination buttons reached their configured road arrival (0m difference), closed the map, and selected the expected mode; Yangtze Bridge selected car mode at deck height.
+Desktop 1200x924 and mobile 390x844 visually inspected; mobile list initially collapsed, no horizontal overflow; no runtime errors.
+Yellow Crane Tower and Red House inspected after one correction round.
+Impeccable detector retains advisories for existing font, loader animation, transitions and panel styling; detector is not claimed clean.
+Roads, water, hills, tunnels, bridge models, bounds and origin equal baseline 5cd864d.
+Ordinary building count reduced by one because the Red House is now a separate custom landmark.
+Height scan: 23,462 ordinary buildings; 39 review candidates, not confirmed errors.

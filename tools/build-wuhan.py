@@ -10,6 +10,7 @@ from road_audit import audit_roads
 from core_geometry import HeightMatcher,hill_grid,sample_hill,landmark_from_building,named_crossings
 from tunnel_routes import build_tunnels
 from building_parts import apply_parts
+from core_destinations import build_destinations
 from spatial_rules import resolve_ground_layout
 from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union
@@ -106,6 +107,8 @@ def main():
             item=next((b for b in raw['buildings'] if b['name']==name),None)
             if not item:raise ValueError('Required core landmark missing from source: '+name)
             landmarks.append(landmark_from_building(item,kind,identifier,height,hills,url))
+        red_house=next(b for b in raw['buildings'] if b['id']=='osm-building-way-1136234332')
+        landmarks.append(landmark_from_building({**red_house,'name':'红楼 · 武昌起义军政府旧址'},'red-house','red-house',18,hills,'visual-estimate:two-storeys-with-roof-and-central-pavilion'))
     landmark_shapes=[Polygon(l['footprint'][0],l['footprint'][1:]) for l in landmarks]
     evidence=json.loads((ROOT/'data/source/building-evidence.json').read_text())
     enricher=BuildingEnricher(raw,roads,evidence)
@@ -230,6 +233,7 @@ def main():
     road_audit=audit_roads(roads,bounds,landmark)
     city['streetFocus']={'roadIds':[r['id'] for r in roads if r['name'] in ('江汉路','江汉路步行街')],'landmarkId':'jianghanguan'}
     city['supplement']={'provider':'Overture Maps','release':json.loads((overture_path.with_suffix('.geojson.state')).read_text())['last_release'],'sha256':hashlib.sha256(overture_path.read_bytes()).hexdigest(),'license':'ODbL 1.0'}
+    city['coreDestinations']=build_destinations(city,json.loads((ROOT/'config/core-destinations.json').read_text()))
     stage=ROOT/'public/data-wuhan-build';shutil.rmtree(stage,ignore_errors=True);(stage/'tiles').mkdir(parents=True)
     dump(stage/'city.json',city)
     dump(stage/'road-audit.json',road_audit)

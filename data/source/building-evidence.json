@@ -414,6 +414,52 @@
         }
       ],
       "massingNote": "Relation comprises ways 943192870 and 1058265256. Only the reviewed southern tower member rises above the podium. Member role and crown proportions estimated from aerial; these ways are not source building:part tags."
+    },
+    {
+      "osmId": "osm-building-way-533413541",
+      "expectedName": "武汉绿地中心",
+      "totalHeightM": 475.6,
+      "use": "mixed-commercial-office",
+      "facadeProfile": "riverfront-office",
+      "heightMeaning": "Completed architectural height; replaces rounded OSM 476m, not an occupied-floor elevation.",
+      "source": "https://www.skyscrapercenter.com/city/wuhan",
+      "publisher": "CVU / CTBUH"
+    },
+    {
+      "osmId": "osm-building-way-1315252655",
+      "expectedName": "武汉长江中心",
+      "totalHeightM": 400,
+      "use": "mixed-commercial-office",
+      "facadeProfile": "riverfront-office",
+      "heightMeaning": "Current CVU architectural total for structurally topped-out Great River Center; 2021 official construction report gives 386.3m. Not a surveyed completed height.",
+      "source": "https://www.skyscrapercenter.com/building/great-river-center/39970",
+      "publisher": "CVU / CTBUH",
+      "constructionStatus": "structurally-topped-out",
+      "supportingSources": [
+        "https://www.wuhan.gov.cn/zwgk/xxgk/zdjsxm/ssqk/202102/t20210218_1635905.shtml"
+      ]
+    },
+    {
+      "osmId": "osm-building-way-761608465",
+      "expectedName": "武汉万达中心",
+      "totalHeightM": 180,
+      "use": "mixed-commercial-office",
+      "facadeProfile": "riverfront-office",
+      "heightMeaning": "Approximate office tower height explicitly published by project developer in 2011; other listings give 188m. Display adopts documented approximate 180m pending completed-height reconciliation.",
+      "source": "https://www.prnasia.com/story/44290-1.shtml",
+      "publisher": "武汉万达公馆开发方新闻稿",
+      "heightApproximate": true
+    },
+    {
+      "osmId": "osm-building-relation-13567167",
+      "expectedName": "武汉恒隆广场",
+      "storeys": 6,
+      "floorHeightEstimateM": 5,
+      "overrideHeight": true,
+      "use": "retail",
+      "heightMeaning": "Aedas describes a six-storey retail mall. Display metric height uses estimated 5m commercial storeys; office tower remains a separate footprint.",
+      "source": "https://architectureprize.com/winners/winner.php?id=4658",
+      "publisher": "Aedas project award submission"
     }
   ]
 }

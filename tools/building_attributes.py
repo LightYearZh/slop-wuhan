@@ -84,6 +84,8 @@ class BuildingEnricher:
             self.applied.append(reference['osmId'])
             if reference.get('totalHeightM'):
                 height=reference['totalHeightM'];hs='reference:architectural-total';height_details={'confidence':'documented-total;estimated-massing','reference':reference['source'],'meaning':reference['heightMeaning']}
+                if reference.get('heightApproximate'):hs='reference:published-approximate';height_details['confidence']='published-approximate'
+                if reference.get('constructionStatus'):height_details['constructionStatus']=reference['constructionStatus']
             elif reference.get('storeys') and (not height or reference.get('overrideHeight')):
                 height=reference['storeys']*reference.get('floorHeightEstimateM',3.6);hs='reference:storeys-derived';height_details={'confidence':'floor-derived','reference':reference['source'],'floorHeightEstimateM':reference.get('floorHeightEstimateM',3.6),'meaning':reference['heightMeaning']}
             elif reference.get('displayHeightM'):

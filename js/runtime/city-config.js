@@ -438,14 +438,14 @@ function districtAt(x, z) {
 
 const LANDMARKS = GEO.landmarks;
 const TAIPEI_LANDMARKS = [
-  ...Object.values(GEO.landmarks).map((l) => ({ name: l.name, x: l.x, z: l.z, r: 90 })),
-  ...GEO.namedBuildings.filter(([, , , h]) => h > 60).map(([name, x, z]) => ({ name, x, z, r: 45 }))
+  ...(GEO.coreDestinations||Object.values(GEO.landmarks)).map(l=>({...l,r:90,core:true})),
+  ...GEO.namedBuildings.filter(([name,x,z,h])=>h>60&&!(GEO.coreDestinations||[]).some(l=>l.name===name||Math.hypot(l.x-x,l.z-z)<2)).map(([name,x,z])=>({name,x,z,r:45}))
 ];
 const PLACES = GEO.places.map(([name, x, z, rank]) => ({ name, x, z, rank }));
 const STATIONS = GEO.stations.map(([name, x, z, mrt]) => ({ name, x, z, mrt: !!mrt }));
 // Teleport destinations, each moved onto the kerbside lane of the nearest main road, heading along it the way the
 // listed heading points
-const TELEPORT_LOCATIONS = Object.fromEntries(GEO.teleports.map((t) => {
+const TELEPORT_LOCATIONS = Object.fromEntries([...GEO.teleports.filter(t=>t.name),...(GEO.coreDestinations||[]).map(d=>({...d,...d.arrival}))].map((t) => {
   // a one-way carriageway only if it runs the listed way (dual carriageways are mapped as two one-way links)
   if(GEO.city==='wuhan') return [t.id,t];
   const hx = Math.sin(t.heading);

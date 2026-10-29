@@ -13,7 +13,7 @@ test('Taipei runtime is the active entry and includes only Wuhan geography',()=>
  const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
  assert.match(html,/src="\.\/js\/runtime\/main.js"/);assert.match(html,/lang="zh-CN"/);
  assert.equal(GEO.city,'wuhan');assert.equal(GEO.frame.lon0,114.293);
- assert.deepEqual(Object.keys(GEO.landmarks),['jianghanguan','yellow-crane','guishan-tower','qingchuange']);
+ assert.deepEqual(Object.keys(GEO.landmarks),['jianghanguan','yellow-crane','guishan-tower','qingchuange','red-house']);
  assert.ok(TELEPORT_LOCATIONS.jianghanguan);assert.ok(GEO.links.some(l=>l[7]&2));
  assert.ok(!html.includes('武汉101'));assert.ok(!html.includes('信义'));
  const audit=JSON.parse(fs.readFileSync(new URL('../public/data/runtime-audit.json',import.meta.url)));

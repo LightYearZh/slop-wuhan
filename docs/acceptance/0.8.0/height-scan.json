@@ -1,0 +1,573 @@
+{
+  "scannedBuildings": 23462,
+  "flaggedCandidates": 39,
+  "heightSources": {
+    "visual-estimate": 2783,
+    "OSM:height": 18,
+    "3D-GloBFP:model-estimate": 20126,
+    "OSM:levels": 475,
+    "OSM:parts-max": 33,
+    "reference:architectural-total": 14,
+    "reference:published-approximate": 1,
+    "reference:storeys-derived": 7,
+    "visual-reference:photo-envelope": 2,
+    "Overture:floors": 3
+  },
+  "rule": "Flags identify review candidates, not ground truth; no automatic multiplication or matching relaxation.",
+  "boundsWgs84": [
+    114.252,
+    30.54,
+    114.336,
+    30.5942
+  ],
+  "candidates": [
+    {
+      "id": "osm-building-way-1315926191-0",
+      "name": "M+购物中心",
+      "x": -1170.85,
+      "z": -103.67,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 14515.2,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-128398490-0",
+      "name": "万达商业广场",
+      "x": -701.42,
+      "z": 598.12,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 9545.0,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1313911115-0",
+      "name": "中国银行大厦",
+      "x": -872.85,
+      "z": -602.17,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 1321.6,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-668261618-0",
+      "name": "中山广场",
+      "x": -2786.83,
+      "z": 70.28,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 4834.9,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1567902425-0",
+      "name": "中铁大厦",
+      "x": 1956.71,
+      "z": 3829.67,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 4519.5,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-254758165-0",
+      "name": "云鹤大厦",
+      "x": 847.2,
+      "z": 4692.53,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 1062.8,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-236672622-0",
+      "name": "凤凰大厦",
+      "x": 1646.78,
+      "z": 3257.48,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 2695.8,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-752891510-0",
+      "name": "创世纪广场",
+      "x": -2904.81,
+      "z": 142.4,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 3731.4,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1127422266-0",
+      "name": "华中-万商广场",
+      "x": -1253.48,
+      "z": 1650.28,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 8951.4,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1321762136-0",
+      "name": "南国中心二期购物中心",
+      "x": -1518.09,
+      "z": -363.85,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 13140.6,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-254758135-0",
+      "name": "南方大厦",
+      "x": 938.05,
+      "z": 4696.74,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 1777.9,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1011161880-0",
+      "name": "圣淘沙大厦",
+      "x": -3133.16,
+      "z": -746.79,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 2928.3,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-128398713-0",
+      "name": "宝利国际广场",
+      "x": -591.98,
+      "z": 708.9,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 8974.9,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1567834086-0",
+      "name": "广西大厦",
+      "x": 1965.41,
+      "z": 4114.01,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 1285.3,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-relation-18155397-0",
+      "name": "扶轮大厦",
+      "x": 263.69,
+      "z": -843.51,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 1835.0,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1043814005-0",
+      "name": "振华大厦",
+      "x": -2990.59,
+      "z": -742.14,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 1735.8,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-772915938-0",
+      "name": "放疗中心",
+      "x": -3540.93,
+      "z": 278.84,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 518.0,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1031641206-0",
+      "name": "教职工活动中心",
+      "x": 1416.35,
+      "z": 3584.61,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 657.4,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-254758172-0",
+      "name": "景观楼大厦",
+      "x": 819.36,
+      "z": 4719.07,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 584.8,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-927232887-0",
+      "name": "未命名",
+      "x": -1859.06,
+      "z": 1201.34,
+      "heightM": 128.0,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 11691.5,
+      "priority": 3,
+      "reviewReasons": [
+        "大占地整体等高挤出，需核对塔楼与裙房",
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1570196024-0",
+      "name": "武展购物中心-东入口",
+      "x": -2381.01,
+      "z": 93.59,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 235.9,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1570196023-0",
+      "name": "武展购物中心-西入口",
+      "x": -2489.77,
+      "z": 129.19,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 236.9,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-488586205-0",
+      "name": "武汉国际会展中心",
+      "x": -2363.91,
+      "z": 307.93,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 23966.0,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1570196022-0",
+      "name": "汉商武展购物中心",
+      "x": -2415.21,
+      "z": 182.61,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 26599.8,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-855689478-0",
+      "name": "活动中心",
+      "x": 1516.59,
+      "z": 4764.48,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 1612.8,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1499156732-0",
+      "name": "知音大厦",
+      "x": 4121.61,
+      "z": 3633.3,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 220.6,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1219927677-0",
+      "name": "索道大厦",
+      "x": -2439.34,
+      "z": 2168.63,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 2014.3,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1029277019-0",
+      "name": "长江广场",
+      "x": -3144.9,
+      "z": 2573.08,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 10284.4,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1571189011-0",
+      "name": "阿里中心・武汉",
+      "x": 4114.29,
+      "z": -880.08,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 2173.7,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-1571189012-0",
+      "name": "阿里中心・武汉 T2 办公楼",
+      "x": 4104.44,
+      "z": -732.94,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 2929.1,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-772915904-0",
+      "name": "附属协和医院PET中心",
+      "x": -3394.41,
+      "z": 141.12,
+      "heightM": 12,
+      "heightSource": "visual-estimate",
+      "footprintAreaM2": 1175.9,
+      "priority": 3,
+      "reviewReasons": [
+        "有名称的商务或公共建筑仍使用占位高度"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-630215710-0",
+      "name": "万达环球国际中心万达尊B座",
+      "x": 3397.26,
+      "z": 2688.93,
+      "heightM": 121.6,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 2827.1,
+      "priority": 1,
+      "reviewReasons": [
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-620326678-0",
+      "name": "未命名",
+      "x": 3563.03,
+      "z": 4294.83,
+      "heightM": 169.6,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 1767.4,
+      "priority": 1,
+      "reviewReasons": [
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-629397601-0",
+      "name": "未命名",
+      "x": 2229.77,
+      "z": 87.19,
+      "heightM": 128.0,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 1818.6,
+      "priority": 1,
+      "reviewReasons": [
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-629397604-0",
+      "name": "未命名",
+      "x": 2262.97,
+      "z": 251.17,
+      "heightM": 147.2,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 1035.6,
+      "priority": 1,
+      "reviewReasons": [
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-629397605-0",
+      "name": "未命名",
+      "x": 2215.81,
+      "z": 316.41,
+      "heightM": 147.2,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 1066.6,
+      "priority": 1,
+      "reviewReasons": [
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-629397625-0",
+      "name": "未命名",
+      "x": 2162.12,
+      "z": 395.06,
+      "heightM": 128.0,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 1109.5,
+      "priority": 1,
+      "reviewReasons": [
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-629397634-0",
+      "name": "未命名",
+      "x": 2119.31,
+      "z": 453.82,
+      "heightM": 128.0,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 1005.6,
+      "priority": 1,
+      "reviewReasons": [
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    },
+    {
+      "id": "osm-building-way-633526416-0",
+      "name": "未命名",
+      "x": 3933.7,
+      "z": 3195.43,
+      "heightM": 128.0,
+      "heightSource": "OSM:levels",
+      "footprintAreaM2": 1554.0,
+      "priority": 1,
+      "reviewReasons": [
+        "高层米数仅由楼层换算，需核对层高和用途"
+      ],
+      "status": "待核对；非确认错误"
+    }
+  ],
+  "sourceCitySha256": "9187c23fd34c10d87e5a17599ab92b8dd0c40f86cc701143edab756cd8dd6bde"
+}

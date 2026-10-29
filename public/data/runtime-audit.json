@@ -1,8 +1,8 @@
 {
   "runtimeBase": "shwang1979/slop-taipei",
   "ruleVersion": "hankou-display-v1",
-  "sourceBuildings": 23463,
-  "renderedParts": 23535,
+  "sourceBuildings": 23462,
+  "renderedParts": 23534,
   "roadLinks": 9560,
   "curvedRoadLinks": 4469,
   "crossings": 154,
@@ -11,22 +11,23 @@
     "crossing_not_on_carriageway": 8
   },
   "heightSources": {
-    "visual-estimate:hankou-display-v1": 2786,
-    "OSM:height": 19,
+    "visual-estimate:hankou-display-v1": 2783,
+    "OSM:height": 18,
     "3D-GloBFP:model-estimate": 20126,
-    "OSM:levels": 476,
+    "OSM:levels": 475,
     "OSM:parts-max": 33,
-    "reference:architectural-total": 12,
-    "reference:storeys-derived": 6,
+    "reference:architectural-total": 14,
+    "reference:published-approximate": 1,
+    "reference:storeys-derived": 7,
     "visual-reference:photo-envelope": 2,
     "Overture:floors": 3
   },
-  "signRecords": 675,
-  "verticalSignCandidates": 570,
+  "signRecords": 673,
+  "verticalSignCandidates": 568,
   "signTextSources": {
     "generic:business-category": 555,
     "OSM:POI": 71,
-    "OSM:building-name": 49
+    "OSM:building-name": 47
   },
   "signRejected": {
     "poi_without_nearby_street_wall": 80,
@@ -60,5 +61,5 @@
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "6ecf0a23f799fbdcfcc5edee0fea129a1a13188fa2cc70582f3f1a52275d6997"
+  "sourceCitySha256": "9187c23fd34c10d87e5a17599ab92b8dd0c40f86cc701143edab756cd8dd6bde"
 }

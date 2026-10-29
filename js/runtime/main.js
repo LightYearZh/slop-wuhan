@@ -498,7 +498,8 @@ async function initApp() {
         mapHint.textContent = '点一下传送 · 拖动平移 · 用 + / − 缩放';
       }
     },
-    onTeleport: teleportTo
+    onTeleport: teleportTo,
+    onVisit:d=>{selectMode(d.mode||'person');const a=d.arrival;teleportTo(a.x,a.z,a.heading||0,a.y??null);}
   });
 
   teleportButtons.forEach((btn) => {

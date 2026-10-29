@@ -1,0 +1,122 @@
+{
+  "version": "0.8.0",
+  "baselineCommit": "5cd864d",
+  "sourceCitySha256": "9187c23fd34c10d87e5a17599ab92b8dd0c40f86cc701143edab756cd8dd6bde",
+  "buildings": 23462,
+  "customLandmarks": 5,
+  "heightReview": {
+    "scanned": 23462,
+    "remainingCandidates": 39,
+    "candidatesAreConfirmedErrors": false
+  },
+  "unchangedFromBaseline": {
+    "roads": true,
+    "water": true,
+    "hills": true,
+    "tunnels": true,
+    "bridgeModels": true,
+    "bounds": true,
+    "origin": true
+  },
+  "automatedVerification": {
+    "javascriptTests": 85,
+    "pythonTests": 33,
+    "roadBuildingOverlap": 0,
+    "roadCentrelineConflicts": 0,
+    "productionBuild": "passed"
+  },
+  "browserVerification": {
+    "origin": "http://127.0.0.1:4187",
+    "desktop": [
+      1200,
+      924
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "runtimeErrors": [],
+    "mobileInitiallyCollapsed": true,
+    "mobileHorizontalOverflow": false,
+    "visits": [
+      {
+        "id": "jianghanguan",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      },
+      {
+        "id": "jianghan-road",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      },
+      {
+        "id": "shipping-center",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      },
+      {
+        "id": "heartland-66",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      },
+      {
+        "id": "qingchuange",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      },
+      {
+        "id": "guishan-tower",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      },
+      {
+        "id": "yangtze-bridge",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "car"
+      },
+      {
+        "id": "yellow-crane",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      },
+      {
+        "id": "red-house",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      },
+      {
+        "id": "greenland-center",
+        "arrivalDistanceM": 0,
+        "mapClosed": true,
+        "mode": "person"
+      }
+    ]
+  },
+  "visualReview": {
+    "screenshots": [
+      "core-yellow-crane-desktop.png",
+      "core-red-house-desktop.png",
+      "core-map-desktop.png",
+      "core-map-mobile.png"
+    ],
+    "directory": "output/playwright",
+    "reviewed": true
+  },
+  "limitations": [
+    "Yellow Crane Tower and Red House are procedural reference models, not measured reproductions.",
+    "Red House 18m and mall 30m remain estimates.",
+    "Wanda 180m is a published approximate value.",
+    "Great River Center 400m is a structurally topped-out record, not confirmed completed height.",
+    "Wangjiadun CBD remains outside the current bounds.",
+    "Other existing landmark models retain different detail levels."
+  ]
+}

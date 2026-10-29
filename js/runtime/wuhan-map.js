@@ -54,12 +54,13 @@ const POLY_LAYERS = [
 ];
 
 class WuhanMapSystem {
-  constructor({ controllerManager, cameraSystem, trafficSystem, onToggle, onTeleport }) {
+  constructor({ controllerManager, cameraSystem, trafficSystem, onToggle, onTeleport, onVisit }) {
     this.controllerManager = controllerManager;
     this.cameraSystem = cameraSystem;
     this.trafficSystem = trafficSystem;
     this.onToggle = onToggle;
     this.onTeleport = onTeleport;
+    this.onVisit = onVisit;
     this.isFullMapOpen = false;
     this.waypoint = null;
     this.viewCenterX = 0;
@@ -98,6 +99,16 @@ class WuhanMapSystem {
     });
     this.mrtLines = GEO.viaducts.map(([, flat]) => flat);
 
+    const list=document.getElementById('core-destination-list');
+    for(const d of GEO.coreDestinations||[]){
+      if(!list)break;
+      const li=document.createElement('li'),button=document.createElement('button'),name=document.createElement('span'),meta=document.createElement('small');
+      button.type='button';button.dataset.coreId=d.id;button.setAttribute('aria-label',`前往${d.name}`);
+      name.textContent=d.name;meta.textContent=`${d.district} · ${d.category}`;button.append(name,meta);
+      button.addEventListener('click',()=>this.visitCore(d));li.append(button);list.append(li);
+    }
+    const rail=document.getElementById('core-destinations');
+    if(rail&&window.matchMedia('(max-width: 800px)').matches)rail.open=false;
     this.initEvents();
   }
 
@@ -306,10 +317,10 @@ class WuhanMapSystem {
       if (x < -40 || y < -40 || x > w + 40 || y > h + 40) continue;
       ctx.fillStyle = '#ffc61a';
       ctx.beginPath();
-      ctx.moveTo(x, y - 6);
-      ctx.lineTo(x + 5, y);
-      ctx.lineTo(x, y + 6);
-      ctx.lineTo(x - 5, y);
+      ctx.moveTo(x, y - (l.core?8:6));
+      ctx.lineTo(x + (l.core?7:5), y);
+      ctx.lineTo(x, y + (l.core?8:6));
+      ctx.lineTo(x - (l.core?7:5), y);
       ctx.fill();
       const tw = ctx.measureText(l.name).width;
       if (free(x - tw / 2, y - 22, tw, 14)) {
@@ -454,6 +465,14 @@ class WuhanMapSystem {
     if (this.elPlayerInfo) this.elPlayerInfo.textContent = `你在 ${getLocationLabel(ent.position.x, ent.position.z).replace(' · ', '　').replace(' & ', '・')}`;
   }
 
+  visitCore(d){
+    this.waypoint={x:d.x,z:d.z,name:d.name};
+    this.viewCenterX=d.x;this.viewCenterZ=d.z;this.viewZoom=1;
+    if(this.onVisit)this.onVisit(d);
+    else this.onTeleport?.(d.arrival.x,d.arrival.z,d.arrival.heading||0,d.arrival.y??null);
+    this.toggleFullMap(false);
+  }
+
   // --- Interaction -------------------------------------------------------------------------------------------------------
   initEvents() {
     const miniCard = document.getElementById('minimap-card');
@@ -563,7 +582,7 @@ class WuhanMapSystem {
       return;
     }
     const norm = (s) => s.replace(/台/g, '台').toLowerCase();
-    const point = TAIPEI_LANDMARKS.find((l) => norm(l.name).includes(q))
+    const point = TAIPEI_LANDMARKS.find((l) => [l.name,...(l.aliases||[])].some(n=>norm(n).includes(q)))
       || STATIONS.find((s) => norm(s.name).includes(q.replace(/站$/, '').replace(/^地铁/, '')))
       || PLACES.find((p) => norm(p.name).includes(q));
     const roads = ROAD_NAMES.filter((r) => norm(r.name).includes(q));

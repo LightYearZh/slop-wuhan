@@ -1,5 +1,7 @@
 import * as THREE from 'three/webgpu';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {buildYellowCrane} from './yellow-crane.js';
+import {buildRedHouse} from './red-house.js';
 
 // Real mapped positions, documented total heights; these are illustrative procedural exteriors.
 export function buildCoreLandmarks(scene,landmarks,bridges=[]){
@@ -45,21 +47,9 @@ export function buildCoreLandmarks(scene,landmarks,bridges=[]){
     const group=new THREE.Group();group.name=l.name;group.position.set(l.x,l.groundY||0,l.z);group.rotation.y=l.ry||0;scene.add(group);groups.push(group);
     const {box,cyl,beam,roof,finish}=make(group);
     if(l.type==='yellow-crane'){
-      const w=Math.min(30,l.w),d=Math.min(30,l.d);
-      box(w,2,d,0,1,0);
-      for(let floor=0;floor<5;floor++){
-        const y=2+floor*8.2,ww=w-floor*2.3,dd=d-floor*2.3;
-        box(ww*.75,6.7,dd*.75,0,y+3.35,0,red);
-        box(ww+1,.5,dd+1,0,y+.25,0,stone);
-        for(const side of [-1,1])for(let i=0;i<7;i++){
-          const x=-ww*.41+i*ww*.82/6;
-          cyl(.2,.25,6.8,x,y+3.4,side*dd*.43,red,8);
-          box(ww/8,.12,.12,x,y+1.7,side*dd*.47,gold);
-          if(i%2===0)box(ww/10,3.4,.15,x,y+3.8,side*(dd*.376),dark);
-        }
-        roof(ww+2.5,dd+2.5,y+6.2,gold);
-      }
-      cyl(.08,.35,7.7,0,47.55,0,gold,8);
+      buildYellowCrane(group);
+    }else if(l.type==='red-house'){
+      buildRedHouse(group,l);
     }else if(l.type==='tv-tower'){
       box(21,5,21,0,2.5,0);
       // Three tapered concrete legs merge into the shaft below the observation deck.

@@ -1453,3 +1453,17 @@ body.touch-enabled .pop-item { min-height: 44px; }
 
 .data-credit{position:fixed;bottom:3px;left:12px;z-index:2;max-width:calc(100vw - 24px);padding:2px 6px;border-radius:4px;background:rgba(16,17,20,.9);color:#d2d9df;font:12px/1.4 system-ui;pointer-events:none}
 @media(max-width:700px){.data-credit{top:126px;bottom:auto;max-width:calc(100vw - 24px)}}
+
+/* Curated places stay distinct from height-calibration targets and ordinary buildings. */
+.core-destinations { position:absolute;top:110px;left:var(--edge);width:248px;max-height:calc(100% - 200px);overflow:auto;padding:16px;color:var(--text); }
+.core-destinations summary { cursor:pointer;font-size:15px;font-weight:750; }
+.core-destinations summary span { float:right;color:var(--text-2);font-size:12px;font-weight:500; }
+.core-destinations p { margin:12px 0 8px;font-size:12px;color:var(--text-2);line-height:1.5; }
+.core-destinations ul { list-style:none;padding:0;margin:0; }
+.core-destinations li+li { border-top:1px solid rgba(255,255,255,.09); }
+.core-destinations button { width:100%;display:flex;flex-direction:column;gap:4px;align-items:flex-start;background:none;border:0;color:inherit;padding:11px 4px;text-align:left;cursor:pointer; }
+.core-destinations button span { font-weight:650;font-size:13px;line-height:1.4; }
+.core-destinations button small { color:var(--text-2);font-size:11px; }
+.core-destinations button:hover,.core-destinations button:focus-visible { color:#ffe28a;background:rgba(255,198,26,.08); }
+.core-destinations button:focus-visible { outline:2px solid #ffc61a;outline-offset:-2px; }
+@media(max-width:800px){.core-destinations{top:104px;left:var(--edge);width:min(248px,calc(100% - 2 * var(--edge)));max-height:46vh;padding:13px;}.core-destinations:not([open]){width:164px;}}
