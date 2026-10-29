@@ -137,7 +137,7 @@ function buildCityBlocks(scene) {
   const colliders = [];
   const roofSites = [];
   const temples = [];
-  const detailStats={frontWalls:0,backWalls:0,styles:{},roofSites:0,heritage:[],passages:[]};
+  const detailStats={frontWalls:0,backWalls:0,styles:{},roofSites:0,heritage:[],streetscape:[],passages:[]};
   const gateProfiles=new Map((GEO.passageGates||[]).map(p=>[p.sourceId,p])),builtGates=new Set();
 
   const streetFilter = (l) => l.cls <= CLS.pedestrian && !(l.flags & LINK_FLAG.ELEVATED);
@@ -163,9 +163,10 @@ function buildCityBlocks(scene) {
         continue;
       }
     }
-    if(b.heritageProfile){
-      const model=buildHeritageBuilding(new THREE.Group(),b);group.add(model);
-      detailStats.heritage.push(model.userData.heritage);
+    if(b.heritageProfile||b.contextAppearance){
+      const model=buildHeritageBuilding(new THREE.Group(),b.contextAppearance?{...b,heritageProfile:b.contextAppearance}:b);
+      if(b.contextAppearance){model.name='WuhanStreetscape_'+b.sourceId;model.userData.appearanceEvidence=b.contextAppearance.detailConfidence;}group.add(model);
+      (b.contextAppearance?detailStats.streetscape:detailStats.heritage).push(model.userData.heritage);
       // The visible body and existing collision system share the same mapped rings.
       // Recesses are inward; no new invisible props or roadside blockers are introduced.
       colliders.push({minX:b.minX,maxX:b.maxX,minZ:b.minZ,maxZ:b.maxZ,minY:yBot,maxY:yTop,poly:b.rings[0],rings:b.rings,building:b});

@@ -14,10 +14,10 @@
     "visual-estimate:hankou-display-v1": 2764,
     "OSM:height": 17,
     "3D-GloBFP:model-estimate": 20123,
-    "OSM:levels": 474,
+    "OSM:levels": 473,
     "OSM:parts-max": 32,
     "reference:architectural-total": 16,
-    "visual-reference:photo-envelope": 6,
+    "visual-reference:photo-envelope": 7,
     "visual-reference:open-building-envelope": 19,
     "reference:published-approximate": 1,
     "reference:storeys-derived": 6,
@@ -40,7 +40,7 @@
   "tunnelLengthM": 6670.143,
   "tunnelProfile": "Estimated width, depth, clearance; source horizontal geometry and portal nodes",
   "heritagePaving": {
-    "areaM2": 20616.15,
+    "areaM2": 20735.51,
     "sourceRoadIds": [
       "osm-way-128398503-part-0",
       "osm-way-177627147-part-0"
@@ -71,5 +71,5 @@
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "15fbf83efe6e6946327d40efe6af3e140dec30b535a44f45cde3f9591b10ac0c"
+  "sourceCitySha256": "4aa59f14ad28fb0d0ff717f6bcd8f37c5f00a29ebb7ffac954ef03e888a5ed9b"
 }

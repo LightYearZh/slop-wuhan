@@ -93,7 +93,7 @@ def convert(city):
             buildings.extend(encode_building(part['rings'],top,base,part_kind))
             meta.append({'sourceId':b['id'],'category':b['category'],'sourceHeight':None if b['heightSource']=='visual-estimate' or b['heightSource'].startswith('visual-reference:') else b['h'],
                          'sourceHeightType':b['heightSource'],'displayHeight':top,'displayHeightSource':source,'baseY':base,
-                         'role':part.get('role'),'partSourceId':part.get('sourceId'),'partHeightSource':part.get('heightSource'),'partHeightReference':part.get('heightReference'),'facadeProfile':part.get('facadeProfile') or b.get('facadeProfile'),'name':b['name'],**({'heritageProfile':b['heritageProfile']} if b.get('heritageProfile') else {}),**({'passageProfileId':b['id'],'groundOverride':b['passageProfile']['groundY']} if b.get('passageProfile') else {})})
+                         'role':part.get('role'),'partSourceId':part.get('sourceId'),'partHeightSource':part.get('heightSource'),'partHeightReference':part.get('heightReference'),'facadeProfile':part.get('facadeProfile') or b.get('facadeProfile'),'name':b['name'],**({'heritageProfile':b['heritageProfile']} if b.get('heritageProfile') else {}),**({'contextAppearance':b['contextAppearance']} if b.get('contextAppearance') else {}),**({'passageProfileId':b['id'],'groundOverride':b['passageProfile']['groundY']} if b.get('passageProfile') else {})})
     print('Matching storefront signs...',flush=True)
     sign_data,sign_rejected=build_signs(city,display_height)
     signs=sign_data['signs']

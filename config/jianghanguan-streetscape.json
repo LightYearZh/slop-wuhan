@@ -1,0 +1,20 @@
+{
+  "evidence": "User on-site recollection and marked screenshot, 2026-10-29; appearance and access reconstruction, not an OSM survey correction",
+  "pedestrianRoads": [
+    {"sourceId":"osm-way-621914969","widthM":2.5,"meaning":"Narrow street along the north side of the Nissin/Risshin block"},
+    {"sourceId":"osm-way-621914971","widthM":2.5,"meaning":"Short alley between Nissin and Risshin"},
+    {"sourceId":"osm-way-621914972","widthM":2.5,"meaning":"Short alley between Risshin and Yongli"}
+  ],
+  "appearanceBuildings": [
+    {
+      "sourceId":"osm-building-way-981847958",
+      "expectedName":"长江航务管理局",
+      "template":"classical-commercial",
+      "label":"沿江大道街区立面",
+      "floors":3,
+      "frontHint":[0.92,0.39],
+      "detailConfidence":"user-reference:streetscape-reconstruction;not-verified-historic-identity",
+      "meaning":"Shallow classical street-facing treatment requested for the marked frontage; source identity, footprint and height retained; provisional appearance, not designation as a historic building"
+    }
+  ]
+}

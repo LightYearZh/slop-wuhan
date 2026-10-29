@@ -17,8 +17,9 @@ export function buildWuhanLandmarks(scene,landmarks){
   const root=new THREE.Group();root.name=l.name;scene.add(root);groups.push(root);
   const mass=new THREE.Mesh(createFootprintGeometry({rings:l.footprint,h:18.6}),stone);mass.castShadow=mass.receiveShadow=true;root.add(mass);
   const g=new THREE.Group();g.position.set(l.x,2,l.z);g.rotation.y=l.ry;root.add(g);
+  let offsetX=0,offsetZ=0;
   const buckets=new Map();
-  function add(geo,mat,x,y,z,rotation=0){geo.rotateY(rotation);geo.translate(x,y,z);if(!buckets.has(mat))buckets.set(mat,[]);buckets.get(mat).push(geo);}
+  function add(geo,mat,x,y,z,rotation=0){geo.rotateY(rotation);geo.translate(x+offsetX,y,z+offsetZ);if(!buckets.has(mat))buckets.set(mat,[]);buckets.get(mat).push(geo);}
   const box=(w,h,d,x,y,z,mat=stone,rot=0)=>add(new THREE.BoxGeometry(w,h,d),mat,x,y,z,rot);
   const cyl=(rt,rb,h,x,y,z,mat=trim,n=12)=>add(new THREE.CylinderGeometry(rt,rb,h,n),mat,x,y,z);
   // Work in the source plan, including its concave party-wall notch.
@@ -27,6 +28,7 @@ export function buildWuhanLandmarks(scene,landmarks){
   const edges=plan.map((a,i)=>{const b=plan[(i+1)%plan.length],dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz);return {a,b,length,dx:dx/length,dz:dz/length};});
   const frontEdge=edges.filter(e=>Math.abs(e.dz)<.12).sort((a,b)=>(b.a[1]+b.b[1])-(a.a[1]+a.b[1]))[0];
   const W=frontEdge.length,front=(frontEdge.a[1]+frontEdge.b[1])/2,frontX=(frontEdge.a[0]+frontEdge.b[0])/2;
+  const towerZ=(Math.max(...plan.map(p=>p[1]))+Math.min(...plan.map(p=>p[1])))/2;
   // Roof and horizontal courses must never fill the concave notch with a bounding box.
   for(const [y,h,mat]of [[.6,1.2,trim],[3.4,.45,trim],[15.7,.65,trim],[18.3,.7,trim],[19.15,.55,trim],[19.6,.3,roof]]){
    const slab=new THREE.Mesh(createFootprintGeometry({rings:l.footprint,h,baseY:y-h/2}),mat);
@@ -63,6 +65,8 @@ export function buildWuhanLandmarks(scene,landmarks){
    for(let i=0;i<9;i++)box(.18,.9,.25,frontX+side*(5+i*(W*.32/9)),20,front-.3,trim);
    box(1.2,1.6,1.2,frontX+side*(W/2-.8),20,front-.6,trim);
   }
+  offsetX=frontX;offsetZ=towerZ-3;
+  root.userData.axis={rotationY:l.ry,towerLocal:[frontX,towerZ],entryLocal:[frontX,front],planDepthCenter:towerZ};
   // Central clock shaft, four clock faces, open belfry, cornice and restrained dark roof.
   box(9.3,13,9.3,0,26.15,3,stone);
   for(const y of [20.2,21.2,32.5,33.4])box(10.4,.55,10.4,0,y,3,trim);
@@ -71,7 +75,7 @@ export function buildWuhanLandmarks(scene,landmarks){
    box(.36,11.1,.55,side*4.8,26.6,-1.75,trim);
   }
   for(let face=0;face<4;face++){
-   const clock=new THREE.Group();clock.userData.bake=true;clock.position.set(0,29.5,3);clock.rotation.y=face*Math.PI/2;g.add(clock);
+   const clock=new THREE.Group();clock.userData.bake=true;clock.position.set(offsetX,29.5,3+offsetZ);clock.rotation.y=face*Math.PI/2;g.add(clock);
    const rim=new THREE.Mesh(new THREE.TorusGeometry(1.96,.17,8,48),gold);rim.position.z=4.76;clock.add(rim);
    const disc=new THREE.Mesh(new THREE.CircleGeometry(1.8,48),clockFace);disc.position.z=4.78;clock.add(disc);
    for(let tick=0;tick<60;tick++){
@@ -93,6 +97,7 @@ export function buildWuhanLandmarks(scene,landmarks){
   box(9.5,.75,9.5,0,40.2,3,trim);
   const crown=new THREE.CylinderGeometry(1.6,6.1,2.4,4);crown.rotateY(Math.PI/4);add(crown,roof,0,41.8,3);
   box(2.4,.7,2.4,0,43.3,3,stone);cyl(.055,.065,2.15,0,44.55,3,dark,8);
+  offsetX=offsetZ=0;
   // Local sign is a model detail; no downloaded image is baked onto the building.
   const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#bfbba9';ctx.fillRect(0,0,512,128);ctx.fillStyle='#3b433f';ctx.font='bold 76px serif';ctx.textAlign='center';ctx.fillText('江 汉 关',256,94);
   const label=new THREE.Mesh(new THREE.PlaneGeometry(7.4,1.8),new THREE.MeshStandardNodeMaterial({map:new THREE.CanvasTexture(c),roughness:.8}));label.position.set(frontX,17.6,front+2.35);g.add(label);

@@ -117,6 +117,16 @@
         "kind": "risshin-central-bays",
         "source": "https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter037.html",
         "meaning": "Five-storey Renaissance facade, central curved balconies and upper continuous balcony; dimensions estimated, projection limited to 0.38 m"
+      },
+      "heightCorrection": {
+        "heightM": 22,
+        "rangeM": [
+          20,
+          24
+        ],
+        "documented": false,
+        "source": "https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter037.html",
+        "meaning": "Five historic commercial storeys with a taller ground floor and parapet; illustrative 22m envelope, not measured. Retains source OSM floor count."
       }
     },
     {

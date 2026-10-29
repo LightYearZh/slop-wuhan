@@ -6,6 +6,7 @@ from shapely.ops import transform
 from shapely.strtree import STRtree
 from city_profile import load_profile,importer_fingerprint
 from building_attributes import BuildingEnricher
+from streetscape_rules import pedestrian_road,appearance_profile
 from road_audit import audit_roads
 from core_geometry import HeightMatcher,hill_grid,sample_hill,landmark_from_building,named_crossings
 from tunnel_routes import build_tunnels
@@ -39,6 +40,7 @@ def geometry(rows):
     return unary_union([make_valid(Polygon(p[0],p[1:])) for p in rows])
 
 def road_width(r):
+    if r.get('accessReview'):return r['accessReview']['widthM'],'user-reference:footpath-width-estimate'
     raw=r.get('widthTag') or ''
     m=re.fullmatch(r'\s*(\d+(?:\.\d+)?)\s*(?:m)?\s*',raw)
     if m and 1<=float(m.group(1))<=45:return float(m.group(1)),'OSM:width'
@@ -70,8 +72,10 @@ def main():
     height_matcher=HeightMatcher(ROOT/profile['heightExtract'],project) if profile.get('heightExtract') else None
     parks=unary_union([geometry(v['polygons']) for v in raw['areas'] if v['kind'] in ('park','green')]).intersection(region).difference(water).buffer(0)
     forest=unary_union([geometry(v['polygons']) for v in raw['areas'] if v.get('natural')=='wood']).intersection(region).difference(water).buffer(0)
+    streetscape=json.loads((ROOT/'config/jianghanguan-streetscape.json').read_text())
     roads=[];excluded=collections.Counter()
     for r in raw['roads']:
+        r=pedestrian_road(r,streetscape)
         if surface_passage(r):r={**r,'passageOriginalTags':{'tunnel':r.get('tunnelTag'),'layer':r['layer'],'covered':r.get('coveredTag')},'tunnel':False,'layer':0,'passageSource':'reviewed:above-ground-building-opening'}
         if r['tunnel'] or r['bridge'] or r['layer']!=0:
             excluded['bridge_tunnel_or_layer']+=1;continue
@@ -131,6 +135,8 @@ def main():
         h=item.get('h',0)
         if not (2<=h<=650):h=12
         attributes=enricher.enrich(item,poly,provider)
+        appearance=appearance_profile(item,streetscape)
+        if appearance:attributes['contextAppearance']=appearance
         candidate=height_matcher.match(poly) if height_matcher else None
         if candidate:
             attributes['heightCandidate']=candidate
@@ -274,6 +280,7 @@ def main():
         'massingEstimates':[{'id':b['id'],'source':b.get('massingReference','OpenStreetMap:building:part'),'method':b['massingSource']} for b in buildings if b.get('massingParts')],
         'rules':'Documented height > floor-derived estimate > marked 12m fallback; classification has its own source; facade appearance remains illustrative'}
     report['landmarkComponentReviews']=component_reviews
+    report['streetscapeReview']={'roads':[{'id':r['id'],**r['accessReview']} for r in roads if r.get('accessReview')],'appearances':[b['id'] for b in buildings if b.get('contextAppearance')],'evidence':streetscape['evidence']}
     report['attributes']=attributes_report
     dump(stage/'building-attributes-audit.json',attributes_report)
     report['buildingParts']=parts_audit
