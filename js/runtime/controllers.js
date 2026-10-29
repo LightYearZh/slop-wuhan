@@ -621,7 +621,7 @@ class ThirdPersonControllerManager {
 
     return {
       type: 'scooter',
-      label: '踏板车',
+      label: '骑行',
       mesh: root,
       leanPivot,
       material,

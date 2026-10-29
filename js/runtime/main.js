@@ -99,7 +99,7 @@ async function initApp() {
   markInit('streetProps');
   const allColliders = [...landmarkColliders, ...cityBlocks.colliders, ...elevated.colliders, ...(streetProps.colliders || [])];
 
-  await setStatus('正在放出踏板车、出租车与公车…');
+  await setStatus('正在生成出租车、两轮车与公交车…');
   const trafficSystem = skip.has('traffic') ? { cars: [], buses: [], scooters: [], peds: [], vehicles: [], update() {} } : createTrafficSystem(scene, streetProps);
   markInit('traffic');
 
