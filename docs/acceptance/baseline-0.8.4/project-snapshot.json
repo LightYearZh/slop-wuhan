@@ -1,0 +1,113 @@
+{
+  "recordDate": "2026-10-29",
+  "applicationVersion": "0.8.4",
+  "codeCommit": "508d23e5fedbec3158ba2dff06b2f9877d527de6",
+  "baselineTag": "baseline/0.8.4-wuhan",
+  "scope": "Code/data snapshot before the documentation retrospective; not a new runtime test run",
+  "region": {
+    "id": "wuhan-three-towns-core",
+    "name": "武汉·两江三镇核心区",
+    "boundsWgs84": [
+      114.252,
+      30.54,
+      114.336,
+      30.5942
+    ],
+    "widthM": 8056.9,
+    "heightM": 6008.7,
+    "areaKm2": 48.412,
+    "scale": "1:1"
+  },
+  "counts": {
+    "sourceBuildings": 23462,
+    "buildingSources": {
+      "OSM:footprint": 3143,
+      "Overture:footprint": 20319
+    },
+    "renderedParts": 23820,
+    "sourceRoadRecords": 4078,
+    "runtimeRoadLinks": 9573,
+    "waterAreaM2": 11383346,
+    "waterPolygons": 26,
+    "legacyTileFiles": 221,
+    "heritageBuildings": 22,
+    "openBuildings": 25,
+    "landmarkBuildings": [
+      "江汉关博物馆",
+      "黄鹤楼",
+      "龟山电视塔",
+      "晴川阁",
+      "红楼 · 武昌起义军政府旧址"
+    ],
+    "coreDestinations": [
+      "江汉关博物馆",
+      "江汉路步行街",
+      "长江航运中心",
+      "武汉恒隆广场",
+      "晴川阁",
+      "龟山电视塔",
+      "武汉长江大桥",
+      "黄鹤楼",
+      "红楼 · 武昌起义军政府旧址",
+      "武汉绿地中心"
+    ],
+    "heightSources": {
+      "visual-estimate": 2764,
+      "OSM:height": 17,
+      "3D-GloBFP:model-estimate": 20124,
+      "OSM:levels": 474,
+      "OSM:parts-max": 32,
+      "reference:architectural-total": 16,
+      "visual-reference:photo-envelope": 6,
+      "visual-reference:open-building-envelope": 19,
+      "reference:published-approximate": 1,
+      "reference:storeys-derived": 6,
+      "Overture:floors": 3
+    }
+  },
+  "upstream": {
+    "repository": "https://github.com/shwang1979/slop-taipei",
+    "revision": "1d70708fc92a088b779c8c0e22677adb64966a1b",
+    "preservedReference": "../reference-taipei",
+    "runtimeDirectory": "js/runtime",
+    "adaptations": [
+      "Wuhan data adapter",
+      "Simplified Chinese UI",
+      "Wuhan cameras, destinations and landmark",
+      "Audited spatial placement and courtyard collision"
+    ],
+    "previousRuntime": {
+      "repository": "https://github.com/YakirLove/ShangHai",
+      "revision": "5422e02e0b4f6982872deb12486625279f8395d2",
+      "preservedReference": "../reference-shanghai",
+      "previousPilotBranch": "archive/standalone-pilot",
+      "archiveBranch": "archive/shanghai-runtime-0.3.0"
+    }
+  },
+  "heightModelReferenceYear": 2020,
+  "terrainScope": "Masked relief around Guishan and Sheshan, not a citywide surveyed DEM",
+  "loadingScope": "Static core built at startup with spatial/distance culling; legacy tile files do not imply runtime streaming",
+  "recordedVerification": {
+    "sceneIteration": "2ae8345",
+    "record": "docs/acceptance/0.8.4/acceptance.json",
+    "results": {
+      "javascriptTests": 98,
+      "pythonTests": 42,
+      "productionBuild": "passed",
+      "roadBuildingOverlapM2": 0,
+      "centrelineConflicts": 0
+    },
+    "localizationCommit": "508d23e",
+    "localizationChecks": [
+      "production build",
+      "browser mode label and original source link"
+    ],
+    "thisDocumentationChange": "source reading, snapshot consistency, local link and Git reference checks; no new browser or driving test claimed"
+  },
+  "fileSha256": {
+    "public/data/city.json": "f9dde297ae70eacd074437e5283933bccedc7113657aa6e55e6d1225239d663f",
+    "public/data/runtime-audit.json": "ed9f274e4898b12046f9f02c19a3125a6b6d29e24aafec130866ebc7793f6493",
+    "js/runtime/wuhan-geodata.js": "a7f7a8a64584494c7fbda12df170bac8bedd08da10017a7d716c9164b5ab8d68",
+    "package-lock.json": "910c0cba4d80a08e016b7af44ba3d1abd5dbc4376f75b92b71996f0e9d6b024e"
+  }
+}

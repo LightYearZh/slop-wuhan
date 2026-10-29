@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-29",
+  "codeBaseline": "508d23e",
+  "scope": "Documentation only",
+  "localLinksChecked": 74,
+  "commitReferencesChecked": 26,
+  "snapshotHashesChecked": 4,
+  "baselineTagVerified": "baseline/0.8.4-wuhan",
+  "whitespaceCheck": "passed",
+  "newRuntimeOrBrowserTestClaimed": false,
+  "bianjingExistingFilesModified": false
+}
