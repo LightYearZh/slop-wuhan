@@ -1,0 +1,209 @@
+{
+  "version": "0.8.1",
+  "baseline": "b5c5613",
+  "sourceCitySha256": "76fec8705af6616031baeb1dad447e67f7e34bf08e5f00c3f6a3e4df69d7438d",
+  "registeredBuildings": 12,
+  "sourceBuildingCount": 23462,
+  "unchanged": {
+    "bounds": true,
+    "origin": true,
+    "roads": true,
+    "water": true,
+    "hills": true,
+    "tunnels": true,
+    "bridgeModels": true,
+    "landmarks": true
+  },
+  "allBuildingRingsUnchanged": true,
+  "heightChanges": [
+    {
+      "id": "osm-building-way-128400520-0",
+      "name": "台湾银行汉口分行旧址",
+      "beforeM": 12,
+      "afterM": 23,
+      "source": "visual-reference:photo-envelope",
+      "evidence": {
+        "confidence": "visual-estimate",
+        "reference": "https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml",
+        "meaning": "Photo-envelope estimate including parapet/cupola; not a surveyed architectural height",
+        "rangeM": [
+          20,
+          26
+        ]
+      }
+    },
+    {
+      "id": "osm-building-way-128400523-0",
+      "name": "四明银行汉口分行旧址",
+      "beforeM": 12,
+      "afterM": 31,
+      "source": "visual-reference:photo-envelope",
+      "evidence": {
+        "confidence": "visual-estimate",
+        "reference": "https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml",
+        "meaning": "Photo-envelope estimate including parapet/cupola; not a surveyed architectural height",
+        "rangeM": [
+          28,
+          35
+        ]
+      }
+    },
+    {
+      "id": "osm-building-way-767972188-0",
+      "name": "汉口汇丰银行大楼旧址",
+      "beforeM": 16.0,
+      "afterM": 24,
+      "source": "visual-reference:photo-envelope",
+      "evidence": {
+        "confidence": "visual-estimate",
+        "reference": "https://www.whcbs.com/Upload/BookReadFile/202004/8bcbb02411c04eb6b90f150e861056bb.pdf",
+        "meaning": "Photo-envelope estimate including parapet/cupola; not a surveyed architectural height",
+        "rangeM": [
+          21,
+          27
+        ]
+      }
+    },
+    {
+      "id": "osm-building-way-767972189-0",
+      "name": "汉口花旗银行大楼旧址",
+      "beforeM": 20.0,
+      "afterM": 29.5,
+      "source": "reference:architectural-total",
+      "evidence": {
+        "confidence": "documented-total",
+        "reference": "https://www.whcbs.com/Upload/BookReadFile/202004/8bcbb02411c04eb6b90f150e861056bb.pdf",
+        "meaning": "Published total height; replaces conflicting OSM 20m tag, ornament dimensions remain estimated",
+        "rangeM": null
+      }
+    },
+    {
+      "id": "osm-building-way-767972190-0",
+      "name": "日清洋行汉口分行旧址",
+      "beforeM": 12,
+      "afterM": 32,
+      "source": "visual-reference:photo-envelope",
+      "evidence": {
+        "confidence": "visual-estimate",
+        "reference": "https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml",
+        "meaning": "Photo-envelope estimate including parapet/cupola; not a surveyed architectural height",
+        "rangeM": [
+          28,
+          35
+        ]
+      }
+    }
+  ],
+  "validation": {
+    "javascriptTests": 88,
+    "pythonTests": 36,
+    "spatialRoadBuildingOverlaps": 0,
+    "spatialCentrelineConflicts": 0,
+    "productionBuild": "passed"
+  },
+  "limitations": [
+    "Only the 12 registered footprints use the heritage generator.",
+    "Five signature buildings have reviewed photographs; other seven use referenced typologies with estimated ornament/window spacing.",
+    "Four revised heights are photo-envelope estimates; Citibank 29.5m uses published height.",
+    "Interiors, detailed sculpture, full inscriptions, and surveyed facade dimensions are not reconstructed.",
+    "The saved baseline is golden-hour lighting; the final main screenshots use midday."
+  ],
+  "geometryBudget": {
+    "vertices": 857310,
+    "meshes": 70,
+    "buildings": 12
+  },
+  "browser": {
+    "origin": "http://127.0.0.1:4187",
+    "desktop": [
+      1280,
+      920
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "runtimeErrors": [],
+    "heritageModelCount": 12,
+    "visits": [
+      {
+        "id": "heritage-osm-building-way-128400520",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-767972188",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-767972189",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-767972190",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-981847959",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-128400523",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-981847960",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-1289238581",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-1289238583",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-1314771294",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-1323368292",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      },
+      {
+        "id": "heritage-osm-building-way-1094546679",
+        "mode": "person",
+        "arrivalDistanceM": 0
+      }
+    ],
+    "searchTaiwanBankCenter": {
+      "x": -272.91,
+      "z": 575.07
+    },
+    "mobileMenuBounds": {
+      "left": 8,
+      "right": 272,
+      "horizontalOverflow": false
+    },
+    "visualReview": "completed after one correction batch",
+    "screenshots": [
+      "heritage-riverfront-overview.png",
+      "heritage-riverbanks.png",
+      "heritage-taiwan-bank.png",
+      "heritage-riqing.png",
+      "heritage-map-search.png",
+      "heritage-mobile-teleports.png"
+    ]
+  }
+}

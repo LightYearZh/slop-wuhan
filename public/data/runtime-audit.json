@@ -11,15 +11,15 @@
     "crossing_not_on_carriageway": 8
   },
   "heightSources": {
-    "visual-estimate:hankou-display-v1": 2783,
-    "OSM:height": 18,
+    "visual-estimate:hankou-display-v1": 2780,
+    "OSM:height": 17,
     "3D-GloBFP:model-estimate": 20126,
-    "OSM:levels": 475,
+    "OSM:levels": 474,
     "OSM:parts-max": 33,
-    "reference:architectural-total": 14,
+    "reference:architectural-total": 15,
+    "visual-reference:photo-envelope": 6,
     "reference:published-approximate": 1,
     "reference:storeys-derived": 7,
-    "visual-reference:photo-envelope": 2,
     "Overture:floors": 3
   },
   "signRecords": 673,
@@ -61,5 +61,5 @@
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "9187c23fd34c10d87e5a17599ab92b8dd0c40f86cc701143edab756cd8dd6bde"
+  "sourceCitySha256": "76fec8705af6616031baeb1dad447e67f7e34bf08e5f00c3f6a3e4df69d7438d"
 }

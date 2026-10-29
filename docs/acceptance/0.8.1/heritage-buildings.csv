@@ -1,0 +1,13 @@
+名称,OSM ID,立面类型,现高m,高度来源,外观依据
+台湾银行汉口分行旧址,osm-building-way-128400520-0,taiwan-bank,23,visual-reference:photo-envelope,https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml
+四明银行汉口分行旧址,osm-building-way-128400523-0,restrained-deco,31,visual-reference:photo-envelope,https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml
+汉口汇丰银行大楼旧址,osm-building-way-767972188-0,hsbc-bank,24,visual-reference:photo-envelope,https://www.whcbs.com/Upload/BookReadFile/202004/8bcbb02411c04eb6b90f150e861056bb.pdf
+汉口花旗银行大楼旧址,osm-building-way-767972189-0,citibank,29.5,reference:architectural-total,https://www.whcbs.com/Upload/BookReadFile/202004/8bcbb02411c04eb6b90f150e861056bb.pdf
+日清洋行汉口分行旧址,osm-building-way-767972190-0,corner-cupola,32,visual-reference:photo-envelope,https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml
+日信洋行旧址,osm-building-way-981847959-0,classical-commercial,16.0,OSM:levels,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+TSUTAYA Book Sote （永利银行旧址）,osm-building-way-981847960-0,modern-bank,12,visual-estimate,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+汉口横滨正金银行大楼,osm-building-way-1094546679-0,classical-commercial,12,visual-estimate,https://www.whzx.gov.cn/zxzl/wsl/whwszl/202405/P020240507544829602192.pdf
+中国实业银行大楼旧址,osm-building-way-1289238581-0,modern-bank,12,visual-estimate,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+中国银行,osm-building-way-1289238583-0,classical-commercial,12,visual-estimate,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+浙江兴业银行大楼,osm-building-way-1314771294-0,classical-commercial,12,visual-estimate,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml
+上海银行汉口分行旧址,osm-building-way-1323368292-0,classical-commercial,12,visual-estimate,https://www.whda.org.cn/dawh/whjy/202512/t20251223_2699331.shtml

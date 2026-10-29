@@ -1,5 +1,6 @@
 """Source-aware building attributes. Appearance choices never become measured facts."""
 import math,re,hashlib
+from heritage_profiles import load_profiles,apply_heritage
 from shapely.geometry import Point,Polygon,LineString
 from shapely.affinity import scale
 from shapely.strtree import STRtree
@@ -60,6 +61,7 @@ class BuildingEnricher:
         self.roads=roads;self.lines=[LineString([(p[0],p[2]) for p in r['points']]) for r in roads];self.road_tree=STRtree(self.lines)
         self.evidence={r['osmId']:r for r in evidence['records']}
         self.applied=[]
+        self.heritage_profiles=load_profiles()
 
     def enrich(self,item,poly,provider):
         tags=item.get('tags',{})
@@ -96,6 +98,7 @@ class BuildingEnricher:
                 'use':tags.get('building:use') or tags.get('building','unknown'),'historic':(category=='historic'),
                 'startDate':tags.get('start_date'),'pois':[{'id':p['id'],'name':p['tags'].get('name',''),'shop':p['tags'].get('shop'),'amenity':p['tags'].get('amenity'),'tourism':p['tags'].get('tourism')} for p in pois]}
         if reference and reference.get('facadeProfile'):result['facadeProfile']=reference['facadeProfile']
+        result=apply_heritage(item,result,self.heritage_profiles)
         if reference:
             result['heightBeforeReference']={'h':item.get('h',0),'heightSource':item.get('heightSource','visual-estimate')}
             if reference.get('identityEvidence'):result['heightEvidence']['identityEvidence']=reference['identityEvidence']

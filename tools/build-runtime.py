@@ -10,6 +10,7 @@ from shapely.ops import unary_union
 from shapely import make_valid
 from runtime_streets import road_graph,road_details
 from runtime_signs import build_signs
+from heritage_profiles import heritage_sites
 
 ROOT = Path(__file__).resolve().parents[1]
 CLASSES = ['motorway','trunk','primary','secondary','tertiary','unclassified','residential','living_street','service','pedestrian']
@@ -91,7 +92,7 @@ def convert(city):
             buildings.extend(encode_building(part['rings'],top,base,part_kind))
             meta.append({'sourceId':b['id'],'category':b['category'],'sourceHeight':None if b['heightSource']=='visual-estimate' or b['heightSource'].startswith('visual-reference:') else b['h'],
                          'sourceHeightType':b['heightSource'],'displayHeight':top,'displayHeightSource':source,'baseY':base,
-                         'role':part.get('role'),'partSourceId':part.get('sourceId'),'partHeightSource':part.get('heightSource'),'partHeightReference':part.get('heightReference'),'facadeProfile':part.get('facadeProfile') or b.get('facadeProfile'),'name':b['name']})
+                         'role':part.get('role'),'partSourceId':part.get('sourceId'),'partHeightSource':part.get('heightSource'),'partHeightReference':part.get('heightReference'),'facadeProfile':part.get('facadeProfile') or b.get('facadeProfile'),'name':b['name'],**({'heritageProfile':b['heritageProfile']} if b.get('heritageProfile') else {})})
     print('Matching storefront signs...',flush=True)
     sign_data,sign_rejected=build_signs(city,display_height)
     signs=sign_data['signs']
@@ -99,6 +100,7 @@ def convert(city):
     water=polygons(city['water']);asphalt=polygons(city['asphalt']);ped=polygons(city['pedestrian'])
     sides=polygons(city['shoulders']).difference(asphalt).difference(ped).difference(water)
     landmark=city['landmarks'][0];spawn=city['spawn'];bounds=city['bounds']
+    heritage=heritage_sites(city)
     places=[[p['name'],p['x'],p['z'],1] for p in city['places']]
     teleports=[{'id':'jianghanguan','name':'江汉关博物馆','sub':'沿江大道 · 钟楼','x':spawn['x'],'z':spawn['z'],'heading':spawn['heading'],'road':'沿江大道'}]
     for p in city['places']:
@@ -106,6 +108,8 @@ def convert(city):
         if p['name'] in ('江汉路','中山大道','沿江大道') or p.get('arrival'):
             arrival=p.get('arrival',p)
             teleports.append({'id':p['id'],'name':p['name'],'sub':'汉口核心区','x':arrival['x'],'z':arrival['z'],'heading':spawn['heading'],'road':p.get('road','')})
+    for s in heritage:
+        teleports.append({'id':s['id'],'name':s['name'],'sub':'汉口历史建筑','x':s['arrival']['x'],'z':s['arrival']['z'],'heading':s['arrival']['heading'],'mode':'person','road':s['arrival']['road']})
     for l in city['landmarks'][1:]:
         a=l['arrival'];teleports.append({'id':l['id'],'name':l['name'],'sub':l['district'],'x':a['x'],'z':a['z'],'y':a['y'],'heading':0,'road':a['road']})
     for model in city.get('bridgeModels',[]):
@@ -135,7 +139,7 @@ def convert(city):
          'tunnels':tunnels,'rampCuts':city.get('rampCuts',[]),'viaducts':[],'mrtStations':[],'stations':[],**sign_data,
          'districts':districts,'places':places,
          'namedBuildings':[[b['name'],b['x'],b['z'],display_height(b)[0]] for b in city['buildings'] if b['name']],
-         'coreDestinations':city.get('coreDestinations',[]),'teleports':teleports,'placementData':{k:city[k] for k in ['bounds','land','water','roads','buildings','landmarks','rampCuts']}}
+         'coreDestinations':city.get('coreDestinations',[]),'heritageSites':heritage,'teleports':teleports,'placementData':{k:city[k] for k in ['bounds','land','water','roads','buildings','landmarks','rampCuts']}}
     lat=city['origin'][1]*math.pi/180;e2=6.69437999014e-3;s=math.sin(lat);rad=math.pi/180
     geo['frame'].update(mLon=rad*6378137/math.sqrt(1-e2*s*s)*math.cos(lat),mLat=rad*6378137*(1-e2)/(1-e2*s*s)**1.5)
     report={'runtimeBase':'shwang1979/slop-taipei','ruleVersion':RULE,'sourceBuildings':len(city['buildings']),

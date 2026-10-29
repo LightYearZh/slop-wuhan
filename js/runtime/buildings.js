@@ -3,6 +3,7 @@ import * as THREE from 'three/webgpu';
 import { attribute } from 'three/tsl';
 import { BUILDINGS, BUILDING_KIND, nearestLink, LINK_FLAG, CLS } from './city-config.js';
 import { BUILDING_STYLE, createWuhanBuildingMaterial, createCorrugatedMetalMaterial } from './tsl-materials.js';
+import {buildHeritageBuilding} from './hankou-heritage.js';
 
 // js/buildings.js
 // Every OSM building footprint of the Wuhan pilot extruded to its height: walls & roofs merged into chunk
@@ -134,7 +135,7 @@ function buildCityBlocks(scene) {
   const colliders = [];
   const roofSites = [];
   const temples = [];
-  const detailStats={frontWalls:0,backWalls:0,styles:{},roofSites:0};
+  const detailStats={frontWalls:0,backWalls:0,styles:{},roofSites:0,heritage:[]};
 
   const streetFilter = (l) => l.cls <= CLS.pedestrian && !(l.flags & LINK_FLAG.ELEVATED);
 
@@ -147,6 +148,14 @@ function buildCityBlocks(scene) {
     let yBot = b.base > 0 ? g0 + b.base : g0 - 1.5;
     const yTop = g0 + b.h;
     if (canopy) yBot = Math.max(g0 + 2.6, yTop - 0.45);
+    if(b.heritageProfile){
+      const model=buildHeritageBuilding(new THREE.Group(),b);group.add(model);
+      detailStats.heritage.push(model.userData.heritage);
+      // The visible body and existing collision system share the same mapped rings.
+      // Recesses are inward; no new invisible props or roadside blockers are introduced.
+      colliders.push({minX:b.minX,maxX:b.maxX,minZ:b.minZ,maxZ:b.maxZ,minY:yBot,maxY:yTop,poly:b.rings[0],rings:b.rings,building:b});
+      continue;
+    }
     const key = `${Math.floor(b.cx / CHUNK)},${Math.floor(b.cz / CHUNK)}`;
     let gb = chunks.get(key);
     if (!gb) chunks.set(key, (gb = new GeoBuilder()));

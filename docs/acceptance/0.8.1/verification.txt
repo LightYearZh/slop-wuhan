@@ -1,0 +1,15 @@
+0.8.1 verification
+
+npm run data:build: PASS
+npm run verify: PASS
+JavaScript: 88 passed, 0 failed
+Python: 36 passed, 0 failed
+Spatial audit: 0 road/building overlaps; 0 centreline conflicts
+Production build: PASS; pre-existing large bundle advisory remains
+Production browser: 12 heritage models, all 12 actual teleport buttons reached their configured arrival (0m difference) in person mode, no runtime errors
+Map search: Taiwan Bank centered at (-272.91, 575.07)
+Mobile 390x844: page width 390, menu left 8 / right 272, no horizontal overflow
+Desktop 1280x920: riverfront, Taiwan Bank, Nissin corner dome and map inspected; lantern windows and mobile bounds corrected in one batch and confirmed
+12 models: 857310 vertices, 70 merged meshes; finite geometry / extents / height budgets covered by tests
+All building rings and roads, water, hills, tunnels, bridges, landmark models, bounds and origin equal baseline b5c5613
+Images: output/playwright/heritage-*.png (local artifacts, ignored by git)

@@ -391,7 +391,9 @@ async function initApp() {
       let above = pop.dataset.side === 'above';
       // The camera control moves to the top on touch screens; open toward the available space.
       if ((above ? spaceAbove : spaceBelow) < 160) above = spaceAbove > spaceBelow;
-      pop.style.right = `${Math.max(8, window.innerWidth - align.getBoundingClientRect().right)}px`;
+      const popWidth = parseFloat(getComputedStyle(pop).width) || 264;
+      const maxRight = Math.max(8, window.innerWidth - popWidth - 8);
+      pop.style.right = `${Math.min(maxRight, Math.max(8, window.innerWidth - align.getBoundingClientRect().right))}px`;
       if (above) {
         pop.style.top = 'auto';
         pop.style.bottom = `${window.innerHeight - r.top + 8}px`;

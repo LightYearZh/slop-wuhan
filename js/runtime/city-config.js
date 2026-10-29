@@ -439,9 +439,10 @@ function districtAt(x, z) {
 const LANDMARKS = GEO.landmarks;
 const TAIPEI_LANDMARKS = [
   ...(GEO.coreDestinations||Object.values(GEO.landmarks)).map(l=>({...l,r:90,core:true})),
+  ...(GEO.heritageSites||[]).map(l=>({...l,r:45,heritage:true})),
   ...GEO.namedBuildings.filter(([name,x,z,h])=>h>60&&!(GEO.coreDestinations||[]).some(l=>l.name===name||Math.hypot(l.x-x,l.z-z)<2)).map(([name,x,z])=>({name,x,z,r:45}))
 ];
-const PLACES = GEO.places.map(([name, x, z, rank]) => ({ name, x, z, rank }));
+const PLACES = GEO.places.filter(([,x,z])=>!(GEO.heritageSites||[]).some(s=>Math.hypot(s.x-x,s.z-z)<3)).map(([name, x, z, rank]) => ({ name, x, z, rank }));
 const STATIONS = GEO.stations.map(([name, x, z, mrt]) => ({ name, x, z, mrt: !!mrt }));
 // Teleport destinations, each moved onto the kerbside lane of the nearest main road, heading along it the way the
 // listed heading points
