@@ -186,6 +186,27 @@ export function buildHeritageBuilding(root,b,m=heritageMaterials()){
       for(let i=0;i<3;i++)box(e,e.L/2,bodyH+i*.5,e.L*(.36-i*.08),.55,.24,m.trim,.02);
     }
   }
+  if(p.balconyDetail?.kind==='risshin-central-bays'){
+    // Publisher's description: central curved balconies above the second floor, continuous fifth-floor balcony.
+    // Keep the detail shallow so the mapped alley remains open; ornament dimensions are estimates.
+    const fh=(bodyH-.8)/p.floors,u=face.L/2,r=Math.min(2.4,face.L*.14);
+    for(let f=2;f<p.floors;f++){
+      const y=.65+fh*(f+.5)-Math.min(fh*.69,3.2)/2-.16;
+      const pts=[];
+      for(let i=0;i<=16;i++){const a=Math.PI-i*Math.PI/16;pts.push([u+Math.cos(a)*r,y,Math.sin(a)*.34]);}
+      const shape=new THREE.Shape();shape.moveTo(-r,0);
+      for(let i=0;i<=16;i++){const a=Math.PI-i*Math.PI/16;shape.lineTo(Math.cos(a)*r,-Math.sin(a)*.34);}shape.closePath();
+      const slab=new THREE.ExtrudeGeometry(shape,{depth:.16,bevelEnabled:false});slab.rotateX(-Math.PI/2);
+      builder.add(slab,m.pale,...wall(face,u,y,0),face.yaw);
+      for(let i=1;i<pts.length;i++)for(const h of [.13,.82])segment(face,[pts[i-1][0],y+h,pts[i-1][2]],[pts[i][0],y+h,pts[i][2]],.035,m.iron);
+      for(const at of pts)segment(face,[at[0],y+.13,at[2]],[at[0],y+.82,at[2]],.025,m.iron);
+      if(f===p.floors-1){
+        box(face,u,y,face.L*.82,.18,.32,m.pale,.13);
+        for(const h of [.13,.82])box(face,u,y+h,face.L*.82,.06,.06,m.iron,.28);
+        for(let v=face.L*.09;v<face.L*.91;v+=.65)box(face,v,y+.46,.045,.7,.06,m.iron,.28);
+      }
+    }
+  }
   if(p.parapet==='balustrade')for(const e of edges){
     if(e.L<3)continue;
     const top=H-.12,low=bodyH+.12;
@@ -240,6 +261,6 @@ export function buildHeritageBuilding(root,b,m=heritageMaterials()){
   }
   const roofDetail=appendHeritageRoof(builder,b,bodyH,m);
   builder.finish();root.name='HankouHeritage_'+b.sourceId;
-  root.userData.heritage={sourceId:b.sourceId,name:p.label,template:p.template,roofDetail,parapet:p.parapet||null,entryPlaque:p.label,facadeBays:bays,mainNormal:[face.nx,face.nz],setbackM:setback,columns:colonnade?(p.columns||8):0,detailConfidence:p.detailConfidence};
+  root.userData.heritage={sourceId:b.sourceId,name:p.label,template:p.template,roofDetail,balconyDetail:p.balconyDetail?.kind||null,parapet:p.parapet||null,entryPlaque:p.label,facadeBays:bays,mainNormal:[face.nx,face.nz],setbackM:setback,columns:colonnade?(p.columns||8):0,detailConfidence:p.detailConfidence};
   return root;
 }

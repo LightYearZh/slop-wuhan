@@ -1,8 +1,8 @@
 {
   "runtimeBase": "shwang1979/slop-taipei",
   "ruleVersion": "hankou-display-v1",
-  "sourceBuildings": 23462,
-  "renderedParts": 23820,
+  "sourceBuildings": 23461,
+  "renderedParts": 23819,
   "roadLinks": 9573,
   "curvedRoadLinks": 4474,
   "crossings": 154,
@@ -13,7 +13,7 @@
   "heightSources": {
     "visual-estimate:hankou-display-v1": 2764,
     "OSM:height": 17,
-    "3D-GloBFP:model-estimate": 20124,
+    "3D-GloBFP:model-estimate": 20123,
     "OSM:levels": 474,
     "OSM:parts-max": 32,
     "reference:architectural-total": 16,
@@ -71,5 +71,5 @@
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "f9dde297ae70eacd074437e5283933bccedc7113657aa6e55e6d1225239d663f"
+  "sourceCitySha256": "15fbf83efe6e6946327d40efe6af3e140dec30b535a44f45cde3f9591b10ac0c"
 }

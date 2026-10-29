@@ -1,0 +1,12 @@
+{
+  "components": [
+    {
+      "sourceId": "overture-125f76ab-8aa9-461d-9085-4e95e08dd4ad",
+      "landmarkId": "jianghanguan",
+      "maxDistanceM": 12,
+      "reason": "Supplemental 28 square metre, 26.825 metre block overlaps the dedicated clock shaft in the concave OSM plan; rendered by the Jianghanguan model instead of a second generic building.",
+      "evidence": "Source footprint and dedicated shaft volume comparison; user screenshot 2026-10-29",
+      "reviewed": "2026-10-29"
+    }
+  ]
+}

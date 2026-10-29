@@ -21,43 +21,47 @@ export function buildWuhanLandmarks(scene,landmarks){
   function add(geo,mat,x,y,z,rotation=0){geo.rotateY(rotation);geo.translate(x,y,z);if(!buckets.has(mat))buckets.set(mat,[]);buckets.get(mat).push(geo);}
   const box=(w,h,d,x,y,z,mat=stone,rot=0)=>add(new THREE.BoxGeometry(w,h,d),mat,x,y,z,rot);
   const cyl=(rt,rb,h,x,y,z,mat=trim,n=12)=>add(new THREE.CylinderGeometry(rt,rb,h,n),mat,x,y,z);
-  const W=l.w,D=l.d,front=D/2;
-  // Rusticated base, cornices and roof parapet.
-  for(const [y,h,extra]of [[.6,1.2,.5],[3.4,.45,.65],[15.7,.65,.85],[18.3,.7,1.25],[19.15,.55,1.65]])box(W+extra,h,D+extra,0,y,0,trim);
-  box(W,.3,D,0,19.6,0,roof);
+  // Work in the source plan, including its concave party-wall notch.
+  const co=Math.cos(l.ry),si=Math.sin(l.ry);
+  const plan=l.footprint[0].slice(0,-1).map(([x,z])=>[(x-l.x)*co-(z-l.z)*si,(x-l.x)*si+(z-l.z)*co]);
+  const edges=plan.map((a,i)=>{const b=plan[(i+1)%plan.length],dx=b[0]-a[0],dz=b[1]-a[1],length=Math.hypot(dx,dz);return {a,b,length,dx:dx/length,dz:dz/length};});
+  const frontEdge=edges.filter(e=>Math.abs(e.dz)<.12).sort((a,b)=>(b.a[1]+b.b[1])-(a.a[1]+a.b[1]))[0];
+  const W=frontEdge.length,front=(frontEdge.a[1]+frontEdge.b[1])/2,frontX=(frontEdge.a[0]+frontEdge.b[0])/2;
+  // Roof and horizontal courses must never fill the concave notch with a bounding box.
+  for(const [y,h,mat]of [[.6,1.2,trim],[3.4,.45,trim],[15.7,.65,trim],[18.3,.7,trim],[19.15,.55,trim],[19.6,.3,roof]]){
+   const slab=new THREE.Mesh(createFootprintGeometry({rings:l.footprint,h,baseY:y-h/2}),mat);
+   slab.name='Jianghanguan footprint course';slab.userData.footprintCourse=true;
+   slab.castShadow=slab.receiveShadow=true;root.add(slab);
+  }
   // Eight tall columns, with shaft taper, bases and carved-leaf inspired capitals.
   for(let i=0;i<8;i++){
-   const x=-W*.405+i*W*.81/7,z=front+.75;
+   const x=frontX-W*.405+i*W*.81/7,z=front+.75;
    box(1.65,.4,1.65,x,3.85,z,trim);cyl(.84,.89,.45,x,4.25,z);
    cyl(.58,.72,10.2,x,9.55,z);
    cyl(.92,.6,.7,x,15,z);box(1.7,.35,1.7,x,15.5,z,trim);
    for(let a=0;a<8;a++){const angle=a*Math.PI/4;add(new THREE.SphereGeometry(.18,5,4),trim,x+Math.cos(angle)*.73,15.1,z+Math.sin(angle)*.73);}
   }
-  box(W+2,1.1,3.3,0,16.25,front+.65,trim);
-  // Deep windows and stone surrounds on front and side elevations.
-  for(const side of [1,-1]){
-   const facade=new THREE.Group();facade.rotation.y=side===1?0:Math.PI;g.add(facade);
-   for(let floor=0;floor<3;floor++)for(let i=0;i<9;i++){
-    const x=-W*.4+i*W*.8/8,y=5.6+floor*4.05,z=side*(front+.12);
-    if(floor===0&&i===4)continue;
-    box(2.15,2.8,.25,x,y,z,dark);box(2.6,.22,.55,x,y+1.55,z,trim);box(2.5,.18,.55,x,y-1.45,z,trim);
-    box(.1,2.8,.32,x,y,z+side*.05,trim);box(2.15,.1,.32,x,y+.15,z+side*.05,trim);
+  box(W,1.1,3.3,frontX,16.25,front+.65,trim);
+  // Follow each real wall; a rectangular window grid creates floating facades in the notch.
+  for(const edge of edges){
+   if(edge.length<4)continue;
+   const yaw=Math.atan2(-edge.dz,edge.dx),count=Math.max(1,Math.floor(edge.length/4.5));
+   for(let floor=0;floor<3;floor++)for(let i=0;i<count;i++){
+    const t=(i+.5)/count,x=edge.a[0]+(edge.b[0]-edge.a[0])*t,z=edge.a[1]+(edge.b[1]-edge.a[1])*t,y=5.6+floor*4.05;
+    box(2.15,2.8,.25,x,y,z,dark,yaw);
+    box(2.6,.22,.5,x,y+1.55,z,trim,yaw);box(2.5,.18,.5,x,y-1.45,z,trim,yaw);
+    box(.1,2.8,.32,x,y,z,trim,yaw);box(2.15,.1,.32,x,y+.15,z,trim,yaw);
    }
   }
-  for(const side of [-1,1])for(let floor=0;floor<3;floor++)for(let i=0;i<7;i++){
-   const z=-D*.37+i*D*.74/6,y=5.6+floor*4.05,x=side*(W/2+.08);
-   box(.24,2.8,2.1,x,y,z,dark);box(.5,.22,2.55,x,y+1.55,z,trim);box(.3,2.8,.1,x,y,z,trim);
-  }
   // Recessed entrance arch and broad granite stairs.
-  box(3.1,5,.3,0,5.7,front+.18,dark);
-  const arch=new THREE.TorusGeometry(1.65,.32,6,20,Math.PI);add(arch,trim,0,7.9,front+.35);
-  for(let step=0;step<7;step++)box(9.2+step*.48,.28,1.15,0,3.35-step*.28,front+1.5+step*.77,granite);
-  // Balustrade and shallow roof on either side of the clock tower.
+  box(3.1,5,.3,frontX,5.7,front+.18,dark);
+  const arch=new THREE.TorusGeometry(1.65,.32,6,20,Math.PI);add(arch,trim,frontX,7.9,front+.35);
+  for(let step=0;step<7;step++)box(9.2+step*.48,.28,1.15,frontX,3.35-step*.28,front+1.5+step*.77,granite);
+  // Keep the front balustrade within the surveyed frontage; no oversized hip roofs over neighbours.
   for(const side of [-1,1]){
-   box(W*.34,.45,.55,side*W*.3,20.5,front,trim);
-   for(let i=0;i<10;i++)box(.18,.9,.25,side*(5+i*(W*.36/10)),20,front,trim);
-   box(1.2,1.6,1.2,side*(W/2-.7),20,front,trim);
-   const r=new THREE.CylinderGeometry(0,1,2,4);r.rotateY(Math.PI/4);r.scale(W*.29,1,D*.35);add(r,roof,side*W*.28,20.2,-D*.1);
+   box(W*.31,.45,.55,frontX+side*W*.31,20.5,front-.3,trim);
+   for(let i=0;i<9;i++)box(.18,.9,.25,frontX+side*(5+i*(W*.32/9)),20,front-.3,trim);
+   box(1.2,1.6,1.2,frontX+side*(W/2-.8),20,front-.6,trim);
   }
   // Central clock shaft, four clock faces, open belfry, cornice and restrained dark roof.
   box(9.3,13,9.3,0,26.15,3,stone);
@@ -91,7 +95,7 @@ export function buildWuhanLandmarks(scene,landmarks){
   box(2.4,.7,2.4,0,43.3,3,stone);cyl(.055,.065,2.15,0,44.55,3,dark,8);
   // Local sign is a model detail; no downloaded image is baked onto the building.
   const c=document.createElement('canvas');c.width=512;c.height=128;const ctx=c.getContext('2d');ctx.fillStyle='#bfbba9';ctx.fillRect(0,0,512,128);ctx.fillStyle='#3b433f';ctx.font='bold 76px serif';ctx.textAlign='center';ctx.fillText('江 汉 关',256,94);
-  const label=new THREE.Mesh(new THREE.PlaneGeometry(7.4,1.8),new THREE.MeshStandardNodeMaterial({map:new THREE.CanvasTexture(c),roughness:.8}));label.position.set(0,17.6,front+2.35);g.add(label);
+  const label=new THREE.Mesh(new THREE.PlaneGeometry(7.4,1.8),new THREE.MeshStandardNodeMaterial({map:new THREE.CanvasTexture(c),roughness:.8}));label.position.set(frontX,17.6,front+2.35);g.add(label);
   g.updateWorldMatrix(true,true);
   const inverse=g.matrixWorld.clone().invert();
   for(const clock of g.children.filter(o=>o.userData.bake)){

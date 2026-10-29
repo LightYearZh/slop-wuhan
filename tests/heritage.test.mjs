@@ -56,3 +56,15 @@ test('reviewed roof pavilions and bank parapets are generated inside their sourc
   assert.equal(model.userData.heritage.columns,6);assert.ok(model.userData.heritage.setbackM>0);
   for(const b of BUILDINGS.filter(b=>b.heritageProfile?.parapet))assert.equal(buildHeritageBuilding(new THREE.Group(),b).userData.heritage.parapet,'balustrade');
 });
+
+test('Risshin keeps its mapped five-storey body and adds the documented central balconies',()=>{
+  const b=BUILDINGS.find(b=>b.sourceId==='osm-building-way-981847959-0');
+  assert.equal(b.heritageProfile.floors,5);
+  assert.equal(b.heritageProfile.balconyDetail.kind,'risshin-central-bays');
+  const root=buildHeritageBuilding(new THREE.Group(),b);
+  assert.equal(root.userData.heritage.balconyDetail,'risshin-central-bays');
+  const bounds=new THREE.Box3().setFromObject(root);
+  assert.ok(bounds.max.y<=b.ground+b.h+.25);
+  assert.ok(bounds.min.x>=b.minX-.6&&bounds.max.x<=b.maxX+.6);
+  assert.ok(bounds.min.z>=b.minZ-.6&&bounds.max.z<=b.maxZ+.6);
+});

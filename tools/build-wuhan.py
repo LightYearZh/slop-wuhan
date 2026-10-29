@@ -154,8 +154,20 @@ def main():
     if not(extraction['xmin']<=west and extraction['ymin']<=south and extraction['xmax']>=east and extraction['ymax']>=north):
         raise SystemExit('Overture extract does not cover the profile. Download the expanded bbox before building.')
     overture=json.loads(overture_path.read_text())
+    landmark_components=json.loads((ROOT/'config/landmark-components.json').read_text())['components']
+    component_reviews=[]
     for feature in overture['features']:
         props=feature['properties']
+        component=next((c for c in landmark_components if c['sourceId']=='overture-'+feature['id']),None)
+        if component:
+            owner=next(l for l in landmarks if l['id']==component['landmarkId'])
+            mapped=make_valid(transform(project,shape(feature['geometry'])))
+            # Fail closed if an upstream identity has moved: this exception belongs only to this clock component.
+            if mapped.distance(Point(owner['x'],owner['z']))>component['maxDistanceM']:
+                raise ValueError('Reviewed landmark component moved: '+component['sourceId'])
+            excluded['dedicated_landmark_component']+=1
+            component_reviews.append(component)
+            continue
         if props.get('is_underground'):continue
         g=make_valid(transform(project,shape(feature['geometry']))).intersection(region)
         for i,poly in enumerate(parts(g)):
@@ -261,6 +273,7 @@ def main():
         'appliedReferences':sorted(set(enricher.applied)),
         'massingEstimates':[{'id':b['id'],'source':b.get('massingReference','OpenStreetMap:building:part'),'method':b['massingSource']} for b in buildings if b.get('massingParts')],
         'rules':'Documented height > floor-derived estimate > marked 12m fallback; classification has its own source; facade appearance remains illustrative'}
+    report['landmarkComponentReviews']=component_reviews
     report['attributes']=attributes_report
     dump(stage/'building-attributes-audit.json',attributes_report)
     report['buildingParts']=parts_audit
