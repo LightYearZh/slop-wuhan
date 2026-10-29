@@ -329,7 +329,7 @@ const BUILDINGS = (() => {
   }
   return out;
 })();
-for (const b of BUILDINGS) b.ground = hillHeight(b.cx, b.cz);
+for (const b of BUILDINGS) b.ground = b.groundOverride ?? hillHeight(b.cx, b.cz);
 
 // Buildings by 40 m cell, for "is there a building here?" (street furniture placement)
 const BUILDING_CELL = 40;
@@ -440,6 +440,7 @@ const LANDMARKS = GEO.landmarks;
 const TAIPEI_LANDMARKS = [
   ...(GEO.coreDestinations||Object.values(GEO.landmarks)).map(l=>({...l,r:90,core:true})),
   ...(GEO.heritageSites||[]).map(l=>({...l,r:45,heritage:true})),
+  ...(GEO.gateDestinations||[]).map(l=>({...l,r:45})),
   ...GEO.namedBuildings.filter(([name,x,z,h])=>h>60&&!(GEO.coreDestinations||[]).some(l=>l.name===name||Math.hypot(l.x-x,l.z-z)<2)).map(([name,x,z])=>({name,x,z,r:45}))
 ];
 const PLACES = GEO.places.filter(([,x,z])=>!(GEO.heritageSites||[]).some(s=>Math.hypot(s.x-x,s.z-z)<3)).map(([name, x, z, rank]) => ({ name, x, z, rank }));

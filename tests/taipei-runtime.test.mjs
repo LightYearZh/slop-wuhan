@@ -25,7 +25,7 @@ test('source heights survive display estimates and documented tower parts remain
  for(const b of BUILDINGS){
   const original=source.get(b.sourceId);assert.ok(original);
   if(original.heightSource==='visual-estimate'||original.heightSource.startsWith('visual-reference:')){
-   assert.equal(b.sourceHeight,null);assert.match(b.displayHeightSource,/visual-estimate:hankou|visual-reference:photo-envelope/);
+   assert.equal(b.sourceHeight,null);assert.match(b.displayHeightSource,/visual-estimate:hankou|visual-reference:photo-envelope|visual-reference:open-building-envelope/);
   }else assert.equal(b.sourceHeight,original.h);
   assert.ok(b.h>b.base);assert.ok(b.rings.every(r=>Array.from(r).every(Number.isFinite)));
  }
@@ -98,7 +98,12 @@ test('hill sampling, landmark foundations and building foundations share a singl
   assert.ok(Math.abs(hillHeight(l.x,l.z)-l.groundY)<.02);
  }
  assert.equal(hillHeight(0,0),0); // no urban building-height noise is promoted to terrain in the old pilot.
- for(const b of BUILDINGS)assert.equal(b.ground,hillHeight(b.cx,b.cz));
+ for(const b of BUILDINGS){
+  // Gate slices share one foundation so piers and vaults do not acquire different
+  // heights from their individual polygon centres along a hillside.
+  if(b.passageProfileId){const p=GEO.passageGates.find(p=>p.sourceId===b.passageProfileId);assert.equal(b.ground,p.groundY);assert.ok(Math.abs(b.ground-hillHeight(p.frame.x,p.frame.z))<.02);}
+  else assert.equal(b.ground,hillHeight(b.cx,b.cz));
+ }
 });
 
 test('remote-sensing heights preserve source identity, thresholds, age and uncertainty',()=>{

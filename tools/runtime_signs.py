@@ -36,6 +36,7 @@ def build_signs(city,height_of):
     roads=[LineString([(p[0],p[2]) for p in r['points']]) for r in city['roads']];road_tree=STRtree(roads)
     edges=[];lines=[]
     for bi,(b,poly) in enumerate(zip(city['buildings'],shapes)):
+        if b.get('passageProfile'):continue # An open gate/canopy is not a shop facade.
         if height_of(b)[0]<6:continue
         for a,c in zip(poly.exterior.coords,list(poly.exterior.coords)[1:]):
             dx,dz=c[0]-a[0],c[1]-a[1];length=math.hypot(dx,dz)

@@ -1,0 +1,298 @@
+{
+  "version": "0.8.2",
+  "baseline": "6422e88",
+  "sourceCitySha256": "e746c585704241ba122c0a294ab8a6619d9b9119973797aa172fc5cb9c4db5b5",
+  "counts": {
+    "canopy": 15,
+    "building-passage": 6,
+    "ceremonial-gate": 2,
+    "city-gate": 1,
+    "riverfront-gate": 1
+  },
+  "buildingCount": 23462,
+  "roadsBefore": 4065,
+  "roadsAfter": 4078,
+  "restoredRoads": [
+    {
+      "id": "osm-way-477997449-part-0",
+      "name": "",
+      "mode": "car",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": "yes"
+      }
+    },
+    {
+      "id": "osm-way-675321054-part-0",
+      "name": "",
+      "mode": "person",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "yes",
+        "layer": -1,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-675321062-part-0",
+      "name": "",
+      "mode": "person",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "yes",
+        "layer": -1,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-912886814-part-0",
+      "name": "游艺路",
+      "mode": "car",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-912886816-part-0",
+      "name": "游艺路",
+      "mode": "car",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-912907470-part-0",
+      "name": "",
+      "mode": "person",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-912907471-part-0",
+      "name": "",
+      "mode": "person",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-912907474-part-0",
+      "name": "",
+      "mode": "car",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-1055558222-part-0",
+      "name": "滨江大道",
+      "mode": "car",
+      "oneway": true,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-1055558225-part-0",
+      "name": "滨江大道",
+      "mode": "car",
+      "oneway": true,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-1313792263-part-0",
+      "name": "",
+      "mode": "car",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": "building_passage",
+        "layer": 0,
+        "covered": null
+      }
+    },
+    {
+      "id": "osm-way-1525361062-part-0",
+      "name": "",
+      "mode": "person",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": null,
+        "layer": -1,
+        "covered": "yes"
+      }
+    },
+    {
+      "id": "osm-way-1525361064-part-0",
+      "name": "",
+      "mode": "person",
+      "oneway": false,
+      "sourceTags": {
+        "tunnel": null,
+        "layer": -1,
+        "covered": "yes"
+      }
+    }
+  ],
+  "deferredNonGroundPassages": [
+    {
+      "id": "osm-way-1055705213",
+      "layer": 1,
+      "mode": "person",
+      "tunnelTag": "building_passage"
+    },
+    {
+      "id": "osm-way-1504050748",
+      "layer": -1,
+      "mode": "car",
+      "tunnelTag": "building_passage"
+    },
+    {
+      "id": "osm-way-1517245064",
+      "layer": -1,
+      "mode": "car",
+      "tunnelTag": "building_passage"
+    },
+    {
+      "id": "osm-way-1517245067",
+      "layer": -1,
+      "mode": "car",
+      "tunnelTag": "building_passage"
+    },
+    {
+      "id": "osm-way-1520071734",
+      "layer": -1,
+      "mode": "car",
+      "tunnelTag": "building_passage"
+    },
+    {
+      "id": "osm-way-1520131557",
+      "layer": -1,
+      "mode": "person",
+      "tunnelTag": "building_passage"
+    },
+    {
+      "id": "osm-way-1520131560",
+      "layer": -1,
+      "mode": "person",
+      "tunnelTag": "building_passage"
+    },
+    {
+      "id": "osm-way-1520131577",
+      "layer": -1,
+      "mode": "car",
+      "tunnelTag": "building_passage"
+    },
+    {
+      "id": "osm-way-1520131579",
+      "layer": -1,
+      "mode": "car",
+      "tunnelTag": "building_passage"
+    }
+  ],
+  "allSourceFootprintsUnchanged": true,
+  "unchanged": {
+    "bounds": true,
+    "origin": true,
+    "water": true,
+    "hills": true,
+    "tunnels": true,
+    "bridgeModels": true,
+    "landmarks": true,
+    "coreDestinations": true
+  },
+  "automatedVerification": {
+    "javascriptTests": 92,
+    "pythonTests": 40,
+    "roadBuildingOverlapM2": 0,
+    "centrelineConflicts": 0,
+    "productionBuild": "passed"
+  },
+  "collisionVerification": [
+    "Taxi capsule sampled through both original Tiemen carriageways at 0.25m intervals",
+    "Pedestrian capsule sampled through both side arches and both Jianghan covered paths",
+    "Solid wall still pushes the player out",
+    "Raycaster crosses visible arch holes and hits wall/vault solids",
+    "Gate slices share the source-centre terrain foundation"
+  ],
+  "limits": [
+    "Opening widths, clearances and gate heights are explicit display estimates, not measured construction dimensions",
+    "Upper/negative-layer unreviewed passages were not promoted to ground",
+    "Jianghan Gate model prioritizes the open canopy relation over exact architectural detailing",
+    "No climbable gate interior/stairs provided"
+  ],
+  "browserVerification": {
+    "origin": "http://127.0.0.1:4187",
+    "viewport": [
+      1280,
+      920
+    ],
+    "runtimeErrors": [],
+    "actualKeyboardDrives": [
+      {
+        "route": "osm-way-1055558222",
+        "gateSpanM": 12.0562,
+        "progressFromEntryM": 62.7389,
+        "passed": true
+      },
+      {
+        "route": "osm-way-1055558225",
+        "gateSpanM": 12.0662,
+        "progressFromEntryM": 61.4877,
+        "passed": true
+      }
+    ],
+    "fullWorldWalkingPhysics": {
+      "method": "560 updatePerson steps at 1/60s with fixed forward input, real scene colliders/terrain/traffic/water checks",
+      "start": {
+        "x": 221.02,
+        "z": 123.66
+      },
+      "end": {
+        "x": 259.5299355803361,
+        "z": 110.48901440293379
+      },
+      "mappedPathLengthM": 40.17163302630349,
+      "passed": true
+    },
+    "gateArrivalModes": {
+      "铁门关": "car",
+      "江汉门": "person"
+    },
+    "visualReview": [
+      "three visible arches with roads underneath",
+      "solid wall and vault remain visible",
+      "Jianghan canopy posts leave the foot path open"
+    ],
+    "screenshots": [
+      "gates-tiemen-overview.png",
+      "gates-tiemen-driving-0.png",
+      "gates-tiemen-driving-1.png",
+      "gates-jianghan-overview.png",
+      "gates-jianghan-passage.png"
+    ]
+  }
+}

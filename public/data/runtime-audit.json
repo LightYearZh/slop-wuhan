@@ -2,28 +2,29 @@
   "runtimeBase": "shwang1979/slop-taipei",
   "ruleVersion": "hankou-display-v1",
   "sourceBuildings": 23462,
-  "renderedParts": 23534,
-  "roadLinks": 9560,
-  "curvedRoadLinks": 4469,
+  "renderedParts": 23820,
+  "roadLinks": 9573,
+  "curvedRoadLinks": 4474,
   "crossings": 154,
   "signals": 102,
   "streetDetailRejected": {
     "crossing_not_on_carriageway": 8
   },
   "heightSources": {
-    "visual-estimate:hankou-display-v1": 2780,
+    "visual-estimate:hankou-display-v1": 2764,
     "OSM:height": 17,
-    "3D-GloBFP:model-estimate": 20126,
+    "3D-GloBFP:model-estimate": 20124,
     "OSM:levels": 474,
-    "OSM:parts-max": 33,
+    "OSM:parts-max": 32,
     "reference:architectural-total": 15,
     "visual-reference:photo-envelope": 6,
+    "visual-reference:open-building-envelope": 19,
     "reference:published-approximate": 1,
     "reference:storeys-derived": 7,
     "Overture:floors": 3
   },
   "signRecords": 673,
-  "verticalSignCandidates": 568,
+  "verticalSignCandidates": 567,
   "signTextSources": {
     "generic:business-category": 555,
     "OSM:POI": 71,
@@ -54,12 +55,12 @@
   },
   "hillTiles": 26,
   "elevatedLinks": 32,
-  "terrainLinks": 653,
+  "terrainLinks": 658,
   "limits": [
     "Missing heights and 3D-GloBFP heights are estimates, not surveyed",
     "No Taipei geography or landmarks imported",
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "76fec8705af6616031baeb1dad447e67f7e34bf08e5f00c3f6a3e4df69d7438d"
+  "sourceCitySha256": "e746c585704241ba122c0a294ab8a6619d9b9119973797aa172fc5cb9c4db5b5"
 }

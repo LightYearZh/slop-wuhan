@@ -4,6 +4,8 @@ import { attribute } from 'three/tsl';
 import { BUILDINGS, BUILDING_KIND, nearestLink, LINK_FLAG, CLS } from './city-config.js';
 import { BUILDING_STYLE, createWuhanBuildingMaterial, createCorrugatedMetalMaterial } from './tsl-materials.js';
 import {buildHeritageBuilding} from './hankou-heritage.js';
+import {buildPassageGate} from './passage-gates.js';
+import {GEO} from './wuhan-geodata.js';
 
 // js/buildings.js
 // Every OSM building footprint of the Wuhan pilot extruded to its height: walls & roofs merged into chunk
@@ -135,7 +137,8 @@ function buildCityBlocks(scene) {
   const colliders = [];
   const roofSites = [];
   const temples = [];
-  const detailStats={frontWalls:0,backWalls:0,styles:{},roofSites:0,heritage:[]};
+  const detailStats={frontWalls:0,backWalls:0,styles:{},roofSites:0,heritage:[],passages:[]};
+  const gateProfiles=new Map((GEO.passageGates||[]).map(p=>[p.sourceId,p])),builtGates=new Set();
 
   const streetFilter = (l) => l.cls <= CLS.pedestrian && !(l.flags & LINK_FLAG.ELEVATED);
 
@@ -148,6 +151,18 @@ function buildCityBlocks(scene) {
     let yBot = b.base > 0 ? g0 + b.base : g0 - 1.5;
     const yTop = g0 + b.h;
     if (canopy) yBot = Math.max(g0 + 2.6, yTop - 0.45);
+    if(b.passageProfileId){
+      const profile=gateProfiles.get(b.passageProfileId);
+      if(!builtGates.has(b.passageProfileId)){
+        if(profile.kind==='building-passage')detailStats.passages.push({id:profile.sourceId,name:profile.name,kind:profile.kind,clearanceM:profile.clearanceM});
+        else{const model=buildPassageGate(profile);group.add(model);detailStats.passages.push(model.userData.passage);}
+        builtGates.add(b.passageProfileId);
+      }
+      if(profile.kind!=='building-passage'){
+        colliders.push({minX:b.minX,maxX:b.maxX,minZ:b.minZ,maxZ:b.maxZ,minY:yBot,maxY:yTop,poly:b.rings[0],rings:b.rings,building:b});
+        continue;
+      }
+    }
     if(b.heritageProfile){
       const model=buildHeritageBuilding(new THREE.Group(),b);group.add(model);
       detailStats.heritage.push(model.userData.heritage);
@@ -235,7 +250,7 @@ function buildCityBlocks(scene) {
     }
 
     if (isTemple) temples.push(b);
-    else if ((style === BUILDING_STYLE.walkup || style === BUILDING_STYLE.midrise) && b.area > 45 && b.h < 70 && !b.base) roofSites.push(b);
+    else if (!b.passageProfileId && (style === BUILDING_STYLE.walkup || style === BUILDING_STYLE.midrise) && b.area > 45 && b.h < 70 && !b.base) roofSites.push(b);
   }
 
   let wallTris = 0;

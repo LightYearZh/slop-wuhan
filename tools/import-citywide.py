@@ -73,7 +73,7 @@ class Importer(osmium.SimpleHandler):
         self.roads.append({'id':'osm-way-'+str(w.id),'name':name,'class':CLASSES[kind],
             'points':[[round(x,2),2.12,round(z,2)] for x,z in pts],
             'nodeIds':[str(n.ref) for n in w.nodes], 'highway':kind,'widthTag':w.tags.get('width'),'lanesTag':w.tags.get('lanes'),'surfaceTag':w.tags.get('surface'),'footTag':w.tags.get('foot'),'oneway':w.tags.get('oneway') in ('yes','1','-1'),
-            'reverse':w.tags.get('oneway')=='-1','bridge':bridge,'tunnel':tunnel,'layer':layer,
+            'reverse':w.tags.get('oneway')=='-1','bridge':bridge,'tunnel':tunnel,'tunnelTag':w.tags.get('tunnel'),'coveredTag':w.tags.get('covered'),'layer':layer,
             'mode':'person' if CLASSES[kind]=='pedestrian' else 'car',
             'directionSource':'OSM:oneway','levelSource':'OSM:bridge/tunnel/layer'})
 

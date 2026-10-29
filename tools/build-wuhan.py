@@ -11,6 +11,7 @@ from core_geometry import HeightMatcher,hill_grid,sample_hill,landmark_from_buil
 from tunnel_routes import build_tunnels
 from building_parts import apply_parts
 from core_destinations import build_destinations
+from building_passages import open_building,surface_passage,apply_passages
 from spatial_rules import resolve_ground_layout
 from shapely.geometry import Polygon, Point, LineString, box
 from shapely.ops import unary_union
@@ -71,6 +72,7 @@ def main():
     forest=unary_union([geometry(v['polygons']) for v in raw['areas'] if v.get('natural')=='wood']).intersection(region).difference(water).buffer(0)
     roads=[];excluded=collections.Counter()
     for r in raw['roads']:
+        if surface_passage(r):r={**r,'passageOriginalTags':{'tunnel':r.get('tunnelTag'),'layer':r['layer'],'covered':r.get('coveredTag')},'tunnel':False,'layer':0,'passageSource':'reviewed:above-ground-building-opening'}
         if r['tunnel'] or r['bridge'] or r['layer']!=0:
             excluded['bridge_tunnel_or_layer']+=1;continue
         line=LineString([(p[0],p[2]) for p in r['points']])
@@ -121,7 +123,7 @@ def main():
         # Compare the actual footprint with narrowly buffered source centrelines, never its bounding rectangle.
         conflict=unary_union([road_lines[int(j)].buffer(min(roads[int(j)]['width']/2,3)) for j in road_tree.query(poly.buffer(16))])
         overlap=poly.intersection(conflict).area/poly.area if not conflict.is_empty else 0
-        if overlap>.35:excluded['source_footprint_road_conflict']+=1;return
+        if overlap>.35 and not open_building(item):excluded['source_footprint_road_conflict']+=1;return
         rr=poly.minimum_rotated_rectangle;q=list(rr.exterior.coords)
         w=math.dist(q[0],q[1]);d=math.dist(q[1],q[2]);x,z=rr.centroid.x,rr.centroid.y
         if min(w,d)<2:excluded['building_dimensions']+=1;return
@@ -167,6 +169,7 @@ def main():
                   'sourceDatasets':sorted(set(s.get('dataset') or s.get('resource','unknown') for s in props.get('sources',[])))}
             add_building(item,poly,i,'Overture:footprint')
     parts_audit=apply_parts(buildings,raw.get('buildingParts',[]),evidence)
+    passage_audit=apply_passages(buildings,raw,roads,hills,sample_hill)
     roads,asphalt,pedestrian,shoulders,spatial_audit=resolve_ground_layout(roads,buildings,landmarks,region,water)
     crossings,bridge_models=named_crossings(raw['roads'],region,road_width,hills) if hills else ([],[])
     # Ground roads drape on the same hill sampler as buildings and the player; bridge decks stay independent.
@@ -238,6 +241,7 @@ def main():
     dump(stage/'city.json',city)
     dump(stage/'road-audit.json',road_audit)
     dump(stage/'spatial-audit.json',spatial_audit)
+    dump(stage/'passage-audit.json',passage_audit)
     manifest={'schemaVersion':1,'sourceVersion':digest,'origin':ORIGIN,'bounds':bounds,'tileSizeM':500,'collisionHaloM':180,'attribution':'© OpenStreetMap contributors · ODbL 1.0','tiles':[],'routes':[]}
     for x in range(math.floor(bounds[0]/500),math.ceil(bounds[2]/500)):
         for z in range(math.floor(bounds[1]/500),math.ceil(bounds[3]/500)):

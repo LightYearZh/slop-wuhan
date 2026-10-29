@@ -92,7 +92,7 @@ def convert(city):
             buildings.extend(encode_building(part['rings'],top,base,part_kind))
             meta.append({'sourceId':b['id'],'category':b['category'],'sourceHeight':None if b['heightSource']=='visual-estimate' or b['heightSource'].startswith('visual-reference:') else b['h'],
                          'sourceHeightType':b['heightSource'],'displayHeight':top,'displayHeightSource':source,'baseY':base,
-                         'role':part.get('role'),'partSourceId':part.get('sourceId'),'partHeightSource':part.get('heightSource'),'partHeightReference':part.get('heightReference'),'facadeProfile':part.get('facadeProfile') or b.get('facadeProfile'),'name':b['name'],**({'heritageProfile':b['heritageProfile']} if b.get('heritageProfile') else {})})
+                         'role':part.get('role'),'partSourceId':part.get('sourceId'),'partHeightSource':part.get('heightSource'),'partHeightReference':part.get('heightReference'),'facadeProfile':part.get('facadeProfile') or b.get('facadeProfile'),'name':b['name'],**({'heritageProfile':b['heritageProfile']} if b.get('heritageProfile') else {}),**({'passageProfileId':b['id'],'groundOverride':b['passageProfile']['groundY']} if b.get('passageProfile') else {})})
     print('Matching storefront signs...',flush=True)
     sign_data,sign_rejected=build_signs(city,display_height)
     signs=sign_data['signs']
@@ -101,6 +101,19 @@ def convert(city):
     sides=polygons(city['shoulders']).difference(asphalt).difference(ped).difference(water)
     landmark=city['landmarks'][0];spawn=city['spawn'];bounds=city['bounds']
     heritage=heritage_sites(city)
+    gate_destinations=[]
+    for b in city['buildings']:
+        p=b.get('passageProfile')
+        if not p or p['kind'] not in ('city-gate','riverfront-gate'):continue
+        poly=Polygon(b['rings'][0],b['rings'][1:]);options=[]
+        for r in city['roads']:
+            if not r.get('passageSource'):continue
+            line=LineString([(q[0],q[2]) for q in r['points']])
+            if line.intersection(poly).length>.1:options.append((0 if r['mode']=='car' and p['kind']=='city-gate' else 1,line.distance(poly.centroid),r))
+        if not options:raise ValueError('Missing restored gate arrival: '+b['name'])
+        _,_,r=min(options,key=lambda a:a[:2]);a,z=r['points'][:2]
+        gate_destinations.append({'id':'gate-'+b['id'],'name':b['name'],'x':b['x'],'z':b['z'],'sourceId':b['id'],
+            'arrival':{'x':a[0],'z':a[2],'heading':math.atan2(z[0]-a[0],z[2]-a[2]),'mode':r['mode'],'road':r['name']}})
     places=[[p['name'],p['x'],p['z'],1] for p in city['places']]
     teleports=[{'id':'jianghanguan','name':'江汉关博物馆','sub':'沿江大道 · 钟楼','x':spawn['x'],'z':spawn['z'],'heading':spawn['heading'],'road':'沿江大道'}]
     for p in city['places']:
@@ -110,6 +123,7 @@ def convert(city):
             teleports.append({'id':p['id'],'name':p['name'],'sub':'汉口核心区','x':arrival['x'],'z':arrival['z'],'heading':spawn['heading'],'road':p.get('road','')})
     for s in heritage:
         teleports.append({'id':s['id'],'name':s['name'],'sub':'汉口历史建筑','x':s['arrival']['x'],'z':s['arrival']['z'],'heading':s['arrival']['heading'],'mode':'person','road':s['arrival']['road']})
+    for s in gate_destinations:teleports.append({'id':s['id'],'name':s['name'],'sub':'门洞通道',**s['arrival']})
     for l in city['landmarks'][1:]:
         a=l['arrival'];teleports.append({'id':l['id'],'name':l['name'],'sub':l['district'],'x':a['x'],'z':a['z'],'y':a['y'],'heading':0,'road':a['road']})
     for model in city.get('bridgeModels',[]):
@@ -139,7 +153,7 @@ def convert(city):
          'tunnels':tunnels,'rampCuts':city.get('rampCuts',[]),'viaducts':[],'mrtStations':[],'stations':[],**sign_data,
          'districts':districts,'places':places,
          'namedBuildings':[[b['name'],b['x'],b['z'],display_height(b)[0]] for b in city['buildings'] if b['name']],
-         'coreDestinations':city.get('coreDestinations',[]),'heritageSites':heritage,'teleports':teleports,'placementData':{k:city[k] for k in ['bounds','land','water','roads','buildings','landmarks','rampCuts']}}
+         'coreDestinations':city.get('coreDestinations',[]),'heritageSites':heritage,'gateDestinations':gate_destinations,'passageGates':[{**b['passageProfile'],'parts':b['massingParts'],'rings':b['rings']} for b in city['buildings'] if b.get('passageProfile')],'teleports':teleports,'placementData':{k:city[k] for k in ['bounds','land','water','roads','buildings','landmarks','rampCuts']}}
     lat=city['origin'][1]*math.pi/180;e2=6.69437999014e-3;s=math.sin(lat);rad=math.pi/180
     geo['frame'].update(mLon=rad*6378137/math.sqrt(1-e2*s*s)*math.cos(lat),mLat=rad*6378137*(1-e2)/(1-e2*s*s)**1.5)
     report={'runtimeBase':'shwang1979/slop-taipei','ruleVersion':RULE,'sourceBuildings':len(city['buildings']),

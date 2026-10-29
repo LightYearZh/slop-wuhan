@@ -12,6 +12,10 @@ def polygons_for(building):
     rings=building.get('rings') or [building['footprint']]
     return Polygon(rings[0],rings[1:])
 
+def ground_polygons_for(building):
+    if not building.get('passageProfile'):return polygons_for(building)
+    return unary_union([Polygon(p['rings'][0],p['rings'][1:]) for p in building['massingParts'] if p.get('baseY',0)<2.6])
+
 
 def line_parts(geometry):
     if geometry.is_empty:return []
@@ -22,7 +26,7 @@ def line_parts(geometry):
 def resolve_ground_layout(roads,buildings,landmarks,region,water):
     if any(r.get('bridge') or r.get('tunnel') or r.get('layer',0)!=0 for r in roads):
         raise ValueError('Ground layout requires screened ground roads; elevated roads need a separate layer')
-    blockers=[(b['id'],polygons_for(b)) for b in buildings]
+    blockers=[(b['id'],ground_polygons_for(b)) for b in buildings]
     blockers += [(l['id'],Polygon(l['footprint'][0],l['footprint'][1:])) for l in landmarks]
     shapes=[g for _,g in blockers];tree=STRtree(shapes)
     occupied=unary_union(shapes).buffer(.2)

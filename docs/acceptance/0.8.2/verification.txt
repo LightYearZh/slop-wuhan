@@ -1,0 +1,16 @@
+0.8.2 verification
+
+npm run data:build: PASS
+npm run data:runtime: PASS
+npm run verify: PASS
+JavaScript: 92 passed, 0 failed
+Python: 40 passed, 0 failed
+Spatial audit: 0 road/building overlap, 0 centreline conflicts (ground solids only)
+Production build: PASS; existing large bundle advisory remains
+Original source footprints, water, terrain, tunnels, bridges, landmarks and core destinations preserved
+25 open-building profiles; 13 ground road segments restored
+Source city hash: e746c585704241ba122c0a294ab8a6619d9b9119973797aa172fc5cb9c4db5b5
+Production browser: 0 runtime errors; keyboard driving passed in both directions (62.74m / 61.49m progress across 12.06m gate spans).
+Full-world updatePerson simulation: 560 x 1/60s steps; covered Jianghan path 40.17m crossed from (221.02,123.66) to (259.53,110.49).
+Both gate arrivals resolve to their intended mode and restored path.
+Visual screenshots inspected: three Tiemen arches, both drive directions, Jianghan canopy and walking clearance.
