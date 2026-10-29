@@ -5,6 +5,7 @@ import {GEO} from '../js/runtime/wuhan-geodata.js';
 import {TELEPORT_LOCATIONS,BOUNDS} from '../js/runtime/city-config.js';
 import {buildYellowCrane} from '../js/runtime/yellow-crane.js';
 import {buildRedHouse} from '../js/runtime/red-house.js';
+import {buildCoreLandmarks} from '../js/runtime/core-landmarks.js';
 
 test('ten curated places cover the three towns and keep residential calibration targets out',()=>{
  assert.equal(GEO.coreDestinations.length,10);
@@ -33,4 +34,13 @@ test('Red House uses the mapped concave footprint and an explicitly estimated 18
  const l=GEO.landmarks['red-house'];assert.equal(l.source,'osm-building-way-1136234332');assert.ok(l.heightSource.startsWith('visual-estimate:'));
  const root=buildRedHouse(new THREE.Group(),l),b=new THREE.Box3().setFromObject(root);
  assert.ok(Math.abs(b.max.y-18)<.01);assert.ok(b.max.x-b.min.x<80);assert.ok(b.max.z-b.min.z<45);
+});
+test('Han River crossings gain a red arch and a steel truss above their traversable decks',()=>{
+ const scene=new THREE.Scene(),{groups}=buildCoreLandmarks(scene,[],GEO.bridgeModels);
+ for(const [name,minY,maxY] of [['晴川桥钢拱',40,80],['江汉桥钢桁架',15,30]]){
+  const group=groups.find(g=>g.name===name);assert.ok(group,name);
+  const bounds=new THREE.Box3().setFromObject(group);assert.ok(bounds.max.y>minY&&bounds.max.y<maxY,name);
+  let vertices=0;group.traverse(o=>{if(o.isMesh){const p=o.geometry.getAttribute('position');vertices+=p.count;assert.ok(Array.from(p.array).every(Number.isFinite));}});
+  assert.ok(vertices>1000,name);
+ }
 });

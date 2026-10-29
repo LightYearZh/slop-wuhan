@@ -14,6 +14,7 @@ const BASE_MPP = 3; // base map: metres per pixel
 const MIN_ZOOM = 0.06;
 const MAX_ZOOM = 6;
 const CELL = 100;
+const CORE_ORDER = ['yellow-crane','yangtze-bridge','jianghanguan','jianghan-road','qingchuange','guishan-tower','red-house','greenland-center','shipping-center','heartland-66'];
 const COLORS = {
   land: '#141a21', lot: '#171e26', water: '#1b3a55', park: '#1f3a2a', forest: '#1a3324', grass: '#22402c', pitch: '#26442f',
   sidewalk: '#202832', building: '#2b343f', buildingTall: '#36404c', road: '#4f5966', major: '#7b8592', highway: '#c08a3e',
@@ -100,7 +101,9 @@ class WuhanMapSystem {
     this.mrtLines = GEO.viaducts.map(([, flat]) => flat);
 
     const list=document.getElementById('core-destination-list');
-    for(const d of GEO.coreDestinations||[]){
+    const coreRank=new Map(CORE_ORDER.map((id,i)=>[id,i]));
+    const core=[...(GEO.coreDestinations||[])].sort((a,b)=>(coreRank.get(a.id)??CORE_ORDER.length)-(coreRank.get(b.id)??CORE_ORDER.length));
+    for(const d of core){
       if(!list)break;
       const li=document.createElement('li'),button=document.createElement('button'),name=document.createElement('span'),meta=document.createElement('small');
       button.type='button';button.dataset.coreId=d.id;button.setAttribute('aria-label',`前往${d.name}`);
