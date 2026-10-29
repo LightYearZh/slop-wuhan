@@ -11,6 +11,7 @@ from shapely import make_valid
 from runtime_streets import road_graph,road_details
 from runtime_signs import build_signs
 from heritage_profiles import heritage_sites
+from heritage_paving import split_heritage_paving
 
 ROOT = Path(__file__).resolve().parents[1]
 CLASSES = ['motorway','trunk','primary','secondary','tertiary','unclassified','residential','living_street','service','pedestrian']
@@ -98,6 +99,7 @@ def convert(city):
     signs=sign_data['signs']
     print('Preparing surfaces and terrain...',flush=True)
     water=polygons(city['water']);asphalt=polygons(city['asphalt']);ped=polygons(city['pedestrian'])
+    ordinary_ped,heritage_ped,paving_sources=split_heritage_paving(city,ped)
     sides=polygons(city['shoulders']).difference(asphalt).difference(ped).difference(water)
     landmark=city['landmarks'][0];spawn=city['spawn'];bounds=city['bounds']
     heritage=heritage_sites(city)
@@ -145,7 +147,7 @@ def convert(city):
         if name:districts.extend([[name,p] for p in flat_polys(piece)])
     geo={'version':1,'city':'wuhan','frame':{'lon0':city['origin'][0],'lat0':city['origin'][1],'units':'m'},
          'bounds':dict(zip(['minX','minZ','maxX','maxZ'],bounds)),'roadClasses':CLASSES,'names':names,'nodes':nodes,'links':links,
-         'roadSourceIds':road_sources,'carriageway':flat(asphalt),'pedestrian':flat(ped),'sidewalks':flat(sides),
+         'roadSourceIds':road_sources,'carriageway':flat(asphalt),'pedestrian':flat(ordinary_ped),'heritagePaving':flat(heritage_ped),'heritagePavingSources':paving_sources,'heritagePavingPaths':[[[p[0],p[2]] for p in r['points']] for r in city['roads'] if r['id'] in paving_sources],'sidewalks':flat(sides),
          'water':flat_polys(water),'ground':flat(polygons(city['land'])),'park':flat(polygons(city['parks'])),
          'grass':[],'forest':flat(polygons(city.get('forest',[]))),'pitch':[],'apron':[],'airfield':[],'runways':[],'parking':[],'plaza':[],
          **graph,**{k:v for k,v in details.items() if k!='detailRejected'},'hills':hills or {'nx':2,'nz':2,'x0':bounds[0],'z0':bounds[1],'res':5000,'tile':2,'tiles':[]},
@@ -159,6 +161,7 @@ def convert(city):
     report={'runtimeBase':'shwang1979/slop-taipei','ruleVersion':RULE,'sourceBuildings':len(city['buildings']),
             'renderedParts':len(meta),'roadLinks':len(links),'curvedRoadLinks':sum(len(l[8])>4 for l in links),'crossings':len(details['crossings']),'signals':len(details['signals']),'streetDetailRejected':details['detailRejected'],'heightSources':dict(heights),'signRecords':len(signs),'verticalSignCandidates':sum(m['verticalAllowed'] for m in sign_data['signMeta']),'signTextSources':dict(collections.Counter(m['textSource'] for m in sign_data['signMeta'])),'signRejected':sign_rejected,
             'tunnelBores':len(tunnels),'tunnelLengthM':round(sum(t['length'] for t in tunnels),3),'tunnelProfile':'Estimated width, depth, clearance; source horizontal geometry and portal nodes',
+            'heritagePaving':{'areaM2':round(heritage_ped.area,2),'sourceRoadIds':paving_sources,'reference':'https://sw.wuhan.gov.cn/xwdt/gzdt/202009/t20200929_1458374.shtml','dimensions':'Illustrative joint spacing and centre-strip width; source walkable geometry preserved'},
             'region':city['region'],'hillTiles':len(geo['hills']['tiles']),'elevatedLinks':sum(bool(l[7]&2) for l in links),'terrainLinks':sum(bool(l[7]&8) for l in links),
             'limits':['Missing heights and 3D-GloBFP heights are estimates, not surveyed','No Taipei geography or landmarks imported',
                       'Only two masked ridges and three named crossings; deck engineering profiles estimated','Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas']}

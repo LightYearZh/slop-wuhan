@@ -98,7 +98,7 @@ class BuildingEnricher:
                 'use':tags.get('building:use') or tags.get('building','unknown'),'historic':(category=='historic'),
                 'startDate':tags.get('start_date'),'pois':[{'id':p['id'],'name':p['tags'].get('name',''),'shop':p['tags'].get('shop'),'amenity':p['tags'].get('amenity'),'tourism':p['tags'].get('tourism')} for p in pois]}
         if reference and reference.get('facadeProfile'):result['facadeProfile']=reference['facadeProfile']
-        result=apply_heritage(item,result,self.heritage_profiles)
+        result=apply_heritage(item,result,self.heritage_profiles,poly)
         if reference:
             result['heightBeforeReference']={'h':item.get('h',0),'heightSource':item.get('heightSource','visual-estimate')}
             if reference.get('identityEvidence'):result['heightEvidence']['identityEvidence']=reference['identityEvidence']

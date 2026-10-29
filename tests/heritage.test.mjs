@@ -42,3 +42,17 @@ test('all heritage models preserve mapped extents and finite geometry within a b
   }
   assert.ok(total<2300000);
 });
+
+test('reviewed roof pavilions and bank parapets are generated inside their source buildings',()=>{
+  const roofs=BUILDINGS.filter(b=>b.heritageProfile?.roofDetail);
+  assert.equal(roofs.length,3);
+  for(const b of roofs){
+    const root=buildHeritageBuilding(new THREE.Group(),b);
+    assert.equal(root.userData.heritage.roofDetail.kind,b.heritageProfile.roofDetail.kind);
+    assert.ok(root.userData.heritage.roofDetail.triangles>5);
+  }
+  const bank=BUILDINGS.find(b=>b.sourceId==='osm-building-way-789936193-0');
+  const model=buildHeritageBuilding(new THREE.Group(),bank);
+  assert.equal(model.userData.heritage.columns,6);assert.ok(model.userData.heritage.setbackM>0);
+  for(const b of BUILDINGS.filter(b=>b.heritageProfile?.parapet))assert.equal(buildHeritageBuilding(new THREE.Group(),b).userData.heritage.parapet,'balustrade');
+});

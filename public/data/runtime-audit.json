@@ -39,6 +39,15 @@
   "tunnelBores": 2,
   "tunnelLengthM": 6670.143,
   "tunnelProfile": "Estimated width, depth, clearance; source horizontal geometry and portal nodes",
+  "heritagePaving": {
+    "areaM2": 20616.15,
+    "sourceRoadIds": [
+      "osm-way-128398503-part-0",
+      "osm-way-177627147-part-0"
+    ],
+    "reference": "https://sw.wuhan.gov.cn/xwdt/gzdt/202009/t20200929_1458374.shtml",
+    "dimensions": "Illustrative joint spacing and centre-strip width; source walkable geometry preserved"
+  },
   "region": {
     "id": "wuhan-three-towns-core",
     "name": "武汉·两江三镇核心区",
@@ -62,5 +71,5 @@
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "9830e8030d60e6e05142ef9c552d8da86570bc66735dbdd42152823f65b455d9"
+  "sourceCitySha256": "f9dde297ae70eacd074437e5283933bccedc7113657aa6e55e6d1225239d663f"
 }

@@ -1,16 +1,19 @@
 """Identity-bound Hankou appearances; never infer a European facade from location alone."""
 import json
+from heritage_geometry import roof_plan
 from pathlib import Path
 
 def load_profiles():
     return json.loads((Path(__file__).resolve().parents[1]/'config/hankou-heritage.json').read_text())['buildings']
 
-def apply_heritage(item, attributes, profiles):
+def apply_heritage(item, attributes, profiles, geometry=None):
     profile=next((p for p in profiles if p['osmId']==item['id']),None)
     if not profile:return attributes
     if item.get('name')!=profile['expectedName']:
         raise ValueError('Heritage identity mismatch: '+item['id'])
     result={**attributes,'heritageProfile':profile,'category':'historic','categorySource':'reference:identity-bound-heritage','historic':True,'roofStyle':'heritage'}
+    if profile.get('roofDetail'):
+        result['heritageProfile']={**profile,'roofPlan':roof_plan(geometry,profile['roofDetail'])}
     correction=profile.get('heightCorrection')
     if correction and (correction.get('documented') or attributes['heightSource'] in ('visual-estimate','OSM:levels')):
         result['heightBeforeHeritage']={'h':attributes['h'],'heightSource':attributes['heightSource']}

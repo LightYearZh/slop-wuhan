@@ -1418,6 +1418,34 @@ function createParkPavingMaterial() {
   return mat;
 }
 
+/** Jianghan Road: rough-hewn bluestone centre strip and smoother stone on both sides.
+ * Material dimensions are illustrative; the mesh is clipped to existing source walkable surfaces.
+ */
+function createHeritagePavingMaterial(){
+  const mat=new THREE.MeshStandardNodeMaterial({metalness:0,roughness:.92});
+  const u=uv().x,v=uv().y,pixel=length(fwidth(uv())),detail=smoothstep(.16,.025,pixel);
+  const central=float(1).sub(smoothstep(.72,.80,abs(u)));
+  const row=floor(v.div(.45)),across=u.add(mod(row,2).mul(.45));
+  const id=vec2(floor(across.div(.9)),row),tone=hash2D(id);
+  const joint=max(gridLine(across,.9,.006),gridLine(v,.45,.006)).mul(detail);
+  const centreJoint=gridLine(v,.6,.009).mul(detail);
+  const chisel=noise2D(vec2(u.mul(24),v.mul(2.5))).sub(.5).mul(central).mul(detail);
+  const grain=noise2D(positionWorld.xz.mul(17)).sub(.5).mul(detail);
+  const wet=roadWetMasks(roadPuddleField(positionWorld.x,positionWorld.z),.025);
+  mat.colorNode=Fn(()=>{
+    const smooth=mix(color(0x747c79),color(0x969c94),tone.mul(.75));
+    const rough=mix(color(0x485957),color(0x64716b),tone);
+    const seam=mix(joint,centreJoint,central);
+    const edgeBand=smoothstep(6.65,6.7,abs(u)).mul(float(1).sub(smoothstep(6.92,6.97,abs(u))));
+    const base=mix(mix(smooth,rough,central),color(0x46524e),edgeBand);
+    const surface=base.mul(float(1).sub(seam.mul(.34))).add(chisel.mul(.023)).add(grain.mul(.028));
+    return surface.mul(mix(float(1),float(.71),max(wet.x,wet.z.mul(.7))));
+  })();
+  mat.roughnessNode=mix(mix(float(.87),float(.97),central),float(.46),max(wet.x,wet.z));
+  mat.normalNode=bumpNormal(chisel.mul(.004).add(grain.mul(.001)).sub(mix(joint,centreJoint,central).mul(.004)));
+  mat.aoNode=canyonSkyAONode();mat.name='JianghanBluestone';return mat;
+}
+
 /**
  * Central Park Perimeter Wall TSL Material: coursed grey schist & gneiss ashlar with recessed mortar joints on
  * the vertical faces and a smoother pale bluestone coping on top (axis-aligned walls, world-space courses).
@@ -3348,6 +3376,7 @@ export {
   createCarPaintMaterial,
   createTreeMaterial,
   createParkPavingMaterial,
+  createHeritagePavingMaterial,
   createParkWallMaterial,
   createIronFenceMaterial,
   createParkLampGlobeMaterial,

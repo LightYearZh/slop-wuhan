@@ -1,11 +1,12 @@
 import * as THREE from 'three/webgpu';
 import {createFootprintGeometry} from '../footprint-buildings.js';
+import {appendHeritageRoof} from './heritage-roofs.js';
 import {modelBuilder,craftTexture} from './landmark-craft.js';
 
 // Small reusable vocabulary, bound to reviewed OSM identities by the data pipeline.
 // No district-wide "European" randomizer; modern banks deliberately omit classical ornament.
-const CLASSICAL = new Set(['taiwan-bank','hsbc-bank','citibank','corner-cupola','classical-commercial','brick-commercial']);
-const COLONNADE = new Set(['taiwan-bank','hsbc-bank','citibank','corner-cupola']);
+const CLASSICAL = new Set(['taiwan-bank','hsbc-bank','citibank','corner-cupola','classical-commercial','brick-commercial','colonnaded-bank']);
+const COLONNADE = new Set(['taiwan-bank','hsbc-bank','citibank','corner-cupola','colonnaded-bank']);
 
 function masonryTexture(){
   if(typeof document==='undefined')return null;
@@ -24,19 +25,50 @@ function masonryTexture(){
   const map=new THREE.CanvasTexture(c);map.wrapS=map.wrapT=THREE.RepeatWrapping;map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=4;return map;
 }
 
+function roofMetalTexture(){
+  if(typeof document==='undefined')return null;
+  const canvas=document.createElement('canvas');canvas.width=canvas.height=512;
+  const ctx=canvas.getContext('2d');if(!ctx)return null;
+  ctx.fillStyle='#737a75';ctx.fillRect(0,0,512,512);
+  for(let x=0;x<512;x+=64){ctx.fillStyle='#414b46';ctx.fillRect(x,0,2,512);ctx.fillStyle='#8a918a';ctx.fillRect(x+2,0,2,512);}
+  for(let y=0;y<512;y+=256){ctx.fillStyle='#59625d';ctx.fillRect(0,y,512,2);}
+  const map=new THREE.CanvasTexture(canvas);map.wrapS=map.wrapT=THREE.RepeatWrapping;map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=4;return map;
+}
+
 let materials;
 export function heritageMaterials(){
-  if(!materials)materials={
+  if(!materials){
+    const stoneMap=masonryTexture();
+    materials={
     brick:new THREE.MeshStandardNodeMaterial({color:0xffffff,map:craftTexture('brick'),roughness:.94}),
-    stone:new THREE.MeshStandardNodeMaterial({color:0xe6e0d1,map:masonryTexture(),roughness:.9}),
-    trim:new THREE.MeshStandardNodeMaterial({color:0xbab6a8,roughness:.86}),
-    pale:new THREE.MeshStandardNodeMaterial({color:0xd4cfc0,roughness:.9}),
+    stone:new THREE.MeshStandardNodeMaterial({color:0xc1baa9,map:stoneMap,bumpMap:stoneMap,bumpScale:.008,roughness:.93}),
+    trim:new THREE.MeshStandardNodeMaterial({color:0x929082,roughness:.86}),
+    pale:new THREE.MeshStandardNodeMaterial({color:0xb9b19f,roughness:.9}),
+    wood:new THREE.MeshStandardNodeMaterial({color:0x493727,roughness:.82}),
+    brass:new THREE.MeshStandardNodeMaterial({color:0x9a7e46,roughness:.48,metalness:.58}),
+    copper:new THREE.MeshStandardNodeMaterial({color:0x7a4c37,roughness:.72,metalness:.25}),
+    glassWarm:new THREE.MeshStandardNodeMaterial({color:0x484435,roughness:.56,metalness:.08}),
+    glassDust:new THREE.MeshStandardNodeMaterial({color:0x3c4c4c,roughness:.62,metalness:.12}),
     glass:new THREE.MeshStandardNodeMaterial({color:0x273332,roughness:.42,metalness:.15}),
     recess:new THREE.MeshStandardNodeMaterial({color:0x45473f,roughness:.96}),
     iron:new THREE.MeshStandardNodeMaterial({color:0x393e38,roughness:.66,metalness:.35}),
-    roof:new THREE.MeshStandardNodeMaterial({color:0x777c71,roughness:.8,metalness:.15})
+    roof:new THREE.MeshStandardNodeMaterial({color:0x93998e,map:roofMetalTexture(),roughness:.82,metalness:.18})
   };
+  }
   return materials;
+}
+
+const plaqueCache=new Map();
+function heritagePlaqueMaterial(label,fallback){
+  if(typeof document==='undefined')return fallback;
+  if(plaqueCache.has(label))return plaqueCache.get(label);
+  const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=128;
+  const ctx=canvas.getContext('2d');if(!ctx)return fallback;
+  ctx.fillStyle='#393c34';ctx.fillRect(0,0,1024,128);
+  ctx.strokeStyle='#ac9865';ctx.lineWidth=5;ctx.strokeRect(8,8,1008,112);
+  ctx.fillStyle='#dfd1aa';ctx.font='600 52px "Noto Sans SC", sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,512,65,960);
+  const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;map.anisotropy=4;
+  const mat=new THREE.MeshStandardNodeMaterial({map,roughness:.83});plaqueCache.set(label,mat);return mat;
 }
 
 export function facadeEdges(flat){
@@ -80,7 +112,7 @@ export function buildHeritageBuilding(root,b,m=heritageMaterials()){
   if(!face)throw Error('No usable heritage facade: '+b.sourceId);
   const classical=CLASSICAL.has(p.template),colonnade=COLONNADE.has(p.template);
   const cupola=p.template==='corner-cupola',deco=p.template==='restrained-deco';
-  const roofReserve=cupola?7.5:p.template==='hsbc-bank'?3.5:deco?1.8:.7;
+  const roofReserve=p.roofDetail?.reserveM??(cupola?7.5:p.template==='hsbc-bank'?3.5:deco?1.8:.7);
   const bodyH=H-roofReserve,baseH=bodyH*(p.template==='citibank'?.23:.30),atticH=bodyH*.12;
   const setback=colonnade?Math.min(1.8,face.L*.055):0;
   const prism=(rings,lo,hi,mat)=>{
@@ -106,13 +138,13 @@ export function buildHeritageBuilding(root,b,m=heritageMaterials()){
     builder.add(new THREE.ShapeGeometry(s,10),mat,...wall(e,u,y,depth),e.yaw+Math.PI);
   };
   const window=(e,u,y,w,h,arched,depth)=>{
-    const frame=.13;
+    const frame=.13,glazing=[m.glass,m.glassWarm,m.glassDust][Math.abs(Math.floor(u*7+y*11))%3];
     if(arched){
-      arch(e,u,y,w+.3,h+.3,depth,m.trim);arch(e,u,y,w,h,depth+.025,m.glass);
+      arch(e,u,y,w+.3,h+.3,depth,m.trim);arch(e,u,y,w,h,depth+.025,glazing);
       // Voussoirs around the arch are a shallow geometry detail, not a white painted semicircle.
       for(let i=0;i<=8;i++){const a=i*Math.PI/8,xx=u+Math.cos(a)*(w/2+.12),yy=y+h/2-w/2+Math.sin(a)*(w/2+.12);box(e,xx,yy,.22,.28,.12,m.trim,depth+.07);}
     }else{
-      box(e,u,y,w+.3,h+.3,.10,m.trim,depth);box(e,u,y,w,h,.10,m.glass,depth+.065);
+      box(e,u,y,w+.3,h+.3,.10,m.trim,depth);box(e,u,y,w,h,.10,glazing,depth+.065);
       box(e,u,y+h/2+.22,w+.7,.16,.32,m.pale,depth+.04);
     }
     box(e,u,y-h/2-.12,w+.48,.18,.32,m.pale,depth+.03);
@@ -154,6 +186,13 @@ export function buildHeritageBuilding(root,b,m=heritageMaterials()){
       for(let i=0;i<3;i++)box(e,e.L/2,bodyH+i*.5,e.L*(.36-i*.08),.55,.24,m.trim,.02);
     }
   }
+  if(p.parapet==='balustrade')for(const e of edges){
+    if(e.L<3)continue;
+    const top=H-.12,low=bodyH+.12;
+    box(e,e.L/2,top,e.L,.18,.27,m.pale,-.18);
+    for(let u=.5;u<e.L-.2;u+=.65)box(e,u,(low+top)/2,.12,Math.max(.12,top-low),.17,m.trim,-.18);
+    for(let u=.3;u<e.L;u+=4)box(e,u,(low+top)/2,.33,Math.max(.2,top-low),.32,m.pale,-.18);
+  }
   if(colonnade){
     const n=p.columns||8,lo=baseH+.3,hi=bodyH-atticH-.3,r=Math.min(.55,face.L/(n*5));
     for(let i=0;i<n;i++){
@@ -170,10 +209,20 @@ export function buildHeritageBuilding(root,b,m=heritageMaterials()){
   window(face,face.L/2,baseH*.46,ew,baseH*.76,classical,.12);
   box(face,face.L/2,baseH-.35,ew+1.7,.45,.65,m.pale,-.12);
   for(let step=0;step<3;step++)box(face,face.L/2,.12+step*.16,ew+1.0-step*.25,.20,.6-step*.12,m.trim,-.3);
+  const doorH=Math.min(3.1,baseH*.69),doorY=doorH/2+.15;
+  box(face,face.L/2,doorY,ew*.82,doorH,.13,m.wood,.17);
+  for(const side of [-1,1]){
+    box(face,face.L/2+side*ew*.2,doorY+.28,ew*.29,doorH*.55,.07,m.glass,.26);
+    box(face,face.L/2+side*.13,doorY-.12,.045,.48,.07,m.brass,.33);
+  }
+  const plaque=heritagePlaqueMaterial(p.label,m.brass),plaqueW=Math.min(6.2,face.L*.45);
+  box(face,face.L/2,Math.max(doorH+.6,baseH-.13),plaqueW,.52,.13,plaque,.26);
   if(p.template==='hsbc-bank'){
     // The raised central gable is the bank's signature; retain the ordinary flat parapets at the wings.
     const w=Math.min(12,face.L*.28),u=face.L/2;
     box(face,u,bodyH+1,w,2,.45,m.stone,-.1);window(face,u,bodyH+1,w*.55,1.5,true,.16);
+    const pediment=new THREE.Shape();pediment.moveTo(-w*.55,0);pediment.lineTo(0,H-bodyH-.65);pediment.lineTo(w*.55,0);pediment.closePath();
+    builder.add(new THREE.ShapeGeometry(pediment),m.pale,...wall(face,u,bodyH+.65,.12),face.yaw+Math.PI);
     for(const [a,c]of [[[u-w*.55,bodyH+.6,.1],[u, H,.1]],[[u,H,.1],[u+w*.55,bodyH+.6,.1]]])segment(face,a,c,.19,m.trim);
   }
   if(cupola){
@@ -189,7 +238,8 @@ export function buildHeritageBuilding(root,b,m=heritageMaterials()){
     const dome=new THREE.SphereGeometry(r*1.12,24,12,0,Math.PI*2,0,Math.PI/2);dome.scale(1,.82,1);builder.add(dome,m.roof,cx,y0+H-3.1,cz);
     builder.cyl(.24,.34,.75,cx,y0+H-.4,cz,m.pale,10);
   }
+  const roofDetail=appendHeritageRoof(builder,b,bodyH,m);
   builder.finish();root.name='HankouHeritage_'+b.sourceId;
-  root.userData.heritage={sourceId:b.sourceId,name:p.label,template:p.template,facadeBays:bays,mainNormal:[face.nx,face.nz],setbackM:setback,columns:colonnade?(p.columns||8):0,detailConfidence:p.detailConfidence};
+  root.userData.heritage={sourceId:b.sourceId,name:p.label,template:p.template,roofDetail,parapet:p.parapet||null,entryPlaque:p.label,facadeBays:bays,mainNormal:[face.nx,face.nz],setbackM:setback,columns:colonnade?(p.columns||8):0,detailConfidence:p.detailConfidence};
   return root;
 }

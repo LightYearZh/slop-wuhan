@@ -26,7 +26,8 @@
         "source": "https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/t20190301_3719.shtml",
         "meaning": "Photo-envelope estimate including parapet/cupola; not a surveyed architectural height"
       },
-      "photo": "https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/W020190301826863781869.jpg"
+      "photo": "https://www.jianghan.gov.cn/mljh/zsyz/zsdt/201903/W020190301826863781869.jpg",
+      "parapet": "balustrade"
     },
     {
       "osmId": "osm-building-way-767972188",
@@ -72,7 +73,8 @@
         "source": "https://www.whcbs.com/Upload/BookReadFile/202004/8bcbb02411c04eb6b90f150e861056bb.pdf",
         "meaning": "Published total height; replaces conflicting OSM 20m tag, ornament dimensions remain estimated"
       },
-      "photo": "https://commons.wikimedia.org/wiki/File:20240622_Former_Site_of_The_National_City_Bank_of_New_York,_Hankow_Branch.jpg"
+      "photo": "https://commons.wikimedia.org/wiki/File:20240622_Former_Site_of_The_National_City_Bank_of_New_York,_Hankow_Branch.jpg",
+      "parapet": "balustrade"
     },
     {
       "osmId": "osm-building-way-767972190",
@@ -218,14 +220,15 @@
       "osmId": "osm-building-way-789936193",
       "expectedName": "交通银行大楼",
       "label": "交通银行旧址",
-      "template": "classical-commercial",
+      "template": "colonnaded-bank",
       "floors": 4,
       "frontHint": [
         -0.7,
         0.71
       ],
       "source": "https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter015.html",
-      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated",
+      "columns": 6
     },
     {
       "osmId": "osm-building-way-789936213",
@@ -309,7 +312,19 @@
         -0.71
       ],
       "source": "https://www.wuhan.gov.cn/sy/whyw/202205/t20220525_1976737.shtml",
-      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated",
+      "roofDetail": {
+        "kind": "onion-pavilion",
+        "reserveM": 3.4,
+        "radiusM": 2.1,
+        "slopeWidthM": 1.9,
+        "slopeFraction": 0.5,
+        "anchorHint": [
+          175,
+          -445
+        ],
+        "source": "https://www.wuhan.gov.cn/sy/whyw/202205/t20220525_1976737.shtml"
+      }
     },
     {
       "osmId": "osm-building-way-1314323878",
@@ -322,7 +337,19 @@
         -0.71
       ],
       "source": "https://www.wuhan.gov.cn/sy/whyw/202205/t20220525_1976737.shtml",
-      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated",
+      "roofDetail": {
+        "kind": "onion-pavilion",
+        "reserveM": 3.4,
+        "radiusM": 2.3,
+        "slopeWidthM": 2.2,
+        "slopeFraction": 0.52,
+        "anchorHint": [
+          120,
+          -351
+        ],
+        "source": "https://wlt.hubei.gov.cn/bmdt/mtjj/202609/t20260916_6015370.shtml"
+      }
     },
     {
       "osmId": "osm-building-way-770782892",
@@ -335,7 +362,19 @@
         0.44
       ],
       "source": "https://www.whcbs.com/Upload/BookReadFile/202002/815f04fc613b45f399c1d43f7777afc5/ops/chapter086.html",
-      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated"
+      "detailConfidence": "typology-reference;facade-and-ornament-dimensions-estimated",
+      "roofDetail": {
+        "kind": "octagonal-belvedere",
+        "reserveM": 4.2,
+        "radiusM": 2.8,
+        "slopeWidthM": 1.5,
+        "slopeFraction": 0.18,
+        "anchorHint": [
+          477,
+          -663
+        ],
+        "source": "https://www.whzx.gov.cn/zxzl/wsl/whwszl/202307/P020240126551516139360.pdf"
+      }
     },
     {
       "osmId": "osm-building-way-1095192364",

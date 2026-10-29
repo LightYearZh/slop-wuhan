@@ -1,9 +1,10 @@
 import * as THREE from 'three/webgpu';
+import {pavingCoordinates} from './paving-coordinates.js';
 import { GEO } from './wuhan-geodata.js';
 import { BOUNDS, SIDEWALK_HEIGHT, WATER_LEVEL, hillHeight } from './city-config.js';
 import {
   createRoadSurfaceMaterial, createWuhanSidewalkMaterial, createCurbMaterial, createLotGroundMaterial, createParkLawnMaterial,
-  createForestFloorMaterial, createWaterMaterial, createParkPavingMaterial, createMountainMaterial
+  createForestFloorMaterial, createWaterMaterial, createParkPavingMaterial, createMountainMaterial, createHeritagePavingMaterial
 } from './tsl-materials.js';
 
 // js/ground.js
@@ -29,7 +30,7 @@ const ringArea = (r) => {
 };
 
 // Flat polygons [[outer, ...holes], ...] -> chunked meshes at height y (uv.x carries `style` for the paving material)
-function flatLayer(group, polys, y, material, name, { style = 0, yAt = null } = {}) {
+function flatLayer(group, polys, y, material, name, { style = 0, yAt = null, uvAt = null } = {}) {
   const chunks = new Map();
   for (const poly of polys) {
     const outer = poly[0];
@@ -76,7 +77,10 @@ function flatLayer(group, polys, y, material, name, { style = 0, yAt = null } = 
     for (let i = 0; i < n; i++) nor[i * 3 + 1] = 1;
     g.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
     const uv = new Float32Array(n * 2);
-    for (let i = 0; i < n; i++) uv[i * 2] = style;
+    for (let i = 0; i < n; i++) {
+      const coords=uvAt?uvAt(c.pos[i*3],c.pos[i*3+2]):[style,0];
+      uv[i*2]=coords[0];uv[i*2+1]=coords[1];
+    }
     g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
     g.setIndex(n > 65535 ? new THREE.Uint32BufferAttribute(c.idx, 1) : new THREE.Uint16BufferAttribute(c.idx, 1));
     if (yAt) g.computeVertexNormals();
@@ -232,6 +236,8 @@ function buildGround(scene) {
   flatLayer(group, GEO.apron, 0.02, road, 'Apron');
   flatLayer(group, GEO.airfield, 0.025, road, 'Runway');
   flatLayer(group, GEO.pedestrian, 0.035, paving, 'PedestrianStreets', { style: 1,...terrain });
+
+  flatLayer(group,GEO.heritagePaving||[],.035,createHeritagePavingMaterial(),'JianghanBluestone',{...terrain,uvAt:(x,z)=>pavingCoordinates(x,z,GEO.heritagePavingPaths||[])});
 
   // Sports grounds
   const byColor = new Map();

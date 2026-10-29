@@ -1,0 +1,115 @@
+{
+  "version": "0.8.4",
+  "baseline": "16dacd3",
+  "sourceCitySha256": "f9dde297ae70eacd074437e5283933bccedc7113657aa6e55e6d1225239d663f",
+  "sourceHeightsAndFootprintsUnchanged": true,
+  "roadsUnchanged": true,
+  "heritagePaving": {
+    "areaM2": 20616.15,
+    "sourceRoadIds": [
+      "osm-way-128398503-part-0",
+      "osm-way-177627147-part-0"
+    ],
+    "reference": "https://sw.wuhan.gov.cn/xwdt/gzdt/202009/t20200929_1458374.shtml",
+    "dimensions": "Illustrative joint spacing and centre-strip width; source walkable geometry preserved"
+  },
+  "roofs": [
+    {
+      "name": "巴诺夫公馆（小巴公）",
+      "roofTriangleCount": 22,
+      "footprintErrorM2": 0.0,
+      "pavilion": {
+        "x": 173.5398,
+        "z": -444.2356,
+        "radiusM": 2.1
+      }
+    },
+    {
+      "name": "美国领事馆旧址",
+      "roofTriangleCount": 16,
+      "footprintErrorM2": 0.0,
+      "pavilion": {
+        "x": 475.8987,
+        "z": -665.5381,
+        "radiusM": 2.8
+      }
+    },
+    {
+      "name": "巴诺夫公馆（大巴公）",
+      "roofTriangleCount": 16,
+      "footprintErrorM2": 0.0,
+      "pavilion": {
+        "x": 120.205,
+        "z": -353.5678,
+        "radiusM": 2.3
+      }
+    }
+  ],
+  "pavingAudit": {
+    "partitionAreaDifferenceM2": 0.007054999998217681,
+    "overlapWithCarriagewayM2": 0.03466351060000981,
+    "overlapWithWaterM2": 0.0,
+    "heritageAreaM2": 20616.145624999983
+  },
+  "automatedVerification": {
+    "javascriptTests": 98,
+    "pythonTests": 42,
+    "productionBuild": "passed",
+    "roadBuildingOverlapM2": 0,
+    "centrelineConflicts": 0
+  },
+  "browserVerification": {
+    "origin": "http://127.0.0.1:4187",
+    "viewports": [
+      [
+        1280,
+        920
+      ],
+      [
+        390,
+        844
+      ]
+    ],
+    "runtimeErrors": [],
+    "heritageModels": 22,
+    "pavingMeshes": [
+      {
+        "name": "JianghanBluestone_-1,-1",
+        "vertices": 110
+      },
+      {
+        "name": "JianghanBluestone_-1,0",
+        "vertices": 843
+      }
+    ],
+    "visualReview": [
+      "Jianghan source-aligned bluestone centre strip and offset slabs visible from street level",
+      "Taiwan, Citi and Communications bank entrance plaques and recessed colonnades visible",
+      "Bagong source-contained roof slopes and corner pavilion visible",
+      "US consulate octagonal roof pavilion visible",
+      "Narrow-screen mode control and return-to-player remain available"
+    ],
+    "screenshots": [
+      "084-street-final.png",
+      "084-taiwan-entry.png",
+      "084-citibank-entry.png",
+      "084-communications-entry.png",
+      "084-bagong-final.png",
+      "084-consulate-roof.png",
+      "084-narrow.png"
+    ],
+    "handoff": {
+      "url": "http://127.0.0.1:4187/",
+      "location": "江汉关附近",
+      "mode": "person",
+      "camera": "chase",
+      "hudHidden": false,
+      "cameraOverride": false
+    }
+  },
+  "limits": [
+    "Roof proportions, pane positions, plaque placement and paving module dimensions remain display estimates",
+    "Roof features use existing display-height envelope; total source heights remain unchanged",
+    "No interiors, new missions or expansion of the city region in this pass"
+  ]
+}
