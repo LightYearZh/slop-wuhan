@@ -346,6 +346,20 @@ class WuhanMapSystem {
     }
   }
 
+  setTaxiNavigation(navigation){
+    this.taxiNavigation=navigation;this.lastMini.x=Infinity;
+    if(this.isFullMapOpen)this.renderFullMap();
+  }
+
+  drawTaxiNavigation(ctx,T){
+    const nav=this.taxiNavigation;if(!nav)return;
+    ctx.save();ctx.strokeStyle='#10181d';ctx.lineWidth=7;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();
+    nav.points.forEach((p,i)=>(i?ctx.lineTo:ctx.moveTo).call(ctx,T.X(p.x),T.Z(p.z)));ctx.stroke();
+    ctx.strokeStyle=nav.color;ctx.lineWidth=4;ctx.stroke();
+    const x=T.X(nav.target.x),y=T.Z(nav.target.z);ctx.fillStyle=nav.color;ctx.beginPath();ctx.arc(x,y,10,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#10181d';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(nav.label,x,y);ctx.restore();
+  }
+
   drawPlayer(ctx, T, size = 9) {
     const ent = this.controllerManager.getActiveEntity();
     const x = T.X(ent.position.x);
@@ -400,6 +414,7 @@ class WuhanMapSystem {
     ctx.scale(1, 1);
     this.drawLabels(ctx, { ...view }, T, { minimap: true });
     ctx.restore();
+    this.drawTaxiNavigation(ctx,T);
     this.drawPlayer(ctx, T, 8 * dpr);
   }
 
@@ -462,6 +477,7 @@ class WuhanMapSystem {
       ctx.arc(T.X(this.waypoint.x), T.Z(this.waypoint.z), 6, 0, Math.PI * 2);
       ctx.fill();
     }
+    this.drawTaxiNavigation(ctx,T);
     this.drawPlayer(ctx, T, 11);
     const ent = this.controllerManager.getActiveEntity();
     if (this.elPlayerInfo) this.elPlayerInfo.textContent = `你在 ${getLocationLabel(ent.position.x, ent.position.z).replace(' · ', '　').replace(' & ', '・')}`;

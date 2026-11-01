@@ -16,6 +16,7 @@ import { buildStreetProps } from './street-props.js';
 import { buildLandmarks } from './landmarks.js';
 import { createTrafficSystem } from './traffic.js';
 import { ThirdPersonControllerManager } from './controllers.js';
+import {createTaxiService} from './taxi-fare.js';
 import { TouchControls } from './touch-controls.js';
 import { GamepadControls } from './gamepad-controls.js';
 import { CameraSystem, CAMERA_PRESETS } from './cameras.js';
@@ -108,6 +109,7 @@ async function initApp() {
   // 4. Third-person controllers (person, taxi, scooter, helicopter) & the camera system
   const controllerManager = new ThirdPersonControllerManager(scene, allColliders);
   controllerManager.trafficVehicles = trafficSystem.vehicles;
+  const taxiService=createTaxiService(scene,{controllers:controllerManager,getMap:()=>mapSystem,goToStand:spot=>{selectMode('car');teleportTo(spot.x,spot.z,spot.heading,spot.y);}});
   // Reuse teleport placement so saved players return at rest, close to their last positions.
   try {
     const saved = JSON.parse(localStorage.getItem('wuhan-taipei-runtime-player-v1'));
@@ -315,6 +317,7 @@ async function initApp() {
   }
 
   function selectMode(mode) {
+    if(mode!=='car')taxiService.cancelForTravel('已结束本单：切换了移动方式');
     controllerManager.setMode(mode);
     mode=controllerManager.activeMode;
     touchControls.setMode(controllerManager.activeMode);
@@ -469,6 +472,7 @@ async function initApp() {
   }
 
   function teleportTo(x, z, heading = Math.PI, y = null) {
+    taxiService.cancelForTravel('已结束本单：传送不计入接送行程');
     const destination = controllerManager.teleportActiveTo(x, z, heading,travelAltitude(controllerManager.activeMode,y));
     touchControls.reset();
     gamepadControls.reset();
@@ -669,7 +673,7 @@ async function initApp() {
   window.addEventListener('error',e=>runtimeErrors.push(e.message));
   window.addEventListener('unhandledrejection',e=>runtimeErrors.push(String(e.reason)));
   window.wuhan={ready:false,base:'slop-taipei',data:GEO,scene,renderer,controllers:controllerManager,cameraSystem,map:mapSystem,
-    placement:streetProps.placement,stats:{...streetProps.stats,buildings:cityBlocks.stats},setMode:mode=>selectMode(mode),
+    placement:streetProps.placement,stats:{...streetProps.stats,buildings:cityBlocks.stats},taxi:taxiService,setMode:mode=>selectMode(mode),
     setView:id=>selectCamera(typeof id==='number'?CAMERA_PRESETS[id].id:id,true),
     gotoLandmark:(id,{mode=null}={})=>{const l=TELEPORT_LOCATIONS[id]||GEO.landmarks[id];if(!l)return false;visitDestination(l,mode);return true},
     metrics:()=>({errors:runtimeErrors,frames:frameTimes.slice(-180),render:renderer.info.render,base:'slop-taipei'})};
@@ -702,6 +706,7 @@ async function initApp() {
     gamepadControls.update(dt);
     controllerManager.update(dt, elapsed);
     cameraSystem.update(dt, elapsed);
+    taxiService.update(dt,elapsed);
     const tunnelCamera=controllerManager.activeMode==='car'&&TUNNELS.camera(cameraSystem.camera.position,controllerManager.entities.car);
     if(tunnelCamera){cameraSystem.camera.position.set(tunnelCamera.x,tunnelCamera.y,tunnelCamera.z);cameraSystem.currentPos.copy(cameraSystem.camera.position);cameraSystem.camera.lookAt(controllerManager.entities.car.position.clone().add(new THREE.Vector3(Math.sin(controllerManager.entities.car.heading)*6,1.4,Math.cos(controllerManager.entities.car.heading)*6)));}
     streetProps.update(dt, elapsed, cameraSystem.camera);

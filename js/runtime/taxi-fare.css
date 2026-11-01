@@ -1,0 +1,22 @@
+#taxi-service{position:fixed;top:104px;left:20px;z-index:24;width:330px;max-width:calc(100vw - 40px);padding:18px;border-radius:14px;background:rgba(20,24,27,.96);box-shadow:0 8px 28px rgba(0,0,0,.28);color:#f6f4e9;font:14px/1.5 system-ui,-apple-system,"PingFang SC",sans-serif;user-select:text}
+#taxi-service[hidden],#taxi-service [hidden],body.hud-minimized #taxi-service,body:not([data-mode="car"]) #taxi-service{display:none!important}
+#taxi-service header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+#taxi-service h2{font-size:16px;font-weight:700;margin:0}
+#taxi-shift{font-size:12px;font-variant-numeric:tabular-nums;color:#d9d6c9}
+#taxi-service h3{font-size:19px;line-height:1.4;margin:8px 0 10px;text-wrap:balance}
+#taxi-status{color:#ffd657;margin:0;font-size:13px}
+#taxi-service[data-phase="ride"] #taxi-status,#taxi-service[data-phase="complete"] #taxi-status{color:#9de7ea}
+#taxi-detail{color:#d9d6c9;margin:0 0 16px;line-height:1.65;overflow-wrap:anywhere}
+#taxi-actions{display:flex;flex-wrap:wrap;gap:8px}
+#taxi-service button{border:0;border-radius:9px;min-height:40px;padding:9px 14px;cursor:pointer;font:inherit;font-weight:600;transition:background .15s ease-out,color .15s ease-out}
+#taxi-primary{background:#ffc61a;color:#181916;flex:1}
+#taxi-primary:hover{background:#ffdc6b}
+#taxi-secondary,#taxi-stand{background:#353b3e;color:#f6f4e9}
+#taxi-secondary:hover,#taxi-stand:hover{background:#4a5356}
+#taxi-stand{width:100%}
+#taxi-service button:focus-visible{outline:2px solid #fff2bd;outline-offset:3px}
+#taxi-service kbd{font-size:11px;padding-left:6px}
+#taxi-hold{height:4px;background:#535a5b;border-radius:3px;overflow:hidden;margin-bottom:14px}
+#taxi-hold span{display:block;background:#ffc61a;height:100%;transform-origin:left;transform:scaleX(0)}
+#taxi-service::selection,#taxi-service ::selection{background:#ffc61a;color:#181916}
+@media(max-width:800px){#taxi-service{left:12px;top:138px;width:300px;max-width:calc(100vw - 24px);padding:12px;font-size:13px}#taxi-service header{margin-bottom:10px}#taxi-service h3{font-size:17px}#taxi-detail{margin-bottom:10px}}

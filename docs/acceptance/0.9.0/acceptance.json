@@ -1,0 +1,151 @@
+{
+  "version": "0.9.0",
+  "javascriptTests": {
+    "passed": 117,
+    "failed": 0
+  },
+  "productionBuild": "passed",
+  "securityScan": {
+    "files": 681,
+    "commits": 40,
+    "currentSecrets": 0,
+    "historySecrets": 0,
+    "currentPrivacy": 0
+  },
+  "taxiTrips": [
+    {
+      "job": "hankou-1",
+      "result": {
+        "fare": 10.6,
+        "distance": 1052.6526215580445,
+        "seconds": 92.63333333333313,
+        "from": "江汉关附近 · 沿江大道",
+        "to": "巴公房子附近 · 沿江大道"
+      },
+      "events": [
+        {
+          "t": 0,
+          "phase": "idle"
+        },
+        {
+          "t": 1,
+          "phase": "offer"
+        },
+        {
+          "t": 3,
+          "phase": "pickup"
+        },
+        {
+          "t": 10.166666666666666,
+          "phase": "boarding"
+        },
+        {
+          "t": 12.2,
+          "phase": "ride"
+        },
+        {
+          "t": 104.83333333333333,
+          "phase": "alighting"
+        },
+        {
+          "t": 106.86666666666666,
+          "phase": "complete"
+        }
+      ],
+      "browserErrors": []
+    },
+    {
+      "job": "hankou-2",
+      "result": {
+        "fare": 10,
+        "distance": 791.2552649698754,
+        "seconds": 71.26666666669023,
+        "from": "航运中心附近 · 沿江大道",
+        "to": "汉口江滩 · 沿江大道"
+      },
+      "events": [
+        {
+          "t": 0,
+          "phase": "idle"
+        },
+        {
+          "t": 1,
+          "phase": "offer"
+        },
+        {
+          "t": 3,
+          "phase": "pickup"
+        },
+        {
+          "t": 10.266666666666667,
+          "phase": "boarding"
+        },
+        {
+          "t": 12.266666666666667,
+          "phase": "ride"
+        },
+        {
+          "t": 83.53333333333333,
+          "phase": "alighting"
+        },
+        {
+          "t": 85.53333333333333,
+          "phase": "complete"
+        }
+      ],
+      "browserErrors": []
+    },
+    {
+      "job": "hankou-3",
+      "result": {
+        "fare": 11.2,
+        "distance": 1279.5530154560715,
+        "seconds": 113.56666666664236,
+        "from": "汉口江滩 · 沿江大道",
+        "to": "领事馆旧址街区 · 沿江大道"
+      },
+      "events": [
+        {
+          "t": 0,
+          "phase": "idle"
+        },
+        {
+          "t": 1,
+          "phase": "offer"
+        },
+        {
+          "t": 3,
+          "phase": "pickup"
+        },
+        {
+          "t": 10.1,
+          "phase": "boarding"
+        },
+        {
+          "t": 12.1,
+          "phase": "ride"
+        },
+        {
+          "t": 125.66666666666667,
+          "phase": "alighting"
+        },
+        {
+          "t": 127.7,
+          "phase": "complete"
+        }
+      ],
+      "browserErrors": []
+    }
+  ],
+  "method": "Normal accept buttons and throttle, steering, brake via existing controllers and traffic physics. No forced pickup, payment or in-trip teleport. Fast validation skips drawing between confirmation frames.",
+  "recording": {
+    "fullSeconds": 109,
+    "job": "hankou-1",
+    "drivenMetres": 1053.115,
+    "rideSeconds": 91.767,
+    "fare": 10.6,
+    "browserErrors": [],
+    "audio": false,
+    "editedDemo": "Approx. 32 seconds excerpted from the continuous source; stored outside Git."
+  }
+}

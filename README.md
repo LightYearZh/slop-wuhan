@@ -8,7 +8,7 @@ A browser-based Wuhan city simulation, inspired by Slop New York. Walk, drive a 
 
 **[在线体验武汉](https://lightyearzh.github.io/slop-wuhan/)** · **[原作体验](https://mrdoob.github.io/slop-newyork/)** · **[其他 Slop 城市](https://github.com/zz85/slop-cities)** · **[本地运行](#本地运行)** · **[更新记录](docs/CHANGELOG.md)**
 
-> 当前版本 **0.8.5**，已通过 GitHub Pages 提供在线体验；建议使用支持 WebGPU 的桌面浏览器。首次进入需要加载地图并编译着色器。这是可自由探索的城市漫游原型，尚未加入完整剧情、接单和计费任务。
+> 当前版本 **0.9.0**，增加汉口短途出租车接送：主动接单、沿路导航、乘客上下车和虚拟车费结算。建议使用支持 WebGPU 的桌面浏览器，首次进入需要加载地图并编译着色器。当前仍是城市漫游原型，尚未加入完整剧情和经营系统。
 
 ![江汉关钟楼与沿江街区，0.8.5实机画面](docs/screenshots/jianghanguan.png)
 
@@ -21,6 +21,7 @@ A browser-based Wuhan city simulation, inspired by Slop New York. Walk, drive a 
 - **街区与历史建筑**：江汉路、沿江大道和22栋有来源身份记录的历史建筑立面，包括柱廊、拱窗、阳台、檐口与转角圆顶。
 - **跨江通行**：武汉长江大桥、晴川桥、江汉桥，以及连接汉口与武昌的武汉长江隧道两条单向主洞。
 - **自由漫游**：步行、驾驶出租车、骑行、飞行；小地图、路名与地点搜索、传送、景点相机，以及黄昏、正午、蓝调和夜间四种时段。
+- **出租车接送**：汽车模式主动开始接单，在汉口三条短途路线接送乘客；地图与路面导航、停车上下客、按实际行程结算。详见[玩法与范围](docs/TAXI.md)。
 - **程序化城市**：23,000多栋普通建筑、车辆与行人、树木、街灯和招牌。大部分建筑依据轮廓和属性自动生成，地标再单独细化。
 
 第一次玩，可以试试：
@@ -58,6 +59,7 @@ A browser-based Wuhan city simulation, inspired by Slop New York. Walk, drive a 
 | 前往代表地点 | 右上角“传送”，保留当前移动方式 |
 | 切换时段 | 右上角时段按钮 |
 | 声音开关 / 隐藏界面 | `N` / `H` |
+| 开始接单 / 接受订单 / 再接一单 | 汽车模式按 `T`，或左上任务按钮；可随时取消 |
 
 ## 本地运行
 
@@ -123,6 +125,7 @@ npm run preview
 - **[Slop Taipei](https://github.com/shwang1979/slop-taipei)**：当前运行系统的重要代码基础，包含渲染、角色、车辆、交通、相机、地图和音效；武汉版替换城市数据、简体中文界面、地标和场景规则。
 - **[Shanghai Roam](https://github.com/YakirLove/ShangHai)**：国内OSM数据导入、城市适配与隧道处理的参考，也是武汉早期版本的基础。
 - **[London Loop](https://github.com/nelsonchris1/london-loop)**：公交与任务玩法的参考；相关接单玩法尚未移植到武汉版。
+- **[London Loop](https://github.com/nelsonchris1/london-loop)**：出租车道路导航、停靠与乘客流程的参考；武汉版按自己的路网实现轻量接送，未移植其完整账户、评分与经营系统。
 - **[Slop Cities](https://github.com/zz85/slop-cities)**：收集各地的城市衍生版本。
 
 当前基线、上游版本及选择性移植记录见[UPSTREAM.json](docs/UPSTREAM.json)。原始代码许可保留于[纽约原作副本](vendor/slop-newyork/LICENSE)、[台北版本许可](docs/upstream/TAIPEI-LICENSE)和各依赖目录。
