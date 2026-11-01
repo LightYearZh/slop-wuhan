@@ -1,6 +1,6 @@
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
 await fs.writeFile(evidenceRoot+'/technical-trial/suite-boundary-failure.json',JSON.stringify(acceptanceSuite,null,2));
-const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+file,'utf8'))(page,context,expect);
+const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+file,'utf8'))(page,context,expect);
 acceptanceSuite.error=null;acceptanceSuite.resumedAfter='sampling clock boundary corrected; walking continuous frames recovered from ring overlap';
 globalThis.suitePromise=(async()=>{try{
  for(const mode of ['cyclist','helicopter']){

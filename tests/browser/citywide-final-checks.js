@@ -1,6 +1,6 @@
 if(!acceptanceSuite.done||acceptanceSuite.error)throw Error('Complete the formal mode/driving suite first');
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
-const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+file,'utf8'))(page,context,expect);
+const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+file,'utf8'))(page,context,expect);
 globalThis.finalChecksStatus={phase:'starting',done:false,error:null};
 globalThis.finalChecksPromise=(async()=>{try{
  await page.evaluate(()=>{if(window.stabilityRun?.timer)clearInterval(stabilityRun.timer);shanghai.controllers.clearGamepadInput();document.getElementById('map-modal').hidden=true;document.getElementById('places').hidden=true;});

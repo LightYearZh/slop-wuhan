@@ -1,5 +1,5 @@
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
-const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+file,'utf8'))(page,context,expect);
+const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+file,'utf8'))(page,context,expect);
 globalThis.finalChecksPromise=postPromise.then(async()=>{if(acceptanceSuite.error)return;try{
  acceptanceSuite.phase='expanded-region-edge-cases';await fs.writeFile(evidenceRoot+'/suite-progress.json',JSON.stringify(acceptanceSuite,null,2));
  await program('expansion-b-extra.js');await program('loading-gate.js');

@@ -1,4 +1,4 @@
-const fs=await import('node:fs/promises');globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.3.1';globalThis.evidenceFs=fs;globalThis.metroStationStatus={phase:'waiting-performance',done:false,error:null};
+const fs=await import('node:fs/promises');globalThis.evidenceRoot='docs/acceptance/0.3.1';globalThis.evidenceFs=fs;globalThis.metroStationStatus={phase:'waiting-performance',done:false,error:null};
 globalThis.metroStationPromise=(async()=>{try{
  await metroPerformancePromise;if(metroAcceptance.error)throw Error(metroAcceptance.error);metroStationStatus.phase='arrivals';await page.evaluate(async()=>{shanghai.controllers.resetInput();shanghai.controllers.clearGamepadInput();await shanghai.setMode('person');});
  const stations=await page.evaluate(()=>shanghai.data.metroStations.map(s=>({id:s.id,name:s.name,stationName:s.stationName})));

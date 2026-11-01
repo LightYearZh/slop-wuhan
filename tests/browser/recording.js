@@ -1,6 +1,6 @@
 // Load once through tabbit-cli nodejs. Captures only this owned page via CDP.
 globalThis.evidenceFs=await import('node:fs/promises');
-globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance';
+globalThis.evidenceRoot='docs/acceptance';
 globalThis.evidenceCDP=globalThis.acceptCDP||await context.newCDPSession(page);
 globalThis.recording=null;
 globalThis.beginRecording=async label=>{

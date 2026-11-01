@@ -4,6 +4,8 @@
 
 ## 检查
 
+首次开发请运行 `npm run security:setup` 启用本仓库的推送前敏感信息检查；日常可运行 `npm run security`。范围、限制与报告说明见[安全检查](../SECURITY.md)。
+
 ```sh
 npm test
 npm run build

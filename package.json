@@ -14,7 +14,9 @@
     "audit:data": ".venv/bin/python tools/audit-spatial.py",
     "verify": "npm test && npm run test:data && npm run audit:data && npm run build",
     "data:runtime": ".venv/bin/python tools/build-runtime.py",
-    "data:prepare": ".venv/bin/python tools/prepare-core-data.py"
+    "data:prepare": ".venv/bin/python tools/prepare-core-data.py",
+    "security": "python3 tools/security_check.py",
+    "security:setup": "python3 tools/security_check.py --install-scanner --install-hook"
   },
   "dependencies": {
     "three": "file:vendor/three"

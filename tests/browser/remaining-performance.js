@@ -1,6 +1,6 @@
 // Isolate performance from the browser's prior screencast/diagnostic session.
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
-const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+file,'utf8'))(page,context,expect);
+const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+file,'utf8'))(page,context,expect);
 acceptanceSuite.error=null;acceptanceSuite.done=false;
 globalThis.remainingPerformance=(async()=>{try{
  for(const mode of ['cyclist','helicopter']){

@@ -108,6 +108,7 @@ npm run preview
 欢迎基于这个项目继续试验，或参考流程制作自己的城市。更换城市数据后，仍需要逐项处理道路、水岸、桥隧、地形和地标，不能只修改城市名称。
 
 - [开发、数据重建与检查](docs/DEVELOPMENT.md)
+- [发布前敏感信息检查](SECURITY.md)
 - [可复用城市工作流程](docs/CITY_WORKFLOW.md)
 - [项目工作记录](docs/PROJECT_HISTORY.md)
 - [版本更新记录](docs/CHANGELOG.md)

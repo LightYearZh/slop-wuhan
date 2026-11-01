@@ -1,0 +1,5 @@
+#!/bin/sh
+# Local gate only for this repository; setup with npm run security:setup.
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+exec python3 tools/security_check.py

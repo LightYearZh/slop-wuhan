@@ -1,6 +1,6 @@
 if(!acceptanceSuite.done||acceptanceSuite.error)throw Error('Finish formal performance before recording functional proof');
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
-const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+file,'utf8'))(page,context,expect);
+const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+file,'utf8'))(page,context,expect);
 globalThis.operationProofStatus={done:false,phase:'starting',steps:[],error:null};
 globalThis.operationProofPromise=(async()=>{try{
  const root=evidenceRoot;await program('recording.js');globalThis.evidenceRoot=root;let started;

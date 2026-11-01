@@ -23,4 +23,4 @@ const cameras=[];for(let i=0;i<3;i++){await page.locator('#camera-button').click
 const times=[];for(const [label,id]of [['☀ 白天','midday'],['☾ 夜间','midnight'],['◒ 黄昏','golden']]){await page.getByRole('button',{name:label,exact:true}).click();times.push({id,active:await page.locator(`[data-time="${id}"]`).evaluate(e=>e.classList.contains('active'))});}
 expect(times.every(t=>t.active)).toBe(true);
 const result={typingDidNotDrive:true,places,modes,cameras,times,errors:await page.evaluate(()=>shanghai.errors)};expect(result.errors).toEqual([]);
-const fs=await import('node:fs/promises');await fs.mkdir('/Users/wuyanji/Desktop/上海漫游/docs/acceptance',{recursive:true});await fs.writeFile('/Users/wuyanji/Desktop/上海漫游/docs/acceptance/interactions.json',JSON.stringify(result,null,2));return result;
+const fs=await import('node:fs/promises');await fs.mkdir('docs/acceptance',{recursive:true});await fs.writeFile('docs/acceptance/interactions.json',JSON.stringify(result,null,2));return result;

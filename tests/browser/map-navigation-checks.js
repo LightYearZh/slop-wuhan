@@ -1,4 +1,4 @@
-globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.3.2';
+globalThis.evidenceRoot='docs/acceptance/0.3.2';
 const fs=await import('node:fs/promises');
 await page.evaluate(async()=>{await shanghai.setMode('person');await shanghai.gotoLandmark('metro-0123');});
 const origin=await page.evaluate(()=>({mode:shanghai.controllers.activeMode,position:shanghai.controllers.getActiveEntity().position.toArray()}));

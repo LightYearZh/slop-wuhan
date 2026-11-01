@@ -24,4 +24,4 @@ const results=await page.evaluate(async()=>{
 expect(results[0].distance).toBeLessThan(25);
 expect(results[1].result).toBe(false);expect(results[1].unchanged).toBe(true);
 expect(results[2].mode).toBe(results[2].expected);
-const fs=await import('node:fs/promises');await fs.writeFile('/Users/wuyanji/Desktop/上海漫游/docs/acceptance/arrival-regressions.json',JSON.stringify(results,null,2));return results;
+const fs=await import('node:fs/promises');await fs.writeFile('docs/acceptance/arrival-regressions.json',JSON.stringify(results,null,2));return results;

@@ -10,4 +10,4 @@ const results=await page.evaluate(async()=>{
  return results;
 });
 for(const r of results)expect(r.outerBoundary,'whole taxi inside the bore').toBeLessThanOrEqual(r.width/2-.11);
-const fs=await import('node:fs/promises');await fs.writeFile('/Users/wuyanji/Desktop/上海漫游/docs/acceptance/vehicle-wall.json',JSON.stringify(results,null,2));return results;
+const fs=await import('node:fs/promises');await fs.writeFile('docs/acceptance/vehicle-wall.json',JSON.stringify(results,null,2));return results;

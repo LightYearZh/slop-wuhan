@@ -1,10 +1,10 @@
 """Keep the current foreground Tabbit acceptance session leased; no scene mutations."""
 from pathlib import Path
-import subprocess,json,time,sys
+import subprocess,json,time,sys,shutil
 import argparse
 parser=argparse.ArgumentParser();parser.add_argument('--task',default='上海漫游验收');parser.add_argument('--output',default='docs/acceptance');parser.add_argument('--diagnostic',action='store_true');args=parser.parse_args()
 root=Path(__file__).resolve().parents[1]
-cli='/Users/wuyanji/.local/bin/tabbit-cli'
+cli=shutil.which('tabbit-cli') or 'tabbit-cli'
 program="return {phase:globalThis.acceptanceSuite?.phase,done:globalThis.acceptanceSuite?.done,error:globalThis.acceptanceSuite?.error,visible:await page.evaluate(()=>document.visibilityState),url:page.url()};"
 previous=None;diagnostic=args.diagnostic
 with (root/args.output/'browser-heartbeat.jsonl').open('a') as log:

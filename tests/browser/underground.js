@@ -14,4 +14,4 @@ await expect(page.locator('#toast')).toContainText('跨江线路未就绪');
 const failure=await page.evaluate(()=>{const e=shanghai.controllers.getActiveEntity();const unchanged=e.position.distanceTo(failureBefore)<.2;restoreRoute();return {unchanged,errors:shanghai.errors};});
 expect(failure.unchanged).toBe(true);expect(failure.errors).toEqual([]);
 await page.locator('#places-button').click();await page.evaluate(async()=>{await shanghai.teleport(-900,-200);shanghai.follow();});
-const fs=await import('node:fs/promises');await fs.writeFile('/Users/wuyanji/Desktop/上海漫游/docs/acceptance/underground-regressions.json',JSON.stringify({result,failure},null,2));return {result,failure};
+const fs=await import('node:fs/promises');await fs.writeFile('docs/acceptance/underground-regressions.json',JSON.stringify({result,failure},null,2));return {result,failure};

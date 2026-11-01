@@ -1,4 +1,4 @@
-const fs=await import('node:fs/promises');globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.3.2';globalThis.evidenceFs=fs;
+const fs=await import('node:fs/promises');globalThis.evidenceRoot='docs/acceptance/0.3.2';globalThis.evidenceFs=fs;
 await page.locator('#map-button').click();expect(await page.locator('#search-results .map-result').count()).toBe(12);expect(await page.locator('.map-metro').count()).toBe(0);await expect(page.locator('#map-line-field')).toBeHidden();
 await page.locator('[data-map-type=metro]').click();await expect(page.locator('#map-line-field')).toBeVisible();expect(await page.locator('#search-results .map-result').count()).toBe(410);expect(await page.locator('#map-line option').count()).toBe(20);expect(await page.locator('#map-district option').count()).toBe(17);
 const lines=await page.evaluate(()=>shanghai.map.catalog.lines.map(l=>({id:l.id,name:l.name}))),checks=[];

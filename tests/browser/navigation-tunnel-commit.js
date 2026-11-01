@@ -1,9 +1,9 @@
-globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.3.2';
+globalThis.evidenceRoot='docs/acceptance/0.3.2';
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
 await page.goto('http://127.0.0.1:4187/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>window.shanghai?.ready||window.shanghaiStartup?.progress.error,null,{timeout:60000});const results=[];
 for(const kind of ['destination-flight','mode-switch']){
  await page.evaluate(kind=>{window.nextDrive={direction:'east',time:'midday',label:'late-tunnel-'+kind,cruise:15};},kind);
- await new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/drive.js','utf8'))(page,context,expect);
+ await new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/drive.js','utf8'))(page,context,expect);
  await page.evaluate(kind=>{const a=shanghai,original=a.loader.ensureAt,mode=kind==='destination-flight'?'helicopter':'person';window.tunnelCommitFixture={original,mode,held:0,releases:[],hold:true};a.loader.ensureAt=async function(position,requestedMode){if(requestedMode===mode&&tunnelCommitFixture.hold){tunnelCommitFixture.held++;await new Promise(r=>tunnelCommitFixture.releases.push(r));}return original.call(this,position,requestedMode);};const target=a.data.metroStations.find(s=>s.stationName==='滴水湖');tunnelCommitFixture.promise=kind==='destination-flight'?a.gotoLandmark(target.id,{mode:'helicopter'}):a.setMode('person');},kind);
  try{
   await page.waitForFunction(()=>tunnelCommitFixture.held>0&&shanghai.controllers.activeMode==='car'&&shanghai.controllers.getActiveEntity().surface?.tunnel&&shanghai.controllers.getActiveEntity().position.y< -3,null,{timeout:45000});

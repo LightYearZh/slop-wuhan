@@ -7,7 +7,7 @@
         "rule": "low-contrast",
         "value": "*",
         "files": [
-          "/Users/longyao/Workspace/Bianjing3D/slop-wuhan/index.html"
+          "index.html"
         ],
         "createdAt": "2026-10-28T13:29:28.306Z",
         "reason": "Codex code review: the detector pairs the dark taxi-ink token with the page background, but taxi-ink is used only on light or yellow active controls; body text uses the light text token. Secondary text and credit contrast have been increased."

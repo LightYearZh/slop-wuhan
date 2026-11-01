@@ -1,4 +1,4 @@
-const fs=await import('node:fs/promises');globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.3.2';globalThis.evidenceFs=fs;
+const fs=await import('node:fs/promises');globalThis.evidenceRoot='docs/acceptance/0.3.2';globalThis.evidenceFs=fs;
 await loadMapCDP.send('Network.setCacheDisabled',{cacheDisabled:true});await loadMapCDP.send('Network.emulateNetworkConditions',{offline:false,latency:80,downloadThroughput:1250000,uploadThroughput:625000,connectionType:'wifi'});
 try{
  await page.goto('http://127.0.0.1:4187/',{waitUntil:'domcontentloaded'});await page.waitForFunction(()=>{const s=window.shanghaiStartup?.progress.snapshot();return s?.stage.id==='download'&&s.stage.loaded>4000000&&s.stage.loaded<s.stage.total-1000000;},null,{timeout:30000});let shot=await loadMapCDP.send('Page.captureScreenshot',{format:'png',fromSurface:true});await fs.writeFile(evidenceRoot+'/loading-download.png',Buffer.from(shot.data,'base64'));

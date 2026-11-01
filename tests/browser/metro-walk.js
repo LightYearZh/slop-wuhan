@@ -1,5 +1,5 @@
 if(!flightStatus.done||flightStatus.error)throw Error('Finish flight acceptance before metro walk checks');
-const fs=await import('node:fs/promises');globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.3.1';globalThis.evidenceFs=fs;
+const fs=await import('node:fs/promises');globalThis.evidenceRoot='docs/acceptance/0.3.1';globalThis.evidenceFs=fs;
 const results=[];
 for(const stationName of ['陆家嘴','上海南站','蟠祥路·国家会计学院']){
  await page.evaluate(async name=>{const a=shanghai;a.controllers.resetInput();a.controllers.clearGamepadInput();await a.setMode('person');const s=a.data.metroStations.find(s=>s.stationName===name);await a.gotoLandmark(s.id);a.follow();a.setTime('golden');window.walkRun={name,station:s,start:performance.now(),trace:[],phase:'out'};window.walkTimer=setInterval(()=>{const e=a.controllers.getActiveEntity(),en=s.entrance,dx=e.position.x-en.x,dz=e.position.z-en.z;walkRun.local={x:dx*Math.cos(en.heading)-dz*Math.sin(en.heading),z:dx*Math.sin(en.heading)+dz*Math.cos(en.heading)};walkRun.trace.push({ms:performance.now()-walkRun.start,x:e.position.x,y:e.position.y,z:e.position.z,local:{...walkRun.local},phase:walkRun.phase});},50);},stationName);

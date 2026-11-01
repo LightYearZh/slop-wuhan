@@ -1,6 +1,6 @@
 // Frozen 0.2.0: no screencast during five-minute frame sampling.
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
-const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+file,'utf8'))(page,context,expect);
+const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+file,'utf8'))(page,context,expect);
 globalThis.acceptanceSuite={startedAt:new Date().toISOString(),phase:'starting',results:[],error:null,done:false};
 const pause=()=>new Promise(resolve=>setTimeout(resolve,1000)),save=()=>fs.writeFile(evidenceRoot+'/suite-progress.json',JSON.stringify(acceptanceSuite,null,2));
 await fs.mkdir(evidenceRoot+'/modes',{recursive:true});

@@ -4,7 +4,7 @@ if(recording)await endRecording();
 await evidenceCDP.send('Page.stopScreencast');
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
 await page.evaluate(()=>window.nextDrive={direction:'east',time:'midnight',label:'car-performance-no-recording',cruise:7,record:false});
-const runProgram=async name=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+name,'utf8'))(page,context,expect);
+const runProgram=async name=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+name,'utf8'))(page,context,expect);
 await runProgram('drive.js');
 globalThis.carPerformancePromise=(async()=>{try{
  while(!await page.evaluate(()=>driveRun.done))await new Promise(r=>setTimeout(r,1000));

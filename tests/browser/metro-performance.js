@@ -1,9 +1,9 @@
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
-globalThis.evidenceFs=fs;globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.3.1';
+globalThis.evidenceFs=fs;globalThis.evidenceRoot='docs/acceptance/0.3.1';
 await page.waitForFunction(()=>shanghai.renderer.domElement.width===1920&&shanghai.renderer.domElement.height===1080);
 globalThis.metroAcceptance={phase:'dense-metro-performance',done:false,error:null};globalThis.acceptanceSuite={phase:'dense-metro-performance',done:false,error:null};
 const id=await page.evaluate(()=>shanghai.data.metroStations.find(s=>s.stationName==='人民广场').id);await page.evaluate(destination=>window.nextMode={mode:'person',destination,label:'dense-metro-person',record:false},id);
-await new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/citywide-mode.js','utf8'))(page,context,expect);
+await new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/citywide-mode.js','utf8'))(page,context,expect);
 globalThis.metroPerformancePromise=(async()=>{try{
  while(!await page.evaluate(()=>modeRun.done))await new Promise(r=>setTimeout(r,1000));
  const run=await page.evaluate(()=>({...modeRun,lastPosition:undefined}));await fs.writeFile(evidenceRoot+'/dense-metro-performance.json',JSON.stringify(run,null,2));

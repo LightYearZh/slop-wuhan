@@ -8,4 +8,4 @@ const result=await page.evaluate(()=>{
  const app=shanghai,e=app.controllers.getActiveEntity(),shift=e.position.distanceTo(gateProbe.before);app.controllers.clearGamepadInput();app.loader.readyAt=gateProbe.readyAt;app.loader.ensureAt=gateProbe.ensureAt;return {shift,errors:app.errors,ready:app.loader.readyAt(e.position)};
 });
 expect(result.shift).toBeLessThan(.01);expect(result.ready).toBe(true);expect(result.errors).toEqual([]);
-const fs=await import('node:fs/promises');await fs.writeFile((globalThis.evidenceRoot||'/Users/wuyanji/Desktop/上海漫游/docs/acceptance')+'/loading-gate.json',JSON.stringify(result,null,2));return result;
+const fs=await import('node:fs/promises');await fs.writeFile((globalThis.evidenceRoot||'docs/acceptance')+'/loading-gate.json',JSON.stringify(result,null,2));return result;

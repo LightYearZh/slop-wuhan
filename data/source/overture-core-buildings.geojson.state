@@ -10,5 +10,5 @@
     "ymax": 30.5942
   },
   "backend": "geojson",
-  "output": "/Users/longyao/Workspace/Bianjing3D/slop-wuhan/data/source/overture-core-buildings.geojson"
+  "output": "data/source/overture-core-buildings.geojson"
 }

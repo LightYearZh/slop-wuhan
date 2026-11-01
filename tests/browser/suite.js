@@ -2,7 +2,7 @@
 // background. All movement uses the application's actual analog controls.
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
 globalThis.acceptanceSuite={startedAt:new Date().toISOString(),phase:'starting',results:[],error:null,done:false};
-const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+file,'utf8'))(page,context,expect);
+const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+file,'utf8'))(page,context,expect);
 const pause=()=>new Promise(r=>setTimeout(r,1000));
 globalThis.suitePromise=(async()=>{try{
  await program('stability-start.js');

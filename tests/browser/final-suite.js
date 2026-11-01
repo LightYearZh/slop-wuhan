@@ -1,6 +1,6 @@
 // Re-run the entire long-duration acceptance on the frozen release build.
 const fs=await import('node:fs/promises'),AsyncFunction=Object.getPrototypeOf(async()=>{}).constructor;
-const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('/Users/wuyanji/Desktop/上海漫游/tests/browser/'+file,'utf8'))(page,context,expect);
+const program=async file=>new AsyncFunction('page','context','expect',await fs.readFile('tests/browser/'+file,'utf8'))(page,context,expect);
 const previous=globalThis.resumeFinalSuite?JSON.parse(await fs.readFile(evidenceRoot+'/suite-progress-final.json','utf8')):null,completed=previous?.results||[];
 globalThis.acceptanceSuite={startedAt:new Date().toISOString(),continuingFrom:previous?.startedAt,build:JSON.parse(await fs.readFile(evidenceRoot+'/builds/final.json','utf8')),phase:'starting',results:completed,error:null,done:false};
 const pause=()=>new Promise(resolve=>setTimeout(resolve,1000)),save=()=>fs.writeFile(evidenceRoot+'/suite-progress-final.json',JSON.stringify(acceptanceSuite,null,2));

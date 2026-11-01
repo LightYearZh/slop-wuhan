@@ -14,3 +14,25 @@ data/derived/
 data/reference/
 
 .impeccable/hook.cache.json
+
+# Local credentials, certificates, caches and tool state
+.cache/
+.env
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+id_rsa*
+id_ed25519*
+.npmrc
+.netrc
+.pypirc
+credentials.json
+service-account*.json
+.impeccable/config.local.json
+.impeccable/hook.pending.json

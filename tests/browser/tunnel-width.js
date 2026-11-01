@@ -21,4 +21,4 @@ for(const r of result.rows){
  if(r.angle===0)expect(r.centreDistance).toBeGreaterThan(3.4);
 }
 expect(result.errors).toEqual([]);
-const fs=await import('node:fs/promises');await fs.mkdir('/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.1.1',{recursive:true});await fs.writeFile('/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.1.1/tunnel-width.json',JSON.stringify(result,null,2));return result;
+const fs=await import('node:fs/promises');await fs.mkdir('docs/acceptance/0.1.1',{recursive:true});await fs.writeFile('docs/acceptance/0.1.1/tunnel-width.json',JSON.stringify(result,null,2));return result;

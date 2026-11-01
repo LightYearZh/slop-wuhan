@@ -1,5 +1,5 @@
 const fs=await import('node:fs/promises');
-globalThis.evidenceRoot='/Users/wuyanji/Desktop/上海漫游/docs/acceptance/0.3.1';globalThis.evidenceFs=fs;
+globalThis.evidenceRoot='docs/acceptance/0.3.1';globalThis.evidenceFs=fs;
 await metroStationPromise;expect(metroStationStatus.error).toBe(null);expect(metroStationStatus.done).toBe(true);
 await page.evaluate(async()=>{const a=shanghai;a.controllers.resetInput();a.controllers.clearGamepadInput();await a.setMode('helicopter');await a.gotoLandmark('tower');a.follow();a.setTime('golden');});
 globalThis.flightStatus={phase:'climb-above-tower',done:false,error:null};
