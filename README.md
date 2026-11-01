@@ -124,7 +124,6 @@ npm run preview
 
 - **[Slop Taipei](https://github.com/shwang1979/slop-taipei)**：当前运行系统的重要代码基础，包含渲染、角色、车辆、交通、相机、地图和音效；武汉版替换城市数据、简体中文界面、地标和场景规则。
 - **[Shanghai Roam](https://github.com/YakirLove/ShangHai)**：国内OSM数据导入、城市适配与隧道处理的参考，也是武汉早期版本的基础。
-- **[London Loop](https://github.com/nelsonchris1/london-loop)**：公交与任务玩法的参考；相关接单玩法尚未移植到武汉版。
 - **[London Loop](https://github.com/nelsonchris1/london-loop)**：出租车道路导航、停靠与乘客流程的参考；武汉版按自己的路网实现轻量接送，未移植其完整账户、评分与经营系统。
 - **[Slop Cities](https://github.com/zz85/slop-cities)**：收集各地的城市衍生版本。
 
