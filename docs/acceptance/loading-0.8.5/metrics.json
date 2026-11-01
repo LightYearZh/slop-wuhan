@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-01",
+  "units": "bytes; MB in documentation is decimal",
+  "upstreamRevision": "e35c06c0d896052a80ff117aefe8b99e978913d4",
+  "before": {
+    "sourceBytes": 51805346,
+    "sourceGzipBytes": 7837521,
+    "mainAsset": "index-BDX1bg7G.js",
+    "mainBytes": 49636264,
+    "mainGzipBytes": 8165584
+  },
+  "after": {
+    "mainAsset": "index-Btbt0qrj.js",
+    "mainBytes": 1299298,
+    "mainGzipBytes": 389162,
+    "mapGzipBytes": 4335900,
+    "mapRawBytes": 8708472,
+    "sourceLoaderBytes": 238,
+    "mapSha256": "5769cb4233b00a2ebfba6935e0ea8cefe3c662e334a84ac42c1dd4a08e64e1e7",
+    "coldEncodedResourceBytes": 4977394,
+    "navigationEncodedBytes": 5991,
+    "totalColdEncodedBytes": 4983385,
+    "totalTransferBytes": 4993285
+  },
+  "roundtrip": {
+    "allRuntimeFieldsExactlyEqual": true,
+    "buildings": 23819,
+    "roadLinks": 9573,
+    "placementBuildings": 23461,
+    "landmarks": [
+      "jianghanguan",
+      "yellow-crane",
+      "guishan-tower",
+      "qingchuange",
+      "red-house"
+    ]
+  },
+  "validation": {
+    "javascriptTests": 111,
+    "pythonTests": 44,
+    "spatialAudit": "passed",
+    "productionBuild": "passed"
+  },
+  "measurement": "Own Chrome session on local Vite preview; cold cache and HTTP content encoding. Public Pages not deployed; no old cold-browser timing comparison."
+}

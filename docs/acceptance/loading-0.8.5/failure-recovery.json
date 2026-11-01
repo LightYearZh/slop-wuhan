@@ -1,0 +1,21 @@
+{
+  "failure": {
+    "ready": false,
+    "text": "武汉地图未能加载，请刷新重试。地图读取失败（HTTP 503）",
+    "retry": true
+  },
+  "recovered": {
+    "ready": true,
+    "errors": []
+  },
+  "rawGzip": {
+    "ready": true,
+    "load": {
+      "url": "http://127.0.0.1:4187/assets/wuhan-geodata.bin-De-rUPFH.gz",
+      "bodyBytes": 4335900,
+      "decodedBytes": 8708472,
+      "elapsedMs": 169.5
+    },
+    "errors": []
+  }
+}

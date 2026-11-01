@@ -1,3 +1,4 @@
+import {yieldLoadingStage} from './startup-yield.js';
 import {teleportMenuDestinations} from './destination-order.js';
 import {buildTunnels} from './tunnels.js';
 import {GEO} from './wuhan-geodata.js';
@@ -42,8 +43,8 @@ async function initApp() {
   };
   const setStatus = async (text) => {
     if (loadingStatus) loadingStatus.textContent = text;
-    // let the status paint before the next long synchronous build step
-    await new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
+    if (loadingTrack) loadingTrack.classList.add('is-indeterminate');
+    await yieldLoadingStage();
   };
 
   await setStatus(`正在初始化 Three.js r${THREE.REVISION} WebGPURenderer 与 TSL 着色器…`);

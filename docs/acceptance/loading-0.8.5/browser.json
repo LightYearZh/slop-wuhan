@@ -1,0 +1,295 @@
+{
+  "cold": {
+    "ready": true,
+    "errors": [],
+    "data": {
+      "url": "http://127.0.0.1:4187/assets/wuhan-geodata.bin-De-rUPFH.gz",
+      "bodyBytes": 8708472,
+      "decodedBytes": 8708472,
+      "elapsedMs": 129.30000001192093
+    },
+    "navigation": {
+      "encoded": 5991,
+      "transfer": 6291
+    },
+    "encodedResourceBytes": 4977394,
+    "transferResourceBytes": 4986994,
+    "resources": [
+      {
+        "url": "http://127.0.0.1:4187/assets/city-config-BEkbgWEn.js",
+        "encoded": 7870,
+        "decoded": 23966,
+        "transfer": 8170
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/trees-C7l9lGyW.js",
+        "encoded": 14128,
+        "decoded": 42888,
+        "transfer": 14428
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/tsl-materials-jae2cA6e.js",
+        "encoded": 48662,
+        "decoded": 163946,
+        "transfer": 48962
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/vehicle-lights-DFiDX8ZX.js",
+        "encoded": 704,
+        "decoded": 1357,
+        "transfer": 1004
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/actor-models-flxH_QUH.js",
+        "encoded": 24371,
+        "decoded": 85227,
+        "transfer": 24671
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/lighting-D0jDNLxX.js",
+        "encoded": 4226,
+        "decoded": 11992,
+        "transfer": 4526
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/scooter-model-Dz-NCR8e.js",
+        "encoded": 3605,
+        "decoded": 10140,
+        "transfer": 3905
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/pedestrians-CVotKOJz.js",
+        "encoded": 18916,
+        "decoded": 62152,
+        "transfer": 19216
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/ground-usIXXV0-.js",
+        "encoded": 4204,
+        "decoded": 11559,
+        "transfer": 4504
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/road-paint-Dx5DT9bO.js",
+        "encoded": 3209,
+        "decoded": 8450,
+        "transfer": 3509
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/buildings-DXg4JUgz.js",
+        "encoded": 6690,
+        "decoded": 18803,
+        "transfer": 6990
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/elevated-eOLTb6YN.js",
+        "encoded": 7466,
+        "decoded": 23546,
+        "transfer": 7766
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/landmarks-Nu2u4Q7q.js",
+        "encoded": 940,
+        "decoded": 940,
+        "transfer": 1240
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/street-props-C-Zltysm.js",
+        "encoded": 9459,
+        "decoded": 28080,
+        "transfer": 9759
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/garbage-truck-ikz6vUGv.js",
+        "encoded": 2610,
+        "decoded": 6432,
+        "transfer": 2910
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/touch-controls-sVoQk-R5.js",
+        "encoded": 2031,
+        "decoded": 7224,
+        "transfer": 2331
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/gamepad-controls-C5paOnaz.js",
+        "encoded": 1906,
+        "decoded": 6260,
+        "transfer": 2206
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/cameras-Ds1OULJP.js",
+        "encoded": 5088,
+        "decoded": 15931,
+        "transfer": 5388
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/traffic-CAiE6l-j.js",
+        "encoded": 10440,
+        "decoded": 34376,
+        "transfer": 10740
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/controllers-D-0KadqT.js",
+        "encoded": 14061,
+        "decoded": 47666,
+        "transfer": 14361
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/wuhan-map-DS3DVjzj.js",
+        "encoded": 7989,
+        "decoded": 27521,
+        "transfer": 8289
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/scene-culling-BW7rZVes.js",
+        "encoded": 4821,
+        "decoded": 14236,
+        "transfer": 5121
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/post-processing-DEgWDjIB.js",
+        "encoded": 1645,
+        "decoded": 3971,
+        "transfer": 1945
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/audio-synthesis-DkseLVa1.js",
+        "encoded": 7941,
+        "decoded": 27491,
+        "transfer": 8241
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/audio-sources-gB3Ynf0i.js",
+        "encoded": 3053,
+        "decoded": 9454,
+        "transfer": 3353
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/audio-events-A0QxFyYq.js",
+        "encoded": 6640,
+        "decoded": 22593,
+        "transfer": 6940
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/audio-acoustics-CwjHJ-5R.js",
+        "encoded": 1581,
+        "decoded": 4154,
+        "transfer": 1881
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/audio-system-fFbTNDNr.js",
+        "encoded": 6984,
+        "decoded": 24434,
+        "transfer": 7284
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/index--PT9eNIh.css",
+        "encoded": 6250,
+        "decoded": 25693,
+        "transfer": 6550
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/main-CH5VqC7B.js",
+        "encoded": 12171,
+        "decoded": 36913,
+        "transfer": 12471
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/index-Btbt0qrj.js",
+        "encoded": 391833,
+        "decoded": 1299298,
+        "transfer": 392133
+      },
+      {
+        "url": "http://127.0.0.1:4187/assets/wuhan-geodata.bin-De-rUPFH.gz",
+        "encoded": 4335900,
+        "decoded": 8708472,
+        "transfer": 4336200
+      }
+    ],
+    "buildings": 23819,
+    "roadLinks": 9573,
+    "placement": {
+      "accepted": 50051,
+      "byKind": {
+        "signal": 195,
+        "planter-tree": 9,
+        "heritage-lamp": 13,
+        "bench": 11,
+        "bollard": 69,
+        "tree": 38881,
+        "lamp": 6374,
+        "parked-scooter": 4499
+      },
+      "rejected": {
+        "building": 665,
+        "carriageway": 10747,
+        "outside-land": 81,
+        "water": 78,
+        "walking-corridor": 684,
+        "other-prop": 13093,
+        "tunnel-ramp": 8,
+        "boundary": 23
+      },
+      "remainingConflicts": 0
+    }
+  },
+  "modes": [
+    {
+      "active": "person",
+      "finite": true
+    },
+    {
+      "active": "car",
+      "finite": true
+    },
+    {
+      "active": "scooter",
+      "finite": true
+    },
+    {
+      "active": "helicopter",
+      "finite": true
+    }
+  ],
+  "drive": {
+    "mode": "car",
+    "moved": 7.185112107981201,
+    "position": [
+      -114.71928588267482,
+      0,
+      689.3788624186691
+    ],
+    "errors": []
+  },
+  "destinations": [
+    {
+      "id": "yellow-crane",
+      "mode": "car",
+      "position": [
+        408.93,
+        36.71440000000001,
+        4211.64
+      ]
+    },
+    {
+      "id": "guishan-tower",
+      "mode": "car",
+      "position": [
+        -1713.3715939185113,
+        63.31229005267346,
+        2957.8072513168363
+      ]
+    },
+    {
+      "id": "jianghanguan",
+      "mode": "car",
+      "position": [
+        -114.67190613553795,
+        0,
+        682.1939065270982
+      ]
+    }
+  ]
+}

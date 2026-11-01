@@ -1,4 +1,4 @@
-# 武汉漫游 · Slop Wuhan 0.8.4
+# 武汉漫游 · Slop Wuhan 0.8.5
 
 源自 mrdoob 的 [Slop New York](https://github.com/mrdoob/slop-newyork)，参考 [Slop Taipei](https://github.com/shwang1979/slop-taipei) 的运行系统和 [ShangHai](https://github.com/YakirLove/ShangHai) 的国内地理数据处理流程，构建武汉的真实距离漫游。范围扩展为**东西8.06公里、南北6.01公里，48.41平方公里外框（含江面）**。WGS84原点不变，每单位1米；没有压缩街区或改变地标间的距离。
 
@@ -10,6 +10,10 @@
 - [可复用城市工作流程](docs/CITY_WORKFLOW.md)：资料、空间、资产、集成、验收和交付的执行步骤，以及当前可复用工具。
 - [汴京项目交接](docs/BIANJING_HANDOFF.md)：对齐现有小型沿河街市计划，说明哪些能沿用、哪些需要历史资料和新资产验证。
 - 可复制模板：[场景简报](docs/templates/SCENE_BRIEF.md)、[证据与资产登记](docs/templates/EVIDENCE_AND_ASSETS.md)、[迭代与交付记录](docs/templates/ITERATION_RECORD.md)。
+
+## 0.8.5 首次加载压缩
+
+更新本地Slop New York参考库至2026-11-01拉取的最新main，移植独立压缩地图、varint编码、服务器自动解压兼容，以及后台标签页启动让步。武汉地图包约4.34 MB，生产主JavaScript从49.64 MB降至1.30 MB；本机Chrome冷缓存首次资源正文合计约4.98 MB（含HTML，使用HTTP压缩）。地理坐标、楼高和轮廓保持不变，范围、建筑、桥隧与历史立面保留。完整资料仍在源数据及审计文件中；这不是裁图或按需流式加载。详见[实现、体积口径与验收](docs/LOADING_OPTIMIZATION.md)。
 
 ## 0.8.4 江汉路街面与历史建筑细化
 
@@ -82,7 +86,7 @@ npm run dev
 
 ## 数据与局限
 
-当前普通建筑23,462栋：3,143栋OSM、20,319栋去重后的Overture。4,078段源道路适配为9,573条路口间连接；水域约11.38平方公里。转换得到154处横道和102组信号控制。源建筑数、渲染部件数和运行连接数分开统计，详见[基础版快照](docs/acceptance/baseline-0.8.4/project-snapshot.json)。街灯、树木和通用立面仍为程序化表现，不是实景设施清单。
+当前普通建筑23,461栋：3,143栋OSM、20,318栋去重后的Overture（已排除江汉关钟楼旁的重复体块）。4,078段源道路适配为9,573条路口间连接；水域约11.38平方公里。转换得到154处横道和102组信号控制。源建筑数、渲染部件数和运行连接数分开统计，详见[基础版快照](docs/acceptance/baseline-0.8.4/project-snapshot.json)。街灯、树木和通用立面仍为程序化表现，不是实景设施清单。
 
 3D-GloBFP **2020年遥感估计高度**：当前20,124栋建筑采用严格轮廓匹配后的模型值；已有高度、层数和文献资料优先。仍有2,764栋使用显示估算。模型可能明显低估高楼，不能称为可靠实测楼高；初次接入与当前数量不同，对照结果和处理方法见[扩区记录](docs/CORE_EXPANSION.md)。
 

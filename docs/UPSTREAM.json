@@ -15,5 +15,17 @@
     "preservedReference": "../reference-shanghai",
     "previousPilotBranch": "archive/standalone-pilot",
     "archiveBranch": "archive/shanghai-runtime-0.3.0"
+  },
+  "loadingOptimizations": {
+    "repository": "https://github.com/mrdoob/slop-newyork",
+    "revision": "e35c06c0d896052a80ff117aefe8b99e978913d4",
+    "reference": "../reference-slop-newyork",
+    "updated": "2026-11-01",
+    "adapted": [
+      "NYB1 gzip asset and zigzag varints, extended losslessly to Wuhan WUH1 schema",
+      "2813f08: detect already-inflated gzip responses",
+      "main.js showLoadingStage: hidden-tab-safe loading stage yield"
+    ],
+    "scope": "Selective loading/data packaging port. Taipei runtime, Wuhan geography and scene systems retained; not a wholesale merge of NYC rendering changes."
   }
 }

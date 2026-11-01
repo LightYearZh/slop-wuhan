@@ -71,5 +71,13 @@
     "Only two masked ridges and three named crossings; deck engineering profiles estimated",
     "Vehicle models and facade details adapted from Taipei; not exact Wuhan replicas"
   ],
-  "sourceCitySha256": "4aa59f14ad28fb0d0ff717f6bcd8f37c5f00a29ebb7ffac954ef03e888a5ed9b"
+  "sourceCitySha256": "4aa59f14ad28fb0d0ff717f6bcd8f37c5f00a29ebb7ffac954ef03e888a5ed9b",
+  "runtimePackage": {
+    "format": "WUH1",
+    "rawBytes": 8708472,
+    "gzipBytes": 4335900,
+    "sha256": "5769cb4233b00a2ebfba6935e0ea8cefe3c662e334a84ac42c1dd4a08e64e1e7",
+    "precision": "lossless; coordinates and dimensions unchanged",
+    "auditData": "Full source attributes remain in public/data/city.json; placement uses only source outlines and road fields"
+  }
 }
