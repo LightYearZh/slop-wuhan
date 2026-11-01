@@ -46,3 +46,13 @@ python3 tools/video-catalog.py output/video
 主批已逐段核对1920×1080、30fps和编码，解码起、中、末帧，并目视检查总览、重点地标、隧道出口与穿门镜头。用户另行安排的DeepSeek补充目录，当次正式MP4为17段、118秒，以蓝调、夜间、固定机位时段对照为主；统一索引按实际文件统计，排除备用、弃用和外部参考，未覆盖其原始素材。两批共39段、768秒，不包括重复节选。
 
 交付目录包含`先看这里-素材说明.md`、`总素材预览.html`、`总素材清单.csv`和各批检查帧。MP4为无声画面，独立WAV不能称为逐镜同步原声；这些文件用于后续剪辑，并未制作或发布完整视频。
+
+## 纽约原作与仓库页面补录
+
+`tools/capture-origin-materials.mjs`在独立、未登录的浏览器中录制两个公开仓库页面及原作正式在线演示。参数沿用`--playwright`和`--output`；`--pages-only`或`--nyc-only`可分别重录。不访问个人账户状态，不修改GitHub页面内容。纽约仅在录制浏览器中增加逐帧钩子，保留原版车辆和场景；2026-11-01核对的上游main为`e35c06c0d896052a80ff117aefe8b99e978913d4`。
+
+本轮新增：纽约出租车带界面、干净画面各8秒；原版与武汉GitHub页面各8秒滚动，另各有首页和README两张PNG。合计4段原始视频、4张截图。来源为[原版体验](https://mrdoob.github.io/slop-newyork/)、[原版仓库](https://github.com/mrdoob/slop-newyork)、[武汉仓库](https://github.com/LightYearZh/slop-wuhan)，不是搬用他人的社交视频。
+
+`python3 tools/build-origin-transition.py /path/to/material-root`可从NY01第1—5秒和W05第6—10.5秒制作0.5秒叠化，输出8秒的无额外字幕、带城市名两个版本。使用Pillow文字图片与FFmpeg叠加，不依赖FFmpeg的drawtext构建选项。原始素材保留；两段派生过渡不重复计入原始时长。它们是两座城市真实实录的剪辑切换，不表示几何实际变形或同一条连续驾驶路线。
+
+新增素材放在单独的`2026-11-01_纽约来源与过渡/`，包含预览、说明、来源记录与起中末抽检帧。视频规格1080p30、无声；保留原作署名与数据归属，未改动原有素材或正式站点。
