@@ -477,22 +477,24 @@ let redCore;
 
 export function buildYellowCrane(root) {
   const mat = (color, extra = {}) => new THREE.MeshStandardNodeMaterial({color, roughness: .76, ...extra});
-  const red = mat(0x823d32, {roughness: .72});
-  const redDark = mat(0x572721, {roughness: .7});
-  const redBeam = mat(0x6f332a, {roughness: .66});
-  redCore = mat(0x622e28, {roughness: .82});
-  const stone = mat(0xc3bdb0, {roughness: .9});
-  const stoneDark = mat(0xa9a294, {roughness: .92});
-  const green = mat(0x2a4742, {roughness: .64, side: THREE.DoubleSide});
-  const teal = mat(0x42665c, {roughness: .62});
-  const dark = mat(0x241c18, {roughness: .62});
-  const gold = mat(0xc7a14f, {metalness: .5, roughness: .38});
-  const bronze = mat(0x8b6b38, {metalness: .55, roughness: .44});
-  const cream = mat(0xe3d8ba, {roughness: .76});
-  const ridge = mat(0x4a3320, {roughness: .58, metalness: .18});
-  const ochre = mat(0xa97830, {roughness: .58, metalness: .08});
+  const red = mat(0x823d32, {roughness: .72, emissive: 0x5a1a0e, emissiveIntensity: 0});
+  const redDark = mat(0x572721, {roughness: .7, emissive: 0x3a0f08, emissiveIntensity: 0});
+  const redBeam = mat(0x6f332a, {roughness: .66, emissive: 0x4a160c, emissiveIntensity: 0});
+  redCore = mat(0x622e28, {roughness: .82, emissive: 0x2a0a05, emissiveIntensity: 0});
+  const stone = mat(0xc3bdb0, {roughness: .9, emissive: 0x6b5a3a, emissiveIntensity: 0});
+  const stoneDark = mat(0xa9a294, {roughness: .92, emissive: 0x4a3a22, emissiveIntensity: 0});
+  const green = mat(0x2a4742, {roughness: .64, side: THREE.DoubleSide, emissive: 0x1f6b5e, emissiveIntensity: 0});
+  const teal = mat(0x42665c, {roughness: .62, emissive: 0x1f6b5e, emissiveIntensity: 0});
+  const dark = mat(0x241c18, {roughness: .62, emissive: 0xffc46a, emissiveIntensity: 0});
+  const gold = mat(0xc7a14f, {metalness: .5, roughness: .38, emissive: 0xffb84d, emissiveIntensity: 0});
+  const bronze = mat(0x8b6b38, {metalness: .55, roughness: .44, emissive: 0xffa040, emissiveIntensity: 0});
+  const cream = mat(0xe3d8ba, {roughness: .76, emissive: 0xffe0a0, emissiveIntensity: 0});
+  const ridge = mat(0x4a3320, {roughness: .58, metalness: .18, emissive: 0x2a1a0e, emissiveIntensity: 0});
+  const ochre = mat(0xa97830, {roughness: .58, metalness: .08, emissive: 0xffb347, emissiveIntensity: 0});
+  const tileTexture = glazedTileTexture();
   const tile = new THREE.MeshStandardNodeMaterial({
-    color: 0xe6c88f, map: glazedTileTexture(), roughness: .52, metalness: .05, side: THREE.DoubleSide
+    color: 0xe6c88f, map: tileTexture, emissive: 0xffb347, emissiveMap: tileTexture,
+    emissiveIntensity: 0, roughness: .52, metalness: .05, side: THREE.DoubleSide
   });
   const soffitMat = new THREE.MeshStandardNodeMaterial({
     color: 0xffffff, map: underEaveTexture(), roughness: .72, side: THREE.DoubleSide
@@ -503,7 +505,8 @@ export function buildYellowCrane(root) {
   const windowTexture = railingTexture();
   if (windowTexture) windowTexture.repeat.set(2.5, 2.5);
   const windowLatticeMat = new THREE.MeshStandardNodeMaterial({
-    color: 0xffffff, map: windowTexture, alphaTest: .4, side: THREE.DoubleSide, roughness: .74
+    color: 0xffffff, map: windowTexture, emissive: 0xffc46a, emissiveMap: windowTexture,
+    emissiveIntensity: 0, alphaTest: .4, side: THREE.DoubleSide, roughness: .74
   });
   const lanternMat = new THREE.MeshStandardNodeMaterial({
     color: 0xa72d25, emissive: 0x4d0d08, emissiveIntensity: .22, roughness: .58
@@ -775,8 +778,24 @@ export function buildYellowCrane(root) {
     detail: 'procedural-photo-reference-not-survey'
   };
   root.userData.update = night => {
-    lanternMat.emissiveIntensity = .22 + night * 1.15;
+    lanternMat.emissiveIntensity = .22 + night * 2.2;
     aviationMat.emissiveIntensity = .45 + night * 2.2;
+    red.emissiveIntensity = night * .45;
+    redDark.emissiveIntensity = night * .3;
+    redBeam.emissiveIntensity = night * .35;
+    redCore.emissiveIntensity = night * .16;
+    stone.emissiveIntensity = night * .08;
+    stoneDark.emissiveIntensity = night * .06;
+    green.emissiveIntensity = night * .25;
+    teal.emissiveIntensity = night * .25;
+    dark.emissiveIntensity = night * .55;
+    gold.emissiveIntensity = night * .8;
+    bronze.emissiveIntensity = night * .25;
+    cream.emissiveIntensity = night * .3;
+    ridge.emissiveIntensity = night * .2;
+    ochre.emissiveIntensity = night * .45;
+    tile.emissiveIntensity = night * .7;
+    windowLatticeMat.emissiveIntensity = night * .6;
   };
 
   finish();

@@ -8,10 +8,14 @@ export function buildLandmarks(scene){
   const group=new THREE.Group();group.name='WuhanLandmarks';group.position.y=-2;scene.add(group);
   const system=buildWuhanLandmarks(group,GEO.wuhanLandmarks);
   const core=buildCoreLandmarks(scene,GEO.wuhanLandmarks,GEO.bridgeModels);
+  const coreUpdate=core.update?.bind(core);
+  const baseUpdate=system.update.bind(system);
+  const update=night=>{baseUpdate(night);coreUpdate?.(night);};
+  system.update=update;
   const colliders=GEO.wuhanLandmarks.map(l=>{
     const ring=l.footprint[0],xs=ring.map(p=>p[0]),zs=ring.map(p=>p[1]);
     return {minX:Math.min(...xs),maxX:Math.max(...xs),minZ:Math.min(...zs),maxZ:Math.max(...zs),
       minY:(l.groundY||0)-1.5,maxY:(l.groundY||0)+l.height,poly:ring.flat(),rings:l.footprint.map(r=>new Float32Array(r.flat()))};
   });
-  return {group,colliders,system,core};
+  return {group,colliders,system,core,update};
 }

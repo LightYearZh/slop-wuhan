@@ -707,7 +707,8 @@ async function initApp() {
     streetProps.update(dt, elapsed, cameraSystem.camera);
     trafficSystem.update(dt, elapsed, cameraSystem.currentPos, controllerManager.getActiveEntity(), controllerManager.activeMode, cameraSystem.camera);
     elevated.update(dt, elapsed);
-    wuhanLandmarkSystem?.update(lightingSystem.activePresetId==='midnight'?1:0);
+    const landmarkNight=lightingSystem.activePresetId==='midnight'?1:lightingSystem.activePresetId==='twilight'?0.55:0;
+    wuhanLandmarkSystem?.update(landmarkNight);
     if (!document.hidden && now >= nextPlayerSave) {
       savePlayerState();
       nextPlayerSave = now + 5000;

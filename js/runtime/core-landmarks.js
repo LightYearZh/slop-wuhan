@@ -12,9 +12,13 @@ export function buildCoreLandmarks(scene,landmarks,bridges=[]){
   const roofMat=new THREE.MeshStandardNodeMaterial({color:0x4d625d,roughness:.78});
   const glass=new THREE.MeshStandardNodeMaterial({color:0x467783,roughness:.3,metalness:.45});
   const steel=new THREE.MeshStandardNodeMaterial({color:0x81918a,roughness:.65,metalness:.45});
-  const bridgeRed=new THREE.MeshStandardNodeMaterial({color:0xc8442f,roughness:.44,metalness:.38});
-  const bridgeSteel=new THREE.MeshStandardNodeMaterial({color:0x79877f,roughness:.52,metalness:.5});
-  const bridgeConcrete=new THREE.MeshStandardNodeMaterial({color:0x9d9b92,roughness:.92});
+  const bridgeRed=new THREE.MeshStandardNodeMaterial({color:0xc8442f,roughness:.44,metalness:.38,emissive:0xff3a20,emissiveIntensity:0});
+  const bridgeSteel=new THREE.MeshStandardNodeMaterial({color:0x79877f,roughness:.52,metalness:.5,emissive:0x7fa7c8,emissiveIntensity:0});
+  const bridgeConcrete=new THREE.MeshStandardNodeMaterial({color:0x9d9b92,roughness:.92,emissive:0x6b5a3a,emissiveIntensity:0});
+  // The TV tower gets its own night-lit materials so its floodlighting does not leak onto other landmarks.
+  const tvStone=new THREE.MeshStandardNodeMaterial({color:0xb8b19d,roughness:.85,emissive:0x8a6a3a,emissiveIntensity:0});
+  const tvGlass=new THREE.MeshStandardNodeMaterial({color:0x467783,roughness:.3,metalness:.45,emissive:0x2b7a8a,emissiveIntensity:0});
+  const tvRed=new THREE.MeshStandardNodeMaterial({color:0xc73128,roughness:.42,emissive:0x7d0d08,emissiveIntensity:.45});
   gold.side=roofMat.side=THREE.DoubleSide;
   const groups=[];
   const make=root=>{
@@ -54,16 +58,21 @@ export function buildCoreLandmarks(scene,landmarks,bridges=[]){
     }else if(l.type==='red-house'){
       buildRedHouse(group,l);
     }else if(l.type==='tv-tower'){
-      box(21,5,21,0,2.5,0);
+      box(21,5,21,0,2.5,0,tvStone);
       // Three tapered concrete legs merge into the shaft below the observation deck.
       for(let i=0;i<3;i++){
-        const a=i*Math.PI*2/3;beam([Math.sin(a)*13,0,Math.cos(a)*13],[Math.sin(a)*3,82,Math.cos(a)*3],2.1,stone);
+        const a=i*Math.PI*2/3;beam([Math.sin(a)*13,0,Math.cos(a)*13],[Math.sin(a)*3,82,Math.cos(a)*3],2.1,tvStone);
       }
-      cyl(3.8,5.5,132,0,70,0);
-      cyl(13.5,8.2,8,0,131,0);cyl(13,13.5,8,0,139,0,glass);cyl(6.7,13,6,0,146,0);
-      cyl(2.2,3.8,30,0,164,0);cyl(8.2,7.2,5,0,178,0);cyl(7,8.2,5,0,183,0,glass);
-      cyl(.65,2.2,30,0,202,0);cyl(.12,.65,4.2,0,219.1,0,red);
-      for(const y of [194,200,206,212])cyl(.9,.9,.8,0,y,0,red,12);
+      cyl(3.8,5.5,132,0,70,0,tvStone);
+      cyl(13.5,8.2,8,0,131,0,tvStone);cyl(13,13.5,8,0,139,0,tvGlass);cyl(6.7,13,6,0,146,0,tvStone);
+      cyl(2.2,3.8,30,0,164,0,tvStone);cyl(8.2,7.2,5,0,178,0,tvStone);cyl(7,8.2,5,0,183,0,tvGlass);
+      cyl(.65,2.2,30,0,202,0,tvStone);cyl(.12,.65,4.2,0,219.1,0,tvRed);
+      for(const y of [194,200,206,212])cyl(.9,.9,.8,0,y,0,tvRed,12);
+      group.userData.update=night=>{
+        tvStone.emissiveIntensity=night*.5;
+        tvGlass.emissiveIntensity=night*1.1;
+        tvRed.emissiveIntensity=.15+night*2.2;
+      };
     }else if(l.type==='qingchuange'){
       const w=l.w,d=l.d;box(w,1.2,d,0,.6,0);
       for(let floor=0;floor<2;floor++){
@@ -172,5 +181,11 @@ export function buildCoreLandmarks(scene,landmarks,bridges=[]){
     addPier(box,route,1,width*.55);
     finish();
   }
-  return {groups,materials:[stone,red,gold,dark,roofMat,glass,steel,bridgeRed,bridgeSteel,bridgeConcrete]};
+  const update=night=>{
+    bridgeSteel.emissiveIntensity=night*.22;
+    bridgeRed.emissiveIntensity=night*.35;
+    bridgeConcrete.emissiveIntensity=night*.06;
+    for(const g of groups)g.userData.update?.(night);
+  };
+  return {groups,materials:[stone,red,gold,dark,roofMat,glass,steel,bridgeRed,bridgeSteel,bridgeConcrete,tvStone,tvGlass,tvRed],update};
 }

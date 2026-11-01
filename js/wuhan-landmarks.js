@@ -4,12 +4,12 @@ import {createFootprintGeometry} from './footprint-buildings.js';
 
 // Simplified photo-referenced Jianghanguan exterior. Plan is OSM, detail dimensions are visual estimates.
 export function buildWuhanLandmarks(scene,landmarks){
- const stone=new THREE.MeshStandardNodeMaterial({color:0xaaa796,roughness:.88});
- const trim=new THREE.MeshStandardNodeMaterial({color:0xbfbba9,roughness:.84});
- const granite=new THREE.MeshStandardNodeMaterial({color:0x8a8b82,roughness:.95});
- const dark=new THREE.MeshStandardNodeMaterial({color:0x283a3d,roughness:.38,metalness:.25});
- const roof=new THREE.MeshStandardNodeMaterial({color:0x606c6c,metalness:.4,roughness:.68});
- const gold=new THREE.MeshStandardNodeMaterial({color:0xb0a383,metalness:.4,roughness:.55});
+ const stone=new THREE.MeshStandardNodeMaterial({color:0xaaa796,roughness:.88,emissive:0x5a4630,emissiveIntensity:0});
+ const trim=new THREE.MeshStandardNodeMaterial({color:0xbfbba9,roughness:.84,emissive:0x6b5535,emissiveIntensity:0});
+ const granite=new THREE.MeshStandardNodeMaterial({color:0x8a8b82,roughness:.95,emissive:0x3a3020,emissiveIntensity:0});
+ const dark=new THREE.MeshStandardNodeMaterial({color:0x283a3d,roughness:.38,metalness:.25,emissive:0xffc46a,emissiveIntensity:0});
+ const roof=new THREE.MeshStandardNodeMaterial({color:0x606c6c,metalness:.4,roughness:.68,emissive:0x2a3440,emissiveIntensity:0});
+ const gold=new THREE.MeshStandardNodeMaterial({color:0xb0a383,metalness:.4,roughness:.55,emissive:0xffb84d,emissiveIntensity:0});
  const clockFace=new THREE.MeshStandardNodeMaterial({color:0xddd4ac,emissive:0xc4bc91,emissiveIntensity:.12,roughness:.7});
  const groups=[];
  for(const l of landmarks){
@@ -108,5 +108,13 @@ export function buildWuhanLandmarks(scene,landmarks){
   }
   for(const [mat,geos]of buckets){const merged=mergeGeometries(geos);for(const geo of geos)geo.dispose();const m=new THREE.Mesh(merged,mat);m.castShadow=m.receiveShadow=true;g.add(m);}
  }
- return {groups,update(night){clockFace.emissiveIntensity=.12+night*.9;},materials:[stone,trim,granite,dark,roof,gold,clockFace]};
+ return {groups,update(night){
+  clockFace.emissiveIntensity=.12+night*1.0;
+  stone.emissiveIntensity=night*.2;
+  trim.emissiveIntensity=night*.25;
+  granite.emissiveIntensity=night*.1;
+  dark.emissiveIntensity=night*.45;
+  roof.emissiveIntensity=night*.12;
+  gold.emissiveIntensity=night*.7;
+ },materials:[stone,trim,granite,dark,roof,gold,clockFace]};
 }
