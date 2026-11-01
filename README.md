@@ -6,9 +6,9 @@
 
 A browser-based Wuhan city simulation, inspired by Slop New York. Walk, drive a taxi, ride a scooter or fly a helicopter around the Yangtze and Han rivers.
 
-**[原作体验](https://mrdoob.github.io/slop-newyork/)** · **[其他 Slop 城市](https://github.com/zz85/slop-cities)** · **[本地运行](#本地运行)** · **[更新记录](docs/CHANGELOG.md)**
+**[在线体验武汉](https://lightyearzh.github.io/slop-wuhan/)** · **[原作体验](https://mrdoob.github.io/slop-newyork/)** · **[其他 Slop 城市](https://github.com/zz85/slop-cities)** · **[本地运行](#本地运行)** · **[更新记录](docs/CHANGELOG.md)**
 
-> 武汉在线体验尚待 GitHub Pages 部署，目前请在本地运行。当前版本 **0.8.5**；这是可自由探索的城市漫游原型，尚未加入完整剧情、接单和计费任务。
+> 当前版本 **0.8.5**，已通过 GitHub Pages 提供在线体验；建议使用支持 WebGPU 的桌面浏览器。首次进入需要加载地图并编译着色器。这是可自由探索的城市漫游原型，尚未加入完整剧情、接单和计费任务。
 
 ![江汉关钟楼与沿江街区，0.8.5实机画面](docs/screenshots/jianghanguan.png)
 
