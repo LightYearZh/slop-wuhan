@@ -4,6 +4,8 @@
 
 ## 0.8.5 首次加载压缩
 
+2026-11-01作为首个公开体验版上线：[在线体验](https://lightyearzh.github.io/slop-wuhan/) · [源码](https://github.com/LightYearZh/slop-wuhan)。增加主分支自动部署，发布前执行敏感信息扫描、测试及构建；README补齐截图、操作与来源说明。此处指Pages上线，未另建GitHub Release或版本标签。详见[发布记录](PUBLISHING.md)。
+
 更新本地Slop New York参考库至2026-11-01拉取的最新main，移植独立压缩地图、varint编码、服务器自动解压兼容，以及后台标签页启动让步。武汉地图包约4.34 MB，生产主JavaScript从49.64 MB降至1.30 MB；本机Chrome冷缓存首次资源正文合计约4.98 MB（含HTML，使用HTTP压缩）。地理坐标、楼高和轮廓保持不变，范围、建筑、桥隧与历史立面保留。完整资料仍在源数据及审计文件中；这不是裁图或按需流式加载。详见[实现、体积口径与验收](LOADING_OPTIMIZATION.md)。
 
 ## 0.8.4 江汉路街面与历史建筑细化

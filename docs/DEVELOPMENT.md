@@ -19,7 +19,7 @@ python3 -m venv .venv
 npm run verify
 ```
 
-当前0.8.5记录为111项JavaScript测试、44项Python测试，另有空间审计及浏览器实测；这是该版本的结果，不代表未来所有变更自动通过。
+0.8.5加载优化阶段记录为111项JavaScript测试、44项Python测试，另有空间审计及浏览器实测；公开发布时新增3项安全规则测试，Python测试合计47项通过。以上是对应阶段的结果，不代表未来所有变更自动通过。
 
 ## 从已有城市数据重新打包
 
@@ -53,6 +53,8 @@ npm run verify
 - 当前武汉源码不包括完整外部参考仓库目录，它们不是本地运行的必要条件。引用和许可保存在本仓库。
 
 ## 静态发布
+
+正式体验地址：[https://lightyearzh.github.io/slop-wuhan/](https://lightyearzh.github.io/slop-wuhan/)。源码仓库：[LightYearZh/slop-wuhan](https://github.com/LightYearZh/slop-wuhan)。首个公开体验版为2026-11-01上线的0.8.5，部署与验收记录见[发布入口](PUBLISHING.md)。
 
 `npm run build`输出`dist/`，相对资源路径支持项目子目录部署。必须同时发布代码块、压缩地图资产、样式和公开数据归属文件。
 

@@ -111,6 +111,7 @@ npm run preview
 - [发布前敏感信息检查](SECURITY.md)
 - [可复用城市工作流程](docs/CITY_WORKFLOW.md)
 - [项目工作记录](docs/PROJECT_HISTORY.md)
+- [首个公开体验版与发布入口](docs/PUBLISHING.md)
 - [版本更新记录](docs/CHANGELOG.md)
 
 报告问题时，请尽量附上地点或路口、移动方式和截图，方便定位。
