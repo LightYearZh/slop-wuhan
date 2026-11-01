@@ -56,7 +56,11 @@ npm run verify
 
 `npm run build`输出`dist/`，相对资源路径支持项目子目录部署。必须同时发布代码块、压缩地图资产、样式和公开数据归属文件。
 
-GitHub Pages尚待配置。配置完成后，以实际部署地址测试初次进入、载具切换、地标传送、地图与声音，再将在线地址写回README。尚未验证前不把推测的Pages地址当作已上线体验入口。
+GitHub Pages使用仓库的 `.github/workflows/pages.yml` 自动发布：推送到 `main`，或在 Actions 中手动运行 **Deploy Wuhan to GitHub Pages**。发布前先扫描敏感信息、安装锁定依赖、运行 JavaScript 测试并构建，只上传 `dist/`。构建或扫描失败时不会部署，已有线上版本保留。
+
+仓库 Settings → Pages 的 Source 需为 **GitHub Actions**。部署使用 GitHub 自动提供的短期凭据，不需要配置个人访问令牌或上传本机 SSH 私钥。Pages 发布写权限只授予部署任务。Vite 的相对资源路径支持 `/slop-wuhan/` 项目子目录；地图包通过模块相对 URL 加载。
+
+查看 [Actions 发布记录](https://github.com/LightYearZh/slop-wuhan/actions)，确认部署成功后，再检查页面初次进入、载具切换、地标传送与地图。GitHub Pages 上的实际加载速度与本地测量不同。
 
 ## 工作记录
 
