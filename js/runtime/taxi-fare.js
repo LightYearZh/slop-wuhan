@@ -3,7 +3,8 @@ import {PersonCrowd,PersonRig} from './pedestrians.js';
 import {groundHeightAt,isTypingInField} from './city-config.js';
 import {createTaxiNetwork} from './taxi-network.js';
 import {TaxiTrip,taxiFare,TAXI_STOP} from './taxi-trip.js';
-import {projectPath} from './taxi-routing.js';
+import {projectPath,pointAt} from './taxi-routing.js';
+import {circleFootprint} from './collision-footprint.js';
 import './taxi-fare.css';
 
 const metres=n=>n>=1000?`${(n/1000).toFixed(1)} 公里`:`${Math.round(n)} 米`;
@@ -11,7 +12,26 @@ const money=n=>`¥${n.toFixed(1)}`;
 const duration=s=>`${Math.floor(s/60)}分${Math.floor(s%60).toString().padStart(2,'0')}秒`;
 const ground=(_owner,x,z)=>groundHeightAt(x,z);
 export function createTaxiService(scene,{controllers,getMap,goToStand}){
- const {router,jobs,stops}=createTaxiNetwork(),trip=new TaxiTrip();
+ const {router,dispatcher,stops,stats}=createTaxiNetwork({validStop:stopIsClear,validRoad:roadIsClear}),trip=new TaxiTrip();
+ function clearAt(p,r){return !controllers.nearColliders(p.x,p.z,r+1).some(c=>p.y+1.8>=c.minY&&p.y<=c.maxY+1.5&&circleFootprint(p.x,p.z,r,c));}
+ function roadIsClear(link){
+  // Some mapped streets intersect estimated building footprints. Require a continuous car-width
+  // corridor in the actual scene, rather than sending a random order through a drawn-but-blocked road.
+  const lane=Math.max(0,Math.min(link.w/2-1.2,1.8)),offsets=lane?[0,lane,-lane]:[0];
+  return offsets.some(lateral=>{
+   const count=Math.max(1,Math.ceil(link.len/3));
+   for(let i=0;i<=count;i++){
+    const s=link.len*i/count,p=pointAt(link,s),a=pointAt(link,s-2),b=pointAt(link,s+2),h=Math.atan2(b.x-a.x,b.z-a.z);
+    for(const offset of[-1.35,0,1.35])if(!clearAt({x:p.x+Math.sin(h)*offset-Math.cos(h)*lateral,y:p.y,z:p.z+Math.cos(h)*offset+Math.sin(h)*lateral},1))return false;
+   }
+   return true;
+  });
+ }
+ function stopIsClear(stop){
+  for(const offset of[-1.3,0,1.3])if(!clearAt({x:stop.x+Math.sin(stop.heading)*offset,y:stop.y,z:stop.z+Math.cos(stop.heading)*offset},1.05))return false;
+  for(let i=0;i<=4;i++){const t=i/4;if(!clearAt({x:stop.x+(stop.curb.x-stop.x)*t,y:stop.curb.y,z:stop.z+(stop.curb.z-stop.z)*t},.5))return false;}
+  return true;
+ }
  const root=new THREE.Group();root.name='WuhanTaxiService';scene.add(root);
  const color=0xffc61a;
  const marker=new THREE.Group();
@@ -22,24 +42,23 @@ export function createTaxiService(scene,{controllers,getMap,goToStand}){
  const ribbon=new THREE.Mesh(new THREE.BufferGeometry(),routeMaterial);root.add(ribbon);ribbon.visible=false;
  const crowd=new PersonCrowd(1,{farDistance:Infinity}),rig=new PersonRig({seed:35.4,female:true,hair:.42,scale:1,girth:1});
  crowd.meshes.forEach(m=>{m.name='TaxiPassenger';scene.add(m);});crowd.begin();crowd.end();
- let passengerPlaced=false,passengerPosition=null,lastPhase='idle',lastRevision=-1,refresh=0,routeRemaining=0,offRoute=false,lastJob=null,lastNav=null;
+ let passengerPlaced=false,passengerPosition=null,lastPhase='idle',lastRevision=-1,refresh=0,routeRemaining=0,offRoute=false,lastNav=null;
 
  const panel=document.createElement('section');panel.id='taxi-service';panel.setAttribute('aria-label','出租车接送任务');
- panel.innerHTML=`<header><h2>出租车接送</h2><span id="taxi-shift">当班 ¥0.0 · 0单</span></header><p id="taxi-status" role="status" aria-live="polite">自由漫游，随时接单</p><h3 id="taxi-place">沿着江岸，送一程</h3><p id="taxi-detail">汉口短途 · 有乘客和道路导航</p><div id="taxi-hold" hidden><span></span></div><div id="taxi-actions"><button id="taxi-primary" type="button">开始接单 <kbd>T</kbd></button><button id="taxi-secondary" type="button" hidden>取消本单</button><button id="taxi-stand" type="button" hidden>前往江汉关候客区</button></div>`;
+ panel.innerHTML=`<header><h2>出租车接送</h2><span id="taxi-shift">当班 ¥0.0 · 0单</span></header><p id="taxi-status" role="status" aria-live="polite">自由漫游，随时接单</p><h3 id="taxi-place">武汉随机接送</h3><p id="taxi-detail">两江三镇 · 按实际道路导航</p><div id="taxi-hold" hidden><span></span></div><div id="taxi-actions"><button id="taxi-primary" type="button">开始接单 <kbd>T</kbd></button><button id="taxi-secondary" type="button" hidden>取消本单</button><button id="taxi-stand" type="button" hidden>前往附近候客路段</button></div>`;
  document.body.append(panel);
  const status=panel.querySelector('#taxi-status'),place=panel.querySelector('#taxi-place'),detail=panel.querySelector('#taxi-detail'),primary=panel.querySelector('#taxi-primary'),secondary=panel.querySelector('#taxi-secondary'),stand=panel.querySelector('#taxi-stand'),hold=panel.querySelector('#taxi-hold');
- let needsStand=false;
+ let needsStand=false,standStop=null;
  function offer(){
   if(controllers.activeMode!=='car')return;
   const car=controllers.getActiveEntity();
-  const choices=jobs.map(job=>({job,path:router.route(car.position,job.pickup)})).filter(o=>o.path&&o.path.length<2500).sort((a,b)=>a.path.length-b.path.length);
-  const candidate=choices.find(o=>o.job.id!==lastJob)||choices[0];
-  if(!candidate){trip.cancel('请先到汉口沿江大道候客区');needsStand=true;render();return;}
-  needsStand=false;lastJob=candidate.job.id;trip.offer(candidate.job,candidate.path);refresh=0;render();
+  const candidate=dispatcher.offer(car.position);
+  if(!candidate){trip.cancel('当前路段没有可达的接送点，请换一条道路再试');standStop=dispatcher.nearestStop(car.position);needsStand=!!standStop;render();return;}
+  needsStand=false;standStop=null;trip.offer(candidate.job,candidate.path);refresh=0;render();
  }
  primary.onclick=()=>{if(trip.phase==='offer')trip.accept();else if(trip.phase==='idle'||trip.phase==='complete')offer();render();};
  secondary.onclick=()=>{trip.cancel('已结束接送，可以继续自由漫游');needsStand=false;render();};
- stand.onclick=()=>{trip.cancel();goToStand(stops[0]);needsStand=false;render();};
+ stand.onclick=()=>{if(!standStop)return;trip.cancel();goToStand(standStop);needsStand=false;standStop=null;render();};
  const onKey=e=>{if(e.code==='KeyT'&&!e.repeat&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&!isTypingInField(e)&&controllers.activeMode==='car'){e.preventDefault();if(!primary.hidden)primary.click();}};
  window.addEventListener('keydown',onKey);
  function render(){
@@ -47,9 +66,9 @@ export function createTaxiService(scene,{controllers,getMap,goToStand}){
   panel.querySelector('#taxi-shift').textContent=`当班 ${money(trip.earned)} · ${trip.completed}单`;
   primary.hidden=trip.active;secondary.hidden=trip.phase==='idle';stand.hidden=!needsStand;
   if(trip.phase==='idle'){
-   status.textContent=trip.message;place.textContent='沿着江岸，送一程';detail.textContent='汉口短途 · 有乘客和道路导航';primary.textContent='开始接单  T';
+   status.textContent=trip.message;place.textContent='武汉随机接送';detail.textContent='两江三镇 · 按实际道路导航';primary.textContent='开始接单  T';
   }else if(trip.phase==='offer'){
-   status.textContent=`短途订单 · ${trip.job.passenger}`;place.textContent=trip.job.pickup.name;detail.textContent=`送往 ${trip.job.drop.name} · ${metres(trip.job.trip.length)} · 约${Math.ceil(trip.job.trip.length/8/60)}分钟 · 预计${money(taxiFare(trip.job.trip.length,trip.job.trip.length/8))}`;primary.textContent='接这一单  T';
+   status.textContent=`随机订单 · ${trip.job.passenger}`;place.textContent=trip.job.pickup.name;detail.textContent=`接客 ${metres(trip.route.length)} · 送往 ${trip.job.drop.name} · 行程 ${metres(trip.job.trip.length)} · 约${Math.ceil(trip.job.trip.length/8/60)}分钟 · 预计${money(taxiFare(trip.job.trip.length,trip.job.trip.length/8))}`;primary.textContent='接这一单  T';
   }else if(trip.phase==='pickup'||trip.phase==='ride'){
    const pickup=trip.phase==='pickup';status.textContent=pickup?`去接 ${trip.job.passenger}`:`乘客在车上 · 已行驶${metres(trip.distance)}`;place.textContent=trip.target.name;
    detail.textContent=offRoute?'已偏离推荐路线，正在重新规划':`${metres(routeRemaining)} · ${routeRemaining<12?'停稳约2秒即可'+(pickup?'接客':'送达'):'跟随地图与路面导航'}${pickup?'':` · 已用时${duration(trip.seconds)}`}`;
@@ -104,5 +123,5 @@ export function createTaxiService(scene,{controllers,getMap,goToStand}){
   updatePassenger(dt);tip.position.y=4+Math.sin(elapsed*2)*.12;
  }
  render();
- return{update,cancelForTravel:message=>{if(trip.active||trip.phase==='offer')trip.cancel(message);},get state(){return{phase:trip.phase,job:trip.job,route:trip.route,result:trip.result,hold:trip.hold,events:trip.events,earned:trip.earned,completed:trip.completed};},get network(){return{jobs,stops};}};
+ return{update,cancelForTravel:message=>{if(trip.active||trip.phase==='offer')trip.cancel(message);},get state(){return{phase:trip.phase,job:trip.job,route:trip.route,result:trip.result,hold:trip.hold,events:trip.events,earned:trip.earned,completed:trip.completed};},get network(){return{stops,stats};}};
 }

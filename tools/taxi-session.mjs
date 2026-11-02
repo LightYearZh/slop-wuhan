@@ -10,7 +10,9 @@ const modulePath=opt('--playwright',null);
 const {chromium}=await import(modulePath?pathToFileURL(modulePath).href:'playwright');
 const verify=args.includes('--verify'),browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-unsafe-webgpu','--use-angle=metal','--ignore-gpu-blocklist']});
 try{
- const page=await browser.newPage({viewport:{width:1920,height:1080},deviceScaleFactor:1});page.setDefaultTimeout(240000);const errors=[];page.on('pageerror',e=>errors.push(String(e)));
+ const page=await browser.newPage({viewport:{width:1920,height:1080},deviceScaleFactor:1});
+ if(args.includes('--seed'))await page.addInitScript(seed=>{Math.random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);},Number(opt('--seed','1')));
+ page.setDefaultTimeout(240000);const errors=[];page.on('pageerror',e=>errors.push(String(e)));
  await page.route('**/js/runtime/main.js*',async route=>{
   const response=await route.fetch(),marker='  renderer.setAnimationLoop((now) => {';let body=await response.text();if(!body.includes(marker))throw Error('Animation entry changed');
   body=body.replace(marker,`  const captureLoop=renderer.setAnimationLoop.bind(renderer);
@@ -25,7 +27,7 @@ try{
    const w=window.wuhan,c=w.controllers,e=c.getActiveEntity(),s=w.taxi.state;c.resetInput();
    if(!['pickup','ride'].includes(s.phase)||!s.route)return;
    const points=s.route.points;let best=null,along=0,total=0;for(let i=1;i<points.length;i++)total+=Math.hypot(points[i].x-points[i-1].x,points[i].z-points[i-1].z);
-   for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz);if(len<.001)continue;const u=Math.max(0,Math.min(1,((e.position.x-a.x)*dx+(e.position.z-a.z)*dz)/(len*len))),x=a.x+dx*u,z=a.z+dz*u,d=Math.hypot(x-e.position.x,z-e.position.z);if(!best||d<best.d)best={i,u,len,d,remaining:total-along-u*len};along+=len;}
+   for(let i=1;i<points.length;i++){const a=points[i-1],b=points[i],dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz);if(len<.001)continue;const u=Math.max(0,Math.min(1,((e.position.x-a.x)*dx+(e.position.z-a.z)*dz)/(len*len))),x=a.x+dx*u,z=a.z+dz*u,d=Math.hypot(x-e.position.x,z-e.position.z);if(Math.abs(e.position.y-(a.y+(b.y-a.y)*u))>4){along+=len;continue;}if(!best||d<best.d)best={i,u,len,d,remaining:total-along-u*len};along+=len;}
    if(!best)return;
    let j=best.i,station=best.u*best.len+8+Math.abs(e.speed)*.6;
    while(j<points.length-1){const len=Math.hypot(points[j].x-points[j-1].x,points[j].z-points[j-1].z);if(station<=len)break;station-=len;j++;}
@@ -39,10 +41,10 @@ try{
   };
  });
  const reports=[];
- for(let attempt=0;attempt<(verify?3:1);attempt++){
+ for(let attempt=0;attempt<Number(opt('--trips',verify?'3':'1'));attempt++){
   await page.evaluate(async index=>{
    const w=window.wuhan;if(w.taxi.state.phase!=='idle')document.getElementById('taxi-secondary').click();
-   const stop=w.taxi.network.jobs[index].pickup,c=w.controllers;w.setMode('car');c.teleportActiveTo(stop.x-Math.sin(stop.heading)*45,stop.z-Math.cos(stop.heading)*45,stop.heading,stop.y);w.setView('chase');w.cameraSystem.zoomMultiplier=1.2;
+   const town=['汉口','武昌','汉阳'][index%3],stop=w.taxi.network.stops.find(s=>s.name.startsWith(town+' · ')),c=w.controllers;if(!stop)throw Error('No roadside stop in '+town);w.setMode('car');c.teleportActiveTo(stop.x,stop.z,stop.heading,stop.y);w.setView('chase');w.cameraSystem.zoomMultiplier=1.2;
    for(let i=0;i<60;i++)await w.video.step();
   },attempt);
   if(attempt===0){
@@ -51,14 +53,14 @@ try{
   let encoder,done,frames=0;
   if(!verify){encoder=spawn('ffmpeg',['-hide_banner','-loglevel','error','-y','-f','image2pipe','-framerate','30','-vcodec','mjpeg','-i','pipe:0','-an','-c:v','libx264','-threads','2','-preset','fast','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',path.join(out,'TX01_完整接单到送达.mp4')],{stdio:['pipe','ignore','inherit']});done=once(encoder,'close');}
   const trace=[],events=[];let lastPhase=null,finishedHold=0;
-  for(let i=0;i<30*300;i++){
+  for(let i=0;i<30*Number(opt('--max-seconds','3600'));i++){
    if(i===30)await page.locator('#taxi-primary').click();
    if(i===90)await page.locator('#taxi-primary').click();
    const state=await page.evaluate(async simulate=>{
     window.__taxiDrive();const w=window.wuhan;await(simulate?w.video.simulate():w.video.step());const s=w.taxi.state,e=w.controllers.getActiveEntity();
-    return{phase:s.phase,job:s.job?.id,position:e.position.toArray(),speed:e.speed,hold:s.hold,result:s.result,routePoints:s.route?.points.length,passengerMeshes:w.scene.children.filter(o=>o.name==='TaxiPassenger').map(o=>o.count),errors:w.metrics().errors};
+    return{phase:s.phase,job:s.job?.id,position:e.position.toArray(),speed:e.speed,heading:e.heading,hold:s.hold,result:s.result,routePoints:s.route?.points.length,passengerMeshes:w.scene.children.filter(o=>o.name==='TaxiPassenger').map(o=>o.count),errors:w.metrics().errors};
    },verify);
-   if(i%30===0)trace.push({t:i/30,...state});
+   if(i%30===0){trace.push({t:i/30,...state});const recent=trace.slice(-90);if(recent.length===90&&['pickup','ride'].includes(state.phase)&&recent.every(s=>s.phase===state.phase&&Math.hypot(s.position[0]-state.position[0],s.position[2]-state.position[2])<.7)){await page.evaluate(()=>wuhan.video.step());await page.screenshot({path:path.join(out,'stalled.png')});await fs.writeFile(path.join(out,'stalled-trace.json'),JSON.stringify({trace,job:await page.evaluate(()=>wuhan.taxi.state.job)},null,2));throw Error('Test driver stalled for 90 seconds: '+JSON.stringify(state));}}
    if(state.phase!==lastPhase){console.log('Trip',attempt+1,'at',i/30,'seconds:',state.phase);events.push({t:i/30,phase:state.phase});lastPhase=state.phase;if(verify)await page.evaluate(()=>wuhan.video.step());await page.screenshot({path:path.join(out,`trip${attempt+1}-${state.phase}.png`)});}
    if(!verify){const buffer=await page.screenshot({type:'jpeg',quality:94});if(!encoder.stdin.write(buffer))await once(encoder.stdin,'drain');frames++;}
    if(state.phase==='complete'){finishedHold++;if(finishedHold>=90)break;}
@@ -66,7 +68,7 @@ try{
    if(i&&i%600===0)console.log('Progress',attempt+1,i/30,'seconds',JSON.stringify({p:state.position,speed:state.speed,phase:state.phase}));
   }
   if(encoder){encoder.stdin.end();const [code]=await done;if(code!==0)throw Error('Encoding failed');}
-  const result=await page.evaluate(()=>wuhan.taxi.state);if(result.phase!=='complete')throw Error('Trip did not complete: '+JSON.stringify(trace.at(-1)));
+  const result=await page.evaluate(()=>wuhan.taxi.state);if(result.phase!=='complete'){await fs.writeFile(path.join(out,'incomplete-trace.json'),JSON.stringify(trace,null,2));throw Error('Trip did not complete: '+JSON.stringify(trace.at(-1)));}
   if(errors.length)throw Error(errors.join('\n'));
   const report={job:result.job.id,events,trace,result:result.result,frames,seconds:frames/30,errors,method:'Normal start/accept controls and steering/throttle/brake input; no forced transitions or in-trip teleports; gameplay physics and traffic retained.'};
   reports.push(report);await fs.writeFile(path.join(out,'trip-'+(attempt+1)+'.json'),JSON.stringify(report,null,2));

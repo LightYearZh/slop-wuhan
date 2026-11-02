@@ -31,6 +31,17 @@ export class TaxiRoadRouter{
    }
   }return best;
  }
+ // Directional reachability, including partial positions on the same one-way edge.
+ reachable(from){
+  const start=from.link?from:this.snap(from);if(!start)return()=>false;
+  const seen=new Set(),stack=[];
+  if(start.link.oneway>=0)stack.push(start.link.b);
+  if(start.link.oneway<=0)stack.push(start.link.a);
+  while(stack.length){const id=stack.pop();if(seen.has(id))continue;seen.add(id);for(const e of this.adj[id])if(!seen.has(e.to))stack.push(e.to);}
+  return stop=>!!stop&&(
+   (stop.link===start.link&&((stop.s>=start.s&&start.link.oneway>=0)||(stop.s<=start.s&&start.link.oneway<=0)))||
+   (stop.link.oneway>=0&&seen.has(stop.link.a))||(stop.link.oneway<=0&&seen.has(stop.link.b)));
+ }
  route(from,to){
   const a=from.link?from:this.snap(from),b=to.link?to:this.snap(to);if(!a||!b)return null;
   const S=this.nodes.length,T=S+1,dist=new Map([[S,0]]),prev=new Map(),closed=new Set(),heap=[];
@@ -55,7 +66,13 @@ export class TaxiRoadRouter{
  stop(name,anchor){
   const snap=this.snap(anchor,110,l=>l.name==='沿江大道'&&l.oneway!==0&&pointAt(l,l.len).z<pointAt(l,0).z);
   if(!snap)return null;
-  const right={x:-Math.cos(snap.heading),z:Math.sin(snap.heading)},lane=Math.max(0,snap.link.w/2-1.65),kerb=snap.link.w/2+1.2;
-  return{name,...snap,x:snap.x+right.x*lane,z:snap.z+right.z*lane,curb:{x:snap.x+right.x*kerb,y:snap.y,z:snap.z+right.z*kerb}};
+  return this.stopAt(name,snap.link,snap.s,snap.link.oneway<0?-1:1);
+ }
+ stopAt(name,link,s,direction=1){
+  if(!this.links.includes(link)||s<0||s>link.len||(link.oneway&&direction!==link.oneway))return null;
+  const p=pointAt(link,s),a=pointAt(link,Math.max(0,s-2)),b=pointAt(link,Math.min(link.len,s+2));
+  const heading=Math.atan2(b.x-a.x,b.z-a.z)+(direction<0?Math.PI:0);
+  const right={x:-Math.cos(heading),z:Math.sin(heading)},lane=Math.max(0,link.w/2-1.65),kerb=link.w/2+1.2;
+  return{name,...p,link,s,direction,heading,x:p.x+right.x*lane,z:p.z+right.z*lane,curb:{x:p.x+right.x*kerb,y:p.y,z:p.z+right.z*kerb}};
  }
 }

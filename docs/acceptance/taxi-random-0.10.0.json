@@ -1,0 +1,74 @@
+{
+  "version": "0.10.0",
+  "date": "2026-11-02",
+  "unitTests": 121,
+  "productionBuild": "PASS",
+  "security": "current secrets, history secrets, private paths: zero findings",
+  "browser": {
+    "orders": 60,
+    "stats": {
+      "motorLinks": 6682,
+      "tunnelLinks": 2,
+      "stops": 3175
+    },
+    "longestPlannedMetres": 20851.09994118367,
+    "largestOfferMs": 10.799999952316284,
+    "tripsViaTunnel": 20,
+    "tripsViaYangtzeBridge": 16,
+    "accepted": {
+      "phase": "pickup",
+      "nav": true,
+      "points": 38
+    },
+    "errors": []
+  },
+  "driving": {
+    "job": "wuhan-1",
+    "result": {
+      "fare": 49.9,
+      "distance": 16593.595863048617,
+      "seconds": 1500.7333333338217,
+      "from": "汉口 · 集贤二路路边",
+      "to": "武昌 · 文明路路边"
+    },
+    "phaseTransitions": [
+      {
+        "t": 0,
+        "phase": "idle"
+      },
+      {
+        "t": 1,
+        "phase": "offer"
+      },
+      {
+        "t": 3,
+        "phase": "pickup"
+      },
+      {
+        "t": 69.8,
+        "phase": "boarding"
+      },
+      {
+        "t": 71.8,
+        "phase": "ride"
+      },
+      {
+        "t": 1572.5,
+        "phase": "alighting"
+      },
+      {
+        "t": 1574.5,
+        "phase": "complete"
+      }
+    ],
+    "lowestElevation": -28.000000000000004,
+    "errors": [],
+    "method": "Normal start/accept controls and steering/throttle/brake input; no forced transitions or in-trip teleports; gameplay physics and traffic retained.",
+    "seed": 20261102
+  },
+  "localArtifacts": [
+    "output/taxi-random/browser-audit.json",
+    "output/taxi-random-drive/verification.json"
+  ],
+  "limits": "Sampled connected-road and collision validation, not exhaustive full-physics driving of every random pair."
+}

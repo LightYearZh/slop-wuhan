@@ -5,7 +5,7 @@ export class TaxiTrip{
  constructor(){this.phase='idle';this.job=null;this.route=null;this.distance=0;this.seconds=0;this.hold=0;this.animation=0;this.earned=0;this.completed=0;this.result=null;this.last=null;this.events=[];this.revision=0;this.message='自由漫游，随时开始接送';}
  get active(){return ['pickup','boarding','ride','alighting'].includes(this.phase);}
  get target(){return this.phase==='pickup'||this.phase==='boarding'?this.job?.pickup:this.phase==='ride'||this.phase==='alighting'?this.job?.drop:null;}
- offer(job,approach){this.job=job;this.route=approach;this.phase='offer';this.result=null;this.message='一单汉口短途，沿途看看江岸';this.last=null;this.revision++;}
+ offer(job,approach){this.job=job;this.route=approach;this.phase='offer';this.result=null;this.message='新订单，沿道路去接乘客';this.last=null;this.revision++;}
  accept(){if(this.phase!=='offer')return false;this.phase='pickup';this.last=null;this.distance=this.seconds=this.hold=0;this.events.push({type:'accepted'});this.revision++;return true;}
  cancel(message='已取消，本单不计费'){if(this.phase==='idle'){this.message=message;this.revision++;return;}this.phase='idle';this.job=null;this.route=null;this.last=null;this.hold=0;this.message=message;this.revision++;this.events.push({type:'cancelled',message});}
  update(dt,entity,{mode='car',paused=false}={}){
